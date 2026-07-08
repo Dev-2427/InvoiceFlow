@@ -1,0 +1,29 @@
+import express from "express"
+import { env } from "./config/env.js"
+import cors from "cors"
+import helmet from "helmet"
+import morgan from "morgan"
+import cookieParser from "cookie-parser";
+import { getDBStatus } from "./config/database.js";
+
+const app = express()
+
+app.use(helmet())
+app.use(morgan("common"))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
+app.use(cors({
+    credentials: true,
+    origin: env.NODE_ENV === "development" ? "http://localhost:5173" : env.CLIENT_URL,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+}))
+
+app.get("/health", (_, res) => {
+    const connected = getDBStatus()
+    return res
+        .status(connected ? 200 : 500)
+        .json({ success: connected, message: connected ? "Connected" : "Failed" })
+})
+
+export default app
