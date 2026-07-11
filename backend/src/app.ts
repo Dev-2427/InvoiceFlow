@@ -5,6 +5,7 @@ import helmet from "helmet"
 import morgan from "morgan"
 import cookieParser from "cookie-parser";
 import { getDBStatus } from "./config/database.js";
+import authRouter from "./routes/auth.route.js"
 
 const app = express()
 
@@ -25,5 +26,7 @@ app.get("/health", (_, res) => {
         .status(connected ? 200 : 500)
         .json({ success: connected, message: connected ? "Connected" : "Failed" })
 })
+
+app.use("/api/auth", authRouter)
 
 export default app

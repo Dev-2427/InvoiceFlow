@@ -9,5 +9,9 @@ export const env = {
 
     CLIENT_URL: process.env.CLIENT_URL,
 
-    MONGODB_URI: process.env.MONGODB_URI
+    MONGODB_URI: process.env.MONGODB_URI,
+
+    EMAIL_USER: process.env.EMAIL_USER,
+
+    EMAIL_PASS: process.env.EMAIL_Pass,
 }
