@@ -7,6 +7,7 @@ import verificationTemplate from "../services/email/templates/verification.js"
 import { generateAccessToken, generateRefreshToken, cookieOptions } from "../services/auth.service.js"
 import RefreshToken from "../models/RefreshToken.js"
 import { UAParser } from "ua-parser-js"
+import Organization from "../models/Organization.js";
 
 async function signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, country } = req.body
@@ -130,4 +131,76 @@ async function verifyCode(req: Request, res: Response) {
     }
 }
 
-export { signup, verifyCode }
+async function signin(req: Request, res: Response) {
+    const { email, password } = req.body
+
+    try {
+        const user = await User.findOne({ email }).lean()
+
+        if (!user) {
+            return sendResponse(res, { status: 401, message: "Invalid credentials" })
+        }
+
+        if (user.authProviders.google && !user.authProviders.credentials) {
+            return sendResponse(res, { status: 409, message: "This account is linked with google. Please sign in with google." })
+        }
+
+        if (!user.isVerified) {
+            return sendResponse(res, { status: 403, message: "Please verify your email address before signing in" })
+        }
+
+        const correctPassword = await bcrypt.compare(password, user.password!)
+
+        if (!correctPassword) {
+            return sendResponse(res, { status: 401, message: "Invalid credentials" })
+        }
+
+        const activeSessions = await RefreshToken.find({ user: user._id }).sort({ lastUsedAt: 1 })
+
+        if (activeSessions.length >= 3) {
+            await activeSessions[0]?.deleteOne()
+        }
+
+        const parser = new UAParser(req.headers["user-agent"])
+        const result = parser.getResult()
+
+        const accessToken = generateAccessToken(user._id.toString())
+        const refreshToken = generateRefreshToken(user._id.toString())
+
+        await RefreshToken.create({
+            user: user._id,
+            token: refreshToken,
+            deviceName: result.browser.name && result.os.name ? `${result.browser.name} on ${result.os.name}` : "unknown device",
+            browser: result.browser.name ?? "unknown",
+            os: result.os.name || "unknown",
+            ipAddress: req.ip || "unknown",
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        })
+
+        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
+        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
+
+        await User.populate(user, {
+            path: "currentOrg",
+            select: "organizationName currency logo.url"
+        })
+
+        const userData = {
+            id: user._id.toString(),
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            avatar: user.avatar.url,
+            country: user.country,
+            authProviders: user.authProviders,
+            currentOrganization: user.currentOrg,
+        }
+
+        return sendResponse(res, { status: 200, message: "Signed in successfully", data: { userData } })
+    } catch (error) {
+        console.error("Failed to sign in:", error)
+        return sendResponse(res, { status: 500, message: "Failed to sign in" })
+    }
+}
+
+export { signup, verifyCode, signin }

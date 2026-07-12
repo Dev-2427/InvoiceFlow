@@ -16,6 +16,11 @@ export const signupSchema = z.object({
     country: z.string().trim().optional().nullable()
 })
 
+export const signinSchema = z.object({
+    email,
+    password
+})
+
 export const verifyCodeSchema = z.object({
     userId,
     verificationCode
