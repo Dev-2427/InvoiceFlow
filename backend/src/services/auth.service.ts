@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import { env } from "../config/env.js"
-import type { CookieOptions } from "express"
+import type { CookieOptions, Response } from "express"
 
 export function generateAccessToken(userId: string) {
     return jwt.sign(
@@ -19,4 +19,9 @@ export const cookieOptions: CookieOptions = {
     httpOnly: true,
     sameSite: env.NODE_ENV === "production" ? "none" : "lax",
     secure: env.NODE_ENV === "production"
-} 
+}
+
+export function clearAllCookies(res: Response) {
+    res.clearCookie("accessToken", { ...cookieOptions })
+    res.clearCookie("refreshToken", { ...cookieOptions })
+}

@@ -4,10 +4,11 @@ import User from "../models/User.js"
 import bcrypt from "bcrypt"
 import sendEmail from "../services/email/sendEmail.js"
 import verificationTemplate from "../services/email/templates/verification.js"
-import { generateAccessToken, generateRefreshToken, cookieOptions } from "../services/auth.service.js"
+import { generateAccessToken, generateRefreshToken, cookieOptions, clearAllCookies } from "../services/auth.service.js"
 import RefreshToken from "../models/RefreshToken.js"
 import { UAParser } from "ua-parser-js"
-import Organization from "../models/Organization.js";
+import jwt from "jsonwebtoken"
+import { env } from "../config/env.js"
 
 async function signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, country } = req.body
@@ -203,4 +204,61 @@ async function signin(req: Request, res: Response) {
     }
 }
 
-export { signup, verifyCode, signin }
+async function refreshToken(req: Request, res: Response) {
+    const refreshToken = req.cookies.refreshToken
+
+    try {
+        if (!refreshToken) {
+            return sendResponse(res, { status: 401, message: "Refresh token not found" })
+        }
+
+        const decodedToken = jwt.verify(refreshToken, env.REFRESH_TOKEN_SECRET!) as { userId: string }
+
+        const refreshTokenInDB = await RefreshToken.findOne({ token: refreshToken })
+
+        if (!refreshTokenInDB) {
+            clearAllCookies(res)
+            return sendResponse(res, { status: 401, message: "Invalid refresh token" })
+        }
+
+        if (decodedToken.userId !== refreshTokenInDB.user.toString()) {
+            clearAllCookies(res)
+            return sendResponse(res, { status: 401, message: "Invalid refresh token" })
+        }
+
+        const parser = new UAParser(req.headers["user-agent"])
+        const result = parser.getResult()
+
+        const newAccessToken = generateAccessToken(refreshTokenInDB.user.toString())
+        const newRefreshToken = generateRefreshToken(refreshTokenInDB.user.toString())
+
+        refreshTokenInDB.token = newRefreshToken
+        refreshTokenInDB.deviceName = result.browser.name && result.os.name ? `${result.browser.name} on ${result.os.name}` : "unknown device"
+        refreshTokenInDB.browser = result.browser.name || "unknown"
+        refreshTokenInDB.os = result.os.name || "unknown"
+        refreshTokenInDB.ipAddress = req.ip || "unknown"
+        refreshTokenInDB.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        refreshTokenInDB.lastUsedAt = new Date()
+
+        await refreshTokenInDB.save()
+
+        res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
+        res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
+
+        return sendResponse(res, { status: 200, message: "Refresh token updated successfully" })
+
+    } catch (error) {
+        console.error("Failed to update refresh token:", error)
+
+        clearAllCookies(res)
+        await RefreshToken.deleteOne({ token: refreshToken })
+
+        if (error instanceof jwt.TokenExpiredError || error instanceof jwt.JsonWebTokenError) {
+            return sendResponse(res, { status: 401, message: "Invalid or expired refresh token" })
+        }
+
+        return sendResponse(res, { status: 500, message: "Failed to update refresh token" })
+    }
+}
+
+export { signup, verifyCode, signin, refreshToken }
