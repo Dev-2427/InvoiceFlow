@@ -9,6 +9,7 @@ import RefreshToken from "../models/RefreshToken.js"
 import { UAParser } from "ua-parser-js"
 import jwt from "jsonwebtoken"
 import { env } from "../config/env.js"
+import Organization from "../models/Organization.js"
 
 async function signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, country } = req.body
@@ -288,4 +289,26 @@ async function signout(req: Request, res: Response) {
     }
 }
 
-export { signup, verifyCode, signin, refreshToken, signout }
+async function signoutAllDevices(req: Request, res: Response) {
+    const userId = req.user?.userId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        await RefreshToken.deleteMany({ user: userId })
+
+        clearAllCookies(res)
+
+        return sendResponse(res, { status: 200, message: "Successfully signed out from all devices" })
+
+    } catch (error) {
+        console.error("Failed to sign out all devices:", error)
+        return sendResponse(res, { status: 500, message: "Failed to sign out all devices" })
+    }
+
+
+}
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices }
