@@ -441,5 +441,57 @@ async function resetPassword(req: Request, res: Response) {
     }
 }
 
+async function changePassword(req: Request, res: Response) {
+    const { oldPassword, newPassword } = req.body
+    const userId = req.user?.userId
 
-export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword }
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const user = await User.findById(userId)
+
+        if (!user) {
+            return sendResponse(res, { status: 404, message: "User not found" })
+        }
+
+        if (!user.isVerified) {
+            return sendResponse(res, { status: 403, message: "Account isn't verified. Please complete the sign up process." })
+        }
+
+        if (!user.authProviders.credentials) {
+            return sendResponse(res, { status: 403, message: "This account was created with Google. Please sign in with Google." })
+        }
+
+        const correctPassword = await bcrypt.compare(oldPassword, user.password!)
+
+        if (!correctPassword) {
+            return sendResponse(res, { status: 401, message: "Invalid credentials" })
+        }
+
+        const samePassword = await bcrypt.compare(newPassword, user.password!)
+
+        if (samePassword) {
+            return sendResponse(res, { status: 400, message: "New password must be different from your current password" })
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+        user.password = hashedPassword
+        await user.save()
+
+        await RefreshToken.deleteMany({ user: userId })
+
+        clearAllCookies(res)
+
+        return sendResponse(res, { status: 200, message: "Password changed successfully" })
+
+    } catch (error) {
+        console.error("Error changing password:", error)
+        return sendResponse(res, { status: 500, message: "Failed to change password" })
+    }
+}
+
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword }

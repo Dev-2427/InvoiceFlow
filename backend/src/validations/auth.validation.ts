@@ -33,3 +33,8 @@ export const forgotPasswordSchema = z.object({
 export const passwordSchema = z.object({
     password
 })
+
+export const changePasswordSchema = z.object({
+    oldPassword: password,
+    newPassword: password
+})
