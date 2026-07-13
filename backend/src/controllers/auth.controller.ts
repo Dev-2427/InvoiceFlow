@@ -261,4 +261,31 @@ async function refreshToken(req: Request, res: Response) {
     }
 }
 
-export { signup, verifyCode, signin, refreshToken }
+async function signout(req: Request, res: Response) {
+    const userId = req.user?.userId
+    const refreshToken = req.cookies.refreshToken
+
+    if (!refreshToken || !userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const deleteRefreshToken = await RefreshToken.deleteOne({
+            token: refreshToken,
+            user: userId
+        })
+
+        clearAllCookies(res)
+
+        if (deleteRefreshToken.deletedCount === 0) {
+            return sendResponse(res, { status: 401, message: "Token not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Logged out successfully" })
+    } catch (error) {
+        console.error("Error on logout:", error)
+        return sendResponse(res, { status: 500, message: "Log out failed" })
+    }
+}
+
+export { signup, verifyCode, signin, refreshToken, signout }
