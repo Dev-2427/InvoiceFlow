@@ -25,3 +25,11 @@ export const verifyCodeSchema = z.object({
     userId,
     verificationCode
 })
+
+export const forgotPasswordSchema = z.object({
+    email
+})
+
+export const passwordSchema = z.object({
+    password
+})

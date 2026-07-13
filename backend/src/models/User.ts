@@ -18,7 +18,9 @@ interface IUser {
     currentOrg: Types.ObjectId | null,
     isVerified: boolean,
     verificationCode: string | null,
-    verificationCodeExpiresAt: Date | null
+    verificationCodeExpiresAt: Date | null,
+    passwordResetCode: string | null,
+    passwordResetCodeExpiresAt: Date | null,
 }
 
 const userSchema = new Schema<IUser>({
@@ -93,6 +95,15 @@ const userSchema = new Schema<IUser>({
         default: null
     },
     verificationCodeExpiresAt: {
+        type: Date,
+        default: null
+    },
+    passwordResetCode: {
+        type: String,
+        match: [/^\d{6}$/, "Password reset code must contain exactly 6 digits"],
+        default: null
+    },
+    passwordResetCodeExpiresAt: {
         type: Date,
         default: null
     }

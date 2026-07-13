@@ -1,7 +1,7 @@
 import { Router } from "express";
 import validate from "../middleware/validate.js";
-import { signinSchema, signupSchema, verifyCodeSchema } from "../validations/auth.validation.js";
-import { refreshToken, signin, signout, signoutAllDevices, signup, verifyCode } from "../controllers/auth.controller.js";
+import { forgotPasswordSchema, passwordSchema, signinSchema, signupSchema, verifyCodeSchema } from "../validations/auth.validation.js";
+import { forgotPassword, refreshToken, resetPassword, signin, signout, signoutAllDevices, signup, verifyCode, verifyResetCode } from "../controllers/auth.controller.js";
 import authCheck from "../middleware/authCheck.js";
 
 const route = Router()
@@ -12,5 +12,8 @@ route.post("/signin", validate(signinSchema), signin)
 route.post("/refreshToken", refreshToken)
 route.post("/signout", authCheck, signout)
 route.post("/signout-all", authCheck, signoutAllDevices)
+route.post("/forgotPassword", validate(forgotPasswordSchema), forgotPassword)
+route.post("/verifyResetCode", validate(verifyCodeSchema), verifyResetCode)
+route.post("/resetPassword", validate(passwordSchema), resetPassword)
 
 export default route

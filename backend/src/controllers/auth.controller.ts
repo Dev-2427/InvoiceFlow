@@ -10,6 +10,7 @@ import { UAParser } from "ua-parser-js"
 import jwt from "jsonwebtoken"
 import { env } from "../config/env.js"
 import Organization from "../models/Organization.js"
+import forgotPasswordVerificationTemplate from "../services/email/templates/forgotPasswordVerification.js"
 
 async function signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, country } = req.body
@@ -311,4 +312,134 @@ async function signoutAllDevices(req: Request, res: Response) {
 
 }
 
-export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices }
+async function forgotPassword(req: Request, res: Response) {
+    const { email } = req.body
+
+    try {
+        const user = await User.findOne({ email })
+
+        if (!user) {
+            return sendResponse(res, { status: 404, message: "Invalid email" })
+        }
+
+        if (!user.isVerified) {
+            return sendResponse(res, { status: 403, message: "Account isn't verified. Please complete the sign up process." })
+        }
+
+        if (!user.authProviders.credentials) {
+            return sendResponse(res, { status: 403, message: "This account was created with google. Please use google sign in" })
+        }
+
+        const passwordResetCode = Math.floor(100000 + Math.random() * 900000).toString()
+        const passwordResetCodeExpiresAt = new Date(Date.now() + 10 * 60 * 1000)
+
+        user.passwordResetCode = passwordResetCode
+        user.passwordResetCodeExpiresAt = passwordResetCodeExpiresAt
+        await user.save()
+
+        try {
+            await sendEmail({ to: email, subject: "Password reset verification code", html: forgotPasswordVerificationTemplate(user.firstName, passwordResetCode) })
+        } catch (error) {
+            console.error("Failed to send password reset email:", error)
+            return sendResponse(res, { status: 500, message: "Failed to send password reset verification email" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Password reset code sent successfully", data: { userId: user._id } })
+
+    } catch (error) {
+        console.error("Failed to process forgot password request", error)
+        return sendResponse(res, { status: 500, message: "Failed to process forgot password request" })
+    }
+}
+
+async function verifyResetCode(req: Request, res: Response) {
+    const { userId, verificationCode } = req.body
+
+    try {
+        const user = await User.findById(userId)
+
+        if (!user) {
+            return sendResponse(res, { status: 404, message: "User not found" })
+        }
+
+        if (!user.isVerified) {
+            return sendResponse(res, { status: 403, message: "Account isn't verified. Please complete the sign up process." })
+        }
+
+        if (!user.authProviders.credentials) {
+            return sendResponse(res, { status: 403, message: "This account was created with google. Please use google sign in" })
+        }
+
+        if (user.passwordResetCodeExpiresAt && user.passwordResetCodeExpiresAt < new Date()) {
+            return sendResponse(res, { status: 410, message: "Verification code has expired" })
+        }
+
+        if (user.passwordResetCode !== verificationCode) {
+            return sendResponse(res, { status: 400, message: "Invalid verification code" })
+        }
+
+
+        user.passwordResetCode = null
+        user.passwordResetCodeExpiresAt = null
+        await user.save()
+
+        const resetPasswordToken = jwt.sign(
+            { userId, purpose: "RESET_PASSWORD" }, env.RESET_PASSWORD_SECRET!,
+            { expiresIn: "10m" }
+        )
+
+        res.cookie("resetPasswordToken", resetPasswordToken, { ...cookieOptions, maxAge: 10 * 60 * 1000 })
+
+        return sendResponse(res, { status: 200, message: "Code verified successfully" })
+    } catch (error) {
+        console.error("Failed to verify code:", error)
+        return sendResponse(res, { status: 500, message: "Failed to verify code" })
+    }
+}
+
+async function resetPassword(req: Request, res: Response) {
+    const { password } = req.body
+    const resetPasswordToken = req.cookies.resetPasswordToken
+
+    if (!resetPasswordToken) {
+        return sendResponse(res, { status: 401, message: "Token not found" })
+    }
+
+    try {
+        const decodedToken = jwt.verify(resetPasswordToken, env.RESET_PASSWORD_SECRET!) as { userId: string, purpose: string }
+
+        if (!decodedToken.userId || decodedToken.purpose !== "RESET_PASSWORD") {
+            return sendResponse(res, { status: 401, message: "Invalid token" })
+        }
+
+        const user = await User.findById(decodedToken.userId)
+
+        if (!user) {
+            return sendResponse(res, { status: 401, message: "Invalid or expired token" })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        user.password = hashedPassword
+        await user.save()
+
+        await RefreshToken.deleteMany({ user: user._id })
+
+        res.clearCookie("resetPasswordToken", { ...cookieOptions })
+
+        return sendResponse(res, { status: 200, message: "Password reset successfully" })
+
+    } catch (error) {
+        console.error("Failed to reset password:", error)
+
+        if (error instanceof jwt.TokenExpiredError || error instanceof jwt.JsonWebTokenError) {
+            res.clearCookie("resetPasswordToken", { ...cookieOptions });
+            return sendResponse(res, { status: 401, message: "Invalid or expired token" });
+        }
+
+        return sendResponse(res, { status: 500, message: "Failed to reset password" })
+    }
+}
+
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword }
