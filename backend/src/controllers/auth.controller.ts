@@ -609,5 +609,48 @@ async function me(req: Request, res: Response) {
     }
 }
 
+async function signoutSession(req: Request, res: Response) {
+    const userId = req.user?.userId
+    const refreshToken = req.cookies.refreshToken
+    const sessionId = req.params.sessionId
 
-export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth, me }
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!refreshToken) {
+        return sendResponse(res, { status: 401, message: "Access denied" })
+    }
+
+    if (!sessionId) {
+        return sendResponse(res, { status: 400, message: "Session ID is required" })
+    }
+
+    try {
+        const refreshTokenInDB = await RefreshToken.findOne({
+            _id: sessionId,
+            user: userId
+        })
+
+        if (!refreshTokenInDB) {
+            return sendResponse(res, { status: 404, message: "Session not found" })
+        }
+
+        const isCurrentSession = refreshTokenInDB.token === refreshToken
+
+        await refreshTokenInDB.deleteOne()
+
+        if (isCurrentSession) {
+            clearAllCookies(res)
+        }
+
+        return sendResponse(res, { status: 200, message: "Sign out successfully from the session" })
+    } catch (error) {
+        console.error("Failed to sign out from the session:", error)
+        return sendResponse(res, { status: 500, message: "Failed to sign out from the session" })
+    }
+
+}
+
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth, me, signoutSession }
