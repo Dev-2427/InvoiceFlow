@@ -6,12 +6,13 @@ import sendEmail from "../services/email/sendEmail.js"
 import verificationTemplate from "../services/email/templates/verification.js"
 import { generateAccessToken, generateRefreshToken, cookieOptions, clearAllCookies } from "../services/auth.service.js"
 import RefreshToken from "../models/RefreshToken.js"
-import { UAParser } from "ua-parser-js"
 import jwt from "jsonwebtoken"
 import { env } from "../config/env.js"
 import Organization from "../models/Organization.js"
 import forgotPasswordVerificationTemplate from "../services/email/templates/forgotPasswordVerification.js"
 import { googleClient } from "../config/google.js"
+import { getDeviceDetails } from "../utils/getDeviceDetails.js"
+import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE } from "../config/constants.js"
 
 async function signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, country } = req.body
@@ -26,7 +27,6 @@ async function signup(req: Request, res: Response) {
         const hashedPassword = await bcrypt.hash(password, 10)
         const newVerificationCode = Math.floor(100000 + Math.random() * 900000).toString()
         const verificationCodeExpiry = new Date(Date.now() + 10 * 60 * 1000)
-        console.log("code", newVerificationCode)
 
         let userId: string
 
@@ -101,8 +101,7 @@ async function verifyCode(req: Request, res: Response) {
         const accessToken = generateAccessToken(userId)
         const refreshToken = generateRefreshToken(userId)
 
-        const parser = new UAParser(req.headers["user-agent"])
-        const result = parser.getResult()
+        const result = getDeviceDetails(req)
 
         await RefreshToken.create({
             user: userId,
@@ -114,8 +113,8 @@ async function verifyCode(req: Request, res: Response) {
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         })
 
-        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
-        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
+        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE })
+        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE })
 
         const userData = {
             id: user._id.toString(),
@@ -165,8 +164,7 @@ async function signin(req: Request, res: Response) {
             await activeSessions[0]?.deleteOne()
         }
 
-        const parser = new UAParser(req.headers["user-agent"])
-        const result = parser.getResult()
+        const result = getDeviceDetails(req)
 
         const accessToken = generateAccessToken(user._id.toString())
         const refreshToken = generateRefreshToken(user._id.toString())
@@ -181,8 +179,8 @@ async function signin(req: Request, res: Response) {
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         })
 
-        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
-        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
+        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE })
+        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE })
 
         await User.populate(user, {
             path: "currentOrg",
@@ -229,8 +227,7 @@ async function refreshToken(req: Request, res: Response) {
             return sendResponse(res, { status: 401, message: "Invalid refresh token" })
         }
 
-        const parser = new UAParser(req.headers["user-agent"])
-        const result = parser.getResult()
+        const result = getDeviceDetails(req)
 
         const newAccessToken = generateAccessToken(refreshTokenInDB.user.toString())
         const newRefreshToken = generateRefreshToken(refreshTokenInDB.user.toString())
@@ -245,8 +242,8 @@ async function refreshToken(req: Request, res: Response) {
 
         await refreshTokenInDB.save()
 
-        res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
-        res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
+        res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE })
+        res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE })
 
         return sendResponse(res, { status: 200, message: "Refresh token updated successfully" })
 
@@ -546,8 +543,7 @@ async function googleAuth(req: Request, res: Response) {
         const accessToken = generateAccessToken(user._id.toString())
         const refreshToken = generateRefreshToken(user._id.toString())
 
-        const parser = new UAParser(req.headers["user-agent"])
-        const result = parser.getResult()
+        const result = getDeviceDetails(req)
 
         await RefreshToken.create({
             token: refreshToken,
@@ -559,8 +555,8 @@ async function googleAuth(req: Request, res: Response) {
             ipAddress: req.ip || "unknown"
         })
 
-        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
-        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
+        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE })
+        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE })
 
         const userData = {
             id: user._id.toString(),
