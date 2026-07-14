@@ -11,6 +11,7 @@ import jwt from "jsonwebtoken"
 import { env } from "../config/env.js"
 import Organization from "../models/Organization.js"
 import forgotPasswordVerificationTemplate from "../services/email/templates/forgotPasswordVerification.js"
+import { googleClient } from "../config/google.js"
 
 async function signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, country } = req.body
@@ -31,7 +32,7 @@ async function signup(req: Request, res: Response) {
 
         if (existingUser && !existingUser.isVerified) {
             existingUser.firstName = firstName
-            existingUser.lastName = lastName
+            existingUser.lastName = lastName || ""
             existingUser.password = hashedPassword
             existingUser.country = country || null
             existingUser.verificationCode = newVerificationCode
@@ -42,7 +43,7 @@ async function signup(req: Request, res: Response) {
         } else {
             const newUser = await User.create({
                 firstName,
-                lastName,
+                lastName: lastName || "",
                 email,
                 password: hashedPassword,
                 country: country || null,
@@ -493,5 +494,92 @@ async function changePassword(req: Request, res: Response) {
     }
 }
 
+async function googleAuth(req: Request, res: Response) {
+    const { idToken } = req.body
 
-export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword }
+    try {
+        const ticket = await googleClient.verifyIdToken({ idToken, audience: env.GOOGLE_CLIENT_ID! })
+
+        const payload = ticket.getPayload()
+
+        if (!payload) {
+            return sendResponse(res, { status: 401, message: "Invalid id token" })
+        }
+
+        const { sub: googleId, email, given_name, family_name, name } = payload
+
+        if (!googleId || !email) {
+            return sendResponse(res, { status: 401, message: "Google account is missing required information" })
+        }
+
+        let user = await User.findOne({
+            $or: [
+                { googleId },
+                { email }
+            ]
+        })
+
+        if (!user) {
+            user = await User.create({
+                firstName: given_name ?? name ?? "User",
+                lastName: family_name ?? "",
+                email,
+                authProviders: { google: true },
+                googleId,
+                isVerified: true
+            })
+        }
+
+        if (!user.googleId) {
+            user.googleId = googleId
+            user.authProviders.google = true
+            user.isVerified = true
+            await user.save()
+        }
+
+        const activeSessions = await RefreshToken.find({ user: user._id }).sort({ lastUsedAt: 1 })
+
+        if (activeSessions.length >= 3) {
+            await activeSessions[0]?.deleteOne()
+        }
+
+        const accessToken = generateAccessToken(user._id.toString())
+        const refreshToken = generateRefreshToken(user._id.toString())
+
+        const parser = new UAParser(req.headers["user-agent"])
+        const result = parser.getResult()
+
+        await RefreshToken.create({
+            token: refreshToken,
+            user: user._id,
+            browser: result.browser.name || "unknown",
+            deviceName: result.browser.name && result.os.name ? `${result.browser.name} on ${result.os.name}` : "unknown",
+            os: result.os.name || "unknown",
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            ipAddress: req.ip || "unknown"
+        })
+
+        res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
+        res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 })
+
+        const userData = {
+            id: user._id.toString(),
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            avatar: user.avatar.url,
+            country: user.country,
+            authProviders: user.authProviders,
+            currentOrganization: user.currentOrg,
+        }
+
+        return sendResponse(res, { status: 200, message: "Signed in successfully", data: { userData } })
+
+    } catch (error) {
+        console.error("Failed to authenticate with Google:", error)
+        return sendResponse(res, { status: 500, message: "Failed to authenticate with Google" })
+    }
+}
+
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth }
