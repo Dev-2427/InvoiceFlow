@@ -581,5 +581,37 @@ async function googleAuth(req: Request, res: Response) {
     }
 }
 
+async function me(req: Request, res: Response) {
+    const userId = req.user?.userId
 
-export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth }
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const user = await User.findById(userId).lean()
+
+        if (!user) {
+            return sendResponse(res, { status: 404, message: "User not found" })
+        }
+
+        const userData = {
+            id: user._id.toString(),
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            avatar: user.avatar.url,
+            country: user.country,
+            authProviders: user.authProviders,
+            currentOrganization: user.currentOrg,
+        }
+
+        return sendResponse(res, { status: 200, message: "Data fetched successfully", data: { userData } })
+    } catch (error) {
+        console.error("Error getting user data:", error)
+        return sendResponse(res, { status: 500, message: "Error getting data" })
+    }
+}
+
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth, me }
