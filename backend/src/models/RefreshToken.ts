@@ -10,6 +10,9 @@ interface IRefreshToken {
     lastUsedAt: Date,
     expiresAt: Date,
     revokedAt: Date | null,
+
+    createdAt: Date,
+    updatedAt: Date
 }
 
 const refreshTokenSchema = new Schema<IRefreshToken>({

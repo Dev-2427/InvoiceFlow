@@ -652,5 +652,48 @@ async function signoutSession(req: Request, res: Response) {
 
 }
 
+async function activeSessions(req: Request, res: Response) {
+    const userId = req.user?.userId
+    const refreshToken = req.cookies.refreshToken
 
-export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth, me, signoutSession }
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!refreshToken) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+    try {
+        const activeSessions = await RefreshToken.find(
+            { user: userId }
+        )
+            .select("token deviceName browser os ipAddress lastUsedAt createdAt")
+            .sort({ lastUsedAt: -1 })
+            .lean()
+
+        if (activeSessions.length === 0) {
+            clearAllCookies(res)
+            return sendResponse(res, { status: 401, message: "Session not found" })
+        }
+
+        const sessions = activeSessions.map((session) => ({
+            sessionId: session._id.toString(),
+            deviceName: session.deviceName,
+            browser: session.browser,
+            os: session.os,
+            ipAddress: session.ipAddress,
+            lastUsedAt: session.lastUsedAt,
+            createdAt: session.createdAt,
+            currentSession: session.token === refreshToken
+        }))
+
+        return sendResponse(res, { status: 200, message: "Active sessions fetched successfully", data: { sessions } })
+
+    } catch (error) {
+        console.error("Failed to fetch active sessions:", error)
+        return sendResponse(res, { status: 500, message: "Failed to fetch active sessions" })
+    }
+}
+
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth, me, signoutSession, activeSessions }
