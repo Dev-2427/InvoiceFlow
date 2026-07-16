@@ -1,6 +1,12 @@
 /* globals.css */
 @import "tailwindcss";
 
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
 @theme {
   /* ── Navy ── */
   --color-navy-900: #0D1F33;  /* sidebar dark, toast bg, auth gradient */
