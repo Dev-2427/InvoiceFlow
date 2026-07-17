@@ -24,7 +24,7 @@ export default function Signup() {
     }
 
     toast.success(res.message)
-    navigate(`/verify-code/${res.data.userId}`)
+    navigate(`/verify-code/${res.data.userId}`, { state: { email: data.email } })
   }
 
   return (
@@ -129,7 +129,7 @@ export default function Signup() {
       <button
         type="submit"
         disabled={isSigningUp}
-        className="bg-gold text-gold-dark text-[14px] mt-5 w-full rounded-lg py-2.5 cursor-pointer font-bold">{isSigningUp ? "Creating..." : "Create Account"}</button>
+        className="bg-gold text-gold-dark text-[14px] mt-5 w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isSigningUp ? "Creating..." : "Create Account"}</button>
 
     </form>
   )

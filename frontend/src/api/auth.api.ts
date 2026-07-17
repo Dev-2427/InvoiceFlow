@@ -1,6 +1,10 @@
 import api from "./axios";
-import type { SignupInput } from "../validation/authValidation";
+import type { SignupInput, VerifyCodeInput } from "../validation/authValidation";
 
-export async function signupApi(data: SignupInput) {
+export function signupApi(data: SignupInput) {
     return api.post("/api/auth/signup", data)
+}
+
+export function verifyCodeApi(data: VerifyCodeInput) {
+    return api.post("/api/auth/verify-email", data)
 }

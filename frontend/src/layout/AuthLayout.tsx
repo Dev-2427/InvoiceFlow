@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { useEffect } from "react"
+import { HiOutlineDocumentText } from "react-icons/hi2";
 
 export default function AuthLayout() {
 
@@ -19,7 +20,7 @@ export default function AuthLayout() {
                 <div className='flex flex-col justify-center items-center gap-2'>
 
                     <div className='bg-gold w-12 h-12 rounded-lg flex justify-center items-center'>
-                        <span className='font-bold text-xl text-gold-dark'>IF</span>
+                        < HiOutlineDocumentText className='text-2xl text-gold-dark' />
                     </div>
 
                     <h1 className='font-bold text-2xl text-text'>InvoiceFlow</h1>

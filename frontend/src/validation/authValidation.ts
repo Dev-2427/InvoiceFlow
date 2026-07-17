@@ -4,6 +4,7 @@ const firstName = z.string().trim().min(2, { error: "First name must be at least
 const email = z.email({ error: "Invalid email address" })
 const password = z.string().min(8, { error: "Password must be at least 8 characters" })
 const verificationCode = z.string().trim().regex(/^\d{6}$/, "verification code must be exactly 6 digits")
+const userId = z.string()
 
 export const signupSchema = z.object({
     firstName,
@@ -14,6 +15,7 @@ export const signupSchema = z.object({
 })
 
 export const verifyCodeSchema = z.object({
+    userId,
     verificationCode
 })
 
