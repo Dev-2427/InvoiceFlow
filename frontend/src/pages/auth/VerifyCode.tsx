@@ -15,11 +15,11 @@ export default function VerifyCode() {
 
     const navigate = useNavigate()
 
-    useEffect(() => {
-        if (!userId || !email) {
-            navigate(-1)
-        }
-    }, [userId, email, navigate])
+    // useEffect(() => {
+    //     if (!userId || !email) {
+    //         navigate(-1)
+    //     }
+    // }, [userId, email, navigate])
 
 
     const { register, handleSubmit, formState: { errors } } = useForm({
@@ -57,9 +57,9 @@ export default function VerifyCode() {
                 </div>
 
                 <h1 className='font-bold text-text text-[20px]'>Check your email</h1>
-                <span className='text-text-md text-[13px]'>We sent a 6-digit vaerification code to</span>
+                <span className='text-text-md text-[13px]'>We sent a 6-digit verification code to</span>
 
-                <span className='text-text-md text-[13px] font-bold'>{email}</span>
+                <span className='text-navy-900 text-[13px] font-bold'>{email}</span>
 
             </div>
 
@@ -67,7 +67,7 @@ export default function VerifyCode() {
             <div className="flex flex-col gap-1 w-full">
                 <input {...register("verificationCode")}
                     className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-                    placeholder='Code'
+                    placeholder='Code' maxLength={6}
                     type="text" id="verifyCode" />
 
                 <p className="min-h-5 text-xs text-red-500">
@@ -84,7 +84,7 @@ export default function VerifyCode() {
             </button>
 
 
-            <hr className='border-text-sm border-1.0 w-full my-5' />
+            <hr className='border-text-sm border-1.0 w-full my-5 opacity-50' />
 
             <button
                 type="button"

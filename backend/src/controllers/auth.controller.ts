@@ -182,11 +182,6 @@ async function signin(req: Request, res: Response) {
         res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE })
         res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE })
 
-        await User.populate(user, {
-            path: "currentOrg",
-            select: "organizationName currency logo.url"
-        })
-
         const userData = {
             id: user._id.toString(),
             firstName: user.firstName,

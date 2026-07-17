@@ -1,21 +1,25 @@
 import { create } from "zustand"
-import type { SignupInput, VerifyCodeInput } from "../validation/authValidation"
-import { signupApi, verifyCodeApi } from "../api/auth.api"
+import type { SignupInput, VerifyCodeInput, SigninInput } from "../validation/authValidation"
+import { signinApi, signupApi, verifyCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { User } from "../types/auth.types"
 
 interface IAuthStore {
     isSigningUp: boolean,
     isVerifyingCode: boolean,
+    isSigningIn: boolean,
+
     signup: (data: SignupInput) => Promise<ApiResponse<{ userId: string }>>,
     verifyCode: (data: VerifyCodeInput) => Promise<ApiResponse<{ userData: User }>>
+    signin: (data: SigninInput) => Promise<ApiResponse<{ userData: User }>>
 
     user: User | null
 }
 
-const authStore = create<IAuthStore>((set, get) => ({
+const authStore = create<IAuthStore>((set) => ({
     isSigningUp: false,
     isVerifyingCode: false,
+    isSigningIn: false,
 
     user: null,
 
@@ -27,7 +31,7 @@ const authStore = create<IAuthStore>((set, get) => ({
 
             return res.data
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error signing up:", error)
 
             return {
@@ -50,7 +54,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             }
 
             return res.data
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error verifying code:", error)
 
             return {
@@ -61,6 +65,28 @@ const authStore = create<IAuthStore>((set, get) => ({
             set({ isVerifyingCode: false })
         }
     },
+
+    async signin(data) {
+        try {
+            set({ isSigningIn: true })
+
+            const res = await signinApi(data)
+
+            if (res.data.success) {
+                set({ user: res.data.data.userData })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Error signing in:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isSigningIn: false })
+        }
+    }
 
 }))
 

@@ -129,7 +129,16 @@ export default function Signup() {
       <button
         type="submit"
         disabled={isSigningUp}
-        className="bg-gold text-gold-dark text-[14px] mt-5 w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isSigningUp ? "Creating..." : "Create Account"}</button>
+        className="bg-gold text-gold-dark text-[14px] mt-5 w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isSigningUp ? "Creating..." : "Create Account"}
+      </button>
+
+      <div className="flex gap-1 mt-3 text-[14px]" >
+        <p className="text-text-sm">Already have an account?</p>
+        <button
+          type="button"
+          onClick={() => navigate("/signin")}
+          className="text-navy-900 font-semibold cursor-pointer">Sign in</button>
+      </div>
 
     </form>
   )

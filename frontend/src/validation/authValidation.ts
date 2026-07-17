@@ -19,5 +19,11 @@ export const verifyCodeSchema = z.object({
     verificationCode
 })
 
+export const signinSchema = z.object({
+    email,
+    password
+})
+
 export type SignupInput = z.infer<typeof signupSchema>;
 export type VerifyCodeInput = z.infer<typeof verifyCodeSchema>;
+export type SigninInput = z.infer<typeof signinSchema>
