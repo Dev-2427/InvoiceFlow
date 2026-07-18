@@ -487,15 +487,25 @@ async function changePassword(req: Request, res: Response) {
 }
 
 async function googleAuth(req: Request, res: Response) {
-    const { idToken } = req.body
+    const { code } = req.body
 
     try {
-        const ticket = await googleClient.verifyIdToken({ idToken, audience: env.GOOGLE_CLIENT_ID! })
+
+        const { tokens } = await googleClient.getToken({code, redirect_uri: "postmessage"})
+
+        if (!tokens.id_token) {
+            return sendResponse(res, { status: 401, message: "Failed to retrieve Google ID token" })
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: tokens.id_token,
+            audience: env.GOOGLE_CLIENT_ID!
+        })
 
         const payload = ticket.getPayload()
 
         if (!payload) {
-            return sendResponse(res, { status: 401, message: "Invalid id token" })
+            return sendResponse(res, { status: 401, message: "Invalid Google account" })
         }
 
         const { sub: googleId, email, given_name, family_name, name } = payload

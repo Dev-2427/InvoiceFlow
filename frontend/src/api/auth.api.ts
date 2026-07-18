@@ -24,3 +24,7 @@ export function verifyResetCodeApi(data: VerifyCodeInput) {
 export function resetPasswordApi(data: ResetPasswordInput) {
     return api.post("/api/auth/reset-password", { password: data.password })
 }
+
+export function googleAuthApi(code: string) {
+    return api.post("/api/auth/google", { code })
+}

@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput } from "../validation/authValidation"
-import { forgotPasswordApi, resetPasswordApi, signinApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import { forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { User } from "../types/auth.types"
 
@@ -18,6 +18,7 @@ interface IAuthStore {
     forgotPassword: (data: ForgotPasswordInput) => Promise<ApiResponse<{ userId: string }>>
     verifyResetCode: (data: VerifyCodeInput) => Promise<ApiResponse<null>>
     resetPassword: (data: ResetPasswordInput) => Promise<ApiResponse<null>>
+    googleAuth: (code: string) => Promise<ApiResponse<{ userData: User }>>
 
     user: User | null
 }
@@ -150,6 +151,24 @@ const authStore = create<IAuthStore>((set) => ({
             }
         } finally {
             set({ isResettingPassword: false })
+        }
+    },
+
+    async googleAuth(code) {
+        try {
+            const res = await googleAuthApi(code)
+
+            if (res.data.success) {
+                set({ user: res.data.data.userData })
+            }
+
+            return res.data
+        } catch (error) {
+            console.error("Google authentication failed:", error);
+            return {
+                success: false,
+                message: "Google authentication failed"
+            }
         }
     }
 
