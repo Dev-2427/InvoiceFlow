@@ -1,6 +1,6 @@
 import { create } from "zustand"
-import type { SignupInput, VerifyCodeInput, SigninInput } from "../validation/authValidation"
-import { signinApi, signupApi, verifyCodeApi } from "../api/auth.api"
+import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput } from "../validation/authValidation"
+import { forgotPasswordApi, resetPasswordApi, signinApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { User } from "../types/auth.types"
 
@@ -8,10 +8,16 @@ interface IAuthStore {
     isSigningUp: boolean,
     isVerifyingCode: boolean,
     isSigningIn: boolean,
+    isSendingMail: boolean,
+    isVerifyingResetCode: boolean,
+    isResettingPassword: boolean,
 
     signup: (data: SignupInput) => Promise<ApiResponse<{ userId: string }>>,
     verifyCode: (data: VerifyCodeInput) => Promise<ApiResponse<{ userData: User }>>
     signin: (data: SigninInput) => Promise<ApiResponse<{ userData: User }>>
+    forgotPassword: (data: ForgotPasswordInput) => Promise<ApiResponse<{ userId: string }>>
+    verifyResetCode: (data: VerifyCodeInput) => Promise<ApiResponse<null>>
+    resetPassword: (data: ResetPasswordInput) => Promise<ApiResponse<null>>
 
     user: User | null
 }
@@ -20,6 +26,9 @@ const authStore = create<IAuthStore>((set) => ({
     isSigningUp: false,
     isVerifyingCode: false,
     isSigningIn: false,
+    isSendingMail: false,
+    isVerifyingResetCode: false,
+    isResettingPassword: false,
 
     user: null,
 
@@ -85,6 +94,62 @@ const authStore = create<IAuthStore>((set) => ({
             }
         } finally {
             set({ isSigningIn: false })
+        }
+    },
+
+    async forgotPassword(data) {
+        try {
+            set({ isSendingMail: true })
+
+            const res = await forgotPasswordApi(data)
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to send email:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isSendingMail: false })
+        }
+    },
+
+    async verifyResetCode(data) {
+        set({ isVerifyingResetCode: true })
+
+        try {
+            const res = await verifyResetCodeApi(data)
+
+            return res.data
+        } catch (error: any) {
+            console.error("Error verifying reset code:", error)
+
+            return {
+                success: false,
+                message: "Something went wrong. Please try again."
+            }
+        } finally {
+            set({ isVerifyingResetCode: false })
+        }
+    },
+
+    async resetPassword(data) {
+        try {
+            set({ isResettingPassword: true })
+
+            const res = await resetPasswordApi(data)
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to reset password:", error)
+
+            return {
+                success: false,
+                message: "Something went wrong. Please try again."
+            }
+        } finally {
+            set({ isResettingPassword: false })
         }
     }
 

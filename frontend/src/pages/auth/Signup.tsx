@@ -17,7 +17,7 @@ export default function Signup() {
 
   async function onSubmit(data: SignupInput) {
     const res = await signup(data)
-    console.log(res)
+
     if (!res.success) {
       toast.error(res.message)
       return
@@ -88,7 +88,7 @@ export default function Signup() {
           </div>
           <input {...register("country")}
             className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-            placeholder='India'
+            placeholder='Country'
             type="text" id="country" />
 
           <p className="min-h-5 text-xs text-red-500">
@@ -117,7 +117,6 @@ export default function Signup() {
             placeholder='Password'
             type="password" id="password" />
 
-          <span className='text-text-sm font-bold text-[11px]'>Use 8+ characters with a mix of letters and numbers</span>
           <p className="min-h-5 text-xs text-red-500">
             {errors.password?.message}
           </p>

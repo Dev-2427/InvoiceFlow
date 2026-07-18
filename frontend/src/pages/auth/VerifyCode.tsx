@@ -15,11 +15,11 @@ export default function VerifyCode() {
 
     const navigate = useNavigate()
 
-    // useEffect(() => {
-    //     if (!userId || !email) {
-    //         navigate(-1)
-    //     }
-    // }, [userId, email, navigate])
+    useEffect(() => {
+        if (!userId || !email) {
+            navigate(-1)
+        }
+    }, [userId, email, navigate])
 
 
     const { register, handleSubmit, formState: { errors } } = useForm({
@@ -68,7 +68,7 @@ export default function VerifyCode() {
                 <input {...register("verificationCode")}
                     className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
                     placeholder='Code' maxLength={6}
-                    type="text" id="verifyCode" />
+                    type="text"/>
 
                 <p className="min-h-5 text-xs text-red-500">
                     {errors.verificationCode?.message}
