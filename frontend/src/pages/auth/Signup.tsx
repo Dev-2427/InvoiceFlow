@@ -31,17 +31,17 @@ export default function Signup() {
 
   return (
 
-    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center items-center'>
+    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center items-center w-full'>
 
-      <div className='flex flex-col justify-center items-center gap-1'>
-        <h1 className='font-bold text-text text-[20px]'>Create your account</h1>
-        <span className='text-text-md text-[15px]'>Start managing your invoice for free</span>
+      <div className="text-center space-y-1 mb-6">
+        <h1 className='font-bold text-text text-2xl'>Create your account</h1>
+        <span className='text-text-md text-sm sm:text-base'>Start managing your invoice for free</span>
       </div>
 
       <GoogleButton text="Sign up" />
 
-      <div className="flex flex-col gap-1">
-        <div className="flex justify-center items-center gap-3">
+      <div className="flex flex-col space-y- w-full">
+        <div className="grid grid-cols-2 gap-3">
 
           <AuthInput id="firstName" placeholder="First name" type="text" label="FIRST NAME" register={register("firstName")} errorMessage={errors.firstName?.message} />
 
@@ -61,12 +61,11 @@ export default function Signup() {
 
       <AuthButton disabled={isSigningUp} loadingText="Creating..." text="Create Account" />
 
-      <div className="flex gap-1 mt-3 text-[14px]" >
-        <p className="text-text-sm">Already have an account?</p>
+      <div className="mt-5 flex justify-center gap-1 text-sm">        <p className="text-text-sm">Already have an account?</p>
         <button
           type="button"
           onClick={() => navigate("/signin")}
-          className="text-navy-900 font-semibold cursor-pointer">Sign in</button>
+          className="text-navy-900 font-semibold cursor-pointer hover:underline transition-colors">Sign in</button>
       </div>
 
     </form>

@@ -13,19 +13,19 @@ export default function AuthLayout() {
     }, [])
 
     return (
-        <main className='min-h-screen flex flex-col justify-center items-center px-4 py-15 bg-navy-900'>
+        <main className='min-h-screen flex flex-col justify-center items-center px-4 py-8 bg-navy-900 sm:px-6 lg:px-8'>
 
-            <div className="flex flex-col justify-center items-center gap-8 bg-card max-w-md w-full rounded-xl py-8 px-10 shadow-2xl">
+            <div className="flex flex-col justify-center items-center gap-8 bg-card max-w-md w-full rounded-2xl py-8 px-6 sm:px-8 sm:py-10 shadow-2xl">
 
                 <div className='flex flex-col justify-center items-center gap-2'>
 
-                    <div className='bg-gold w-12 h-12 rounded-lg flex justify-center items-center'>
+                    <div className='bg-gold w-14 h-14 rounded-lg flex justify-center items-center'>
                         < HiOutlineDocumentText className='text-2xl text-gold-dark' />
                     </div>
 
-                    <h1 className='font-bold text-2xl text-text'>InvoiceFlow</h1>
+                    <h1 className='font-bold text-3xl tracking-tight text-text'>InvoiceFlow</h1>
 
-                    <p className='text-text-md font-semibold text-[13px]'>Invoice Manager</p>
+                    <p className='text-text-md font-semibold text-sm'>Invoice Manager</p>
 
                 </div>
 

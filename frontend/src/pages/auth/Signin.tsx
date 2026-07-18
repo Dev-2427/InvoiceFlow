@@ -38,9 +38,9 @@ export default function Signin() {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center items-center w-full'>
 
-            <div className='flex flex-col justify-center items-center gap-1'>
-                <h1 className='font-bold text-text text-[20px]'>Welcome back</h1>
-                <span className='text-text-md text-[15px]'>Sign in to your InvoiceFlow account</span>
+            <div className="text-center space-y-1 mb-6">
+                <h1 className='font-bold text-text text-2xl'>Welcome back</h1>
+                <span className='text-text-md text-sm sm:text-base'>Sign in to your InvoiceFlow account</span>
             </div>
 
             <GoogleButton text="Sign in" />
@@ -56,7 +56,7 @@ export default function Signin() {
                         <label htmlFor="password" className='text-text-sm font-bold text-[11px]'>PASSWORD</label>
 
                         <button type="button" onClick={() => navigate("/forgot-password")}
-                            className="text-navy-900 font-bold text-[12px] cursor-pointer">Forgot password?</button>
+                            className="text-navy-900 font-bold text-xs hover:underline transition-colors cursor-pointer">Forgot password?</button>
                     </div>
 
                     <input {...register("password")}
@@ -74,7 +74,7 @@ export default function Signin() {
             <AuthButton disabled={isSigningIn} loadingText="Signing in..." text="Sign in" />
 
 
-            <div className="flex gap-1 mt-3 text-[14px]">
+            <div className="flex gap-1 mt-5 text-[14px]">
                 <p className="text-text-sm">Don't have an account?</p>
                 <button
                     type="button"

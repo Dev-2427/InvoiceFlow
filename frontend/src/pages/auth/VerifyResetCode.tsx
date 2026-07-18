@@ -56,16 +56,16 @@ export default function VerifyResetCode() {
                 <h1 className='font-bold text-text text-[20px]'>Check your email</h1>
                 <span className='text-text-md text-[13px]'>We sent a 6-digit verification code to</span>
 
-                <span className='text-navy-900 text-[13px] font-bold'>{email}</span>
+                <span className='text-navy-900 text-[13px] font-bold text-sm'>{email}</span>
 
             </div>
 
             <div className="w-full">
-                <AuthInput id="code" placeholder="Code" register={register("verificationCode")} type="text" errorMessage={errors.verificationCode?.message} />
+                <AuthInput id="code" placeholder="Enter 6-digit code" register={register("verificationCode")} type="text" errorMessage={errors.verificationCode?.message} />
             </div>
 
 
-            <AuthButton disabled={isVerifyingResetCode} loadingText="Verifying..." text="Verify Email" />
+            <AuthButton disabled={isVerifyingResetCode} loadingText="Verifying..." text="Verify Code" />
 
 
             <hr className='border-text-sm border-1.0 w-full my-5 opacity-50' />

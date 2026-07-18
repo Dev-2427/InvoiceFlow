@@ -52,34 +52,33 @@ export default function VerifyCode() {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center items-center w-full'>
 
-            <div className='flex flex-col justify-center items-center gap-2 mb-4'>
-
-                <div className="flex justify-center items-center border-gold border-2 rounded-lg w-14 h-14 bg-gold-light">
+            <div className="flex flex-col justify-center items-center mb-6 gap-2">
+                <div className="flex justify-center items-center border-gold border-2 rounded-2xl w-16 h-16 bg-gold-light">
                     <HiOutlineEnvelope className="text-3xl text-gold" />
                 </div>
 
                 <h1 className='font-bold text-text text-[20px]'>Check your email</h1>
                 <span className='text-text-md text-[13px]'>We sent a 6-digit verification code to</span>
 
-                <span className='text-navy-900 text-[13px] font-bold'>{email}</span>
+                <span className='text-navy-900 text-sm font-bold'>{email}</span>
 
             </div>
 
 
             <div className="w-full">
-                <AuthInput id="code" placeholder="Code" register={register("verificationCode")} type="text" errorMessage={errors.verificationCode?.message} />
+                <AuthInput id="code" placeholder="Enter 6-digit code" register={register("verificationCode")} type="text" errorMessage={errors.verificationCode?.message} />
             </div>
 
 
             <AuthButton disabled={isVerifyingCode} loadingText="Verifying..." text="Verify Email" />
 
 
-            <hr className='border-text-sm border-1.0 w-full my-5 opacity-50' />
+            <hr className='border-text-sm w-full my-5 opacity-40' />
 
             <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="flex cursor-pointer items-center gap-1">
+                className="flex cursor-pointer items-center gap-2">
 
                 <HiArrowLeft className="text-text-sm" />
                 <p className="text-text-sm text-[14px] font-semibold">Cancel and go back</p>

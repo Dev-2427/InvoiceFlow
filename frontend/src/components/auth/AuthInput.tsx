@@ -22,11 +22,11 @@ export default function AuthInput({ id, optional = false, label, type, placehold
                 }
             </div>
             <input {...register}
-                className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full'
+                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
                 placeholder={placeholder}
                 type={type} id={id} />
 
-            <p className="min-h-5 text-xs text-red-500">
+            <p className="min-h-[20px] text-xs text-red-500">
                 {errorMessage}
             </p>
         </div>)

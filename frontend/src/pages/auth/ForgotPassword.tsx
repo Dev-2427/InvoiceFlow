@@ -36,14 +36,14 @@ export default function ForgotPassword() {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center items-center w-full'>
 
-            <div className='flex flex-col justify-center items-center gap-2 mb-4'>
+            <div className='flex flex-col justify-center items-center gap-2 mb-6'>
 
-                <div className="flex justify-center items-center border-gold border-2 rounded-lg w-14 h-14 bg-gold-light">
+                <div className="flex justify-center items-center border-gold border-2 w-16 h-16 rounded-2xl bg-gold-light">
                     <HiKey className="text-3xl text-gold" />
                 </div>
 
                 <h1 className='font-bold text-text text-[20px]'>Forgot password?</h1>
-                <span className='text-text-md text-[13px] text-center'>No worries! Enter your email address and we'll send you a verification code to reset password.</span>
+                <span className="text-sm text-text-md text-center max-w-xs">No worries! Enter your email address and we'll send you a verification code to reset password.</span>
             </div>
 
 
@@ -56,7 +56,7 @@ export default function ForgotPassword() {
             <AuthButton disabled={isSendingMail} loadingText="Sending..." text="Send Email" />
 
 
-            <div className="flex gap-1 mt-3 text-[14px]" >
+            <div className="flex gap-1 mt-5 text-[14px]" >
                 <p className="text-text-sm">Remember your password?</p>
                 <button
                     type="button"

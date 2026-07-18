@@ -38,16 +38,16 @@ export default function GoogleButton({ text }: { text: string }) {
 
     return (
         <>
-            <div onClick={() => login()} className='flex justify-center items-center gap-2 my-5 border-text-sm border w-full rounded-2xl py-2 cursor-pointer'>
+            <div onClick={() => login()} className='flex justify-center items-center gap-3 my-5 border-text-sm border w-full rounded-xl py-2 cursor-pointer select-none'>
                 <FcGoogle size={20} />
                 <span className='text-text font-semibold text-[14px]'>{text} with Google</span>
             </div>
 
 
             <div className="flex justify-between items-center gap-1 w-full mb-5">
-                <hr className='border-text-sm  w-full' />
-                <span className='text-text-sm text-sm font-semibold'>OR</span>
-                <hr className='border-text-sm w-full' />
+                <hr className='border-text-sm opacity-40 w-full' />
+                <span className='text-text-sm text-xs tracking-wider font-semibold'>OR</span>
+                <hr className='border-text-sm w-full opacity-40' />
             </div>
         </>
     )

@@ -33,19 +33,18 @@ export default function ResetPassword() {
 
     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center items-center w-full'>
 
-      <div className='flex flex-col justify-center items-center gap-2 mb-4'>
+      <div className='flex flex-col justify-center items-center gap-2 mb-6'>
 
-        <div className="flex justify-center items-center border-gold border-2 rounded-lg w-14 h-14 bg-gold-light">
+        <div className="flex justify-center items-center border-gold border-2 w-16 h-16 rounded-2xl bg-gold-light">
           <HiLockClosed className="text-3xl text-gold" />
         </div>
 
         <h1 className='font-bold text-text text-[20px]'>Set new password</h1>
-        <span className='text-text-md text-[13px]'>Your password must be different form previous one.</span>
+        <span className='text-text-md text-sm max-w-xs text-center'>Your password must be different from your previous password.</span>
       </div>
 
-      <div className="flex flex-col gap-1 w-full">
-
-        <AuthInput id="newPassword" placeholder="New Password" register={register("password")} type="password" errorMessage={errors.password?.message} label="NEW PASSWORD" />
+      <div className="w-full space-y-2">
+        <AuthInput id="newPassword" placeholder="New password" register={register("password")} type="password" errorMessage={errors.password?.message} label="NEW PASSWORD" />
 
         <AuthInput id="confirmPassword" placeholder="Re-enter your password" register={register("confirmPassword")} type="password" errorMessage={errors.confirmPassword?.message} label="CONFIRM PASSWORD" />
 
@@ -57,7 +56,7 @@ export default function ResetPassword() {
       <button
         type="button"
         onClick={() => navigate("/signin")}
-        className="flex cursor-pointer items-center gap-1 mt-3">
+        className="flex cursor-pointer items-center gap-1 mt-5">
 
         <HiArrowLeft className="text-text-sm" />
         <p className="text-text-sm text-[14px] font-semibold">Go back to sign in</p>

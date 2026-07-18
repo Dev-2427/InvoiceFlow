@@ -9,6 +9,6 @@ export default function AuthButton({ disabled, loadingText, text }: IAuthButton)
         <button
             type="submit"
             disabled={disabled}
-            className="bg-gold text-gold-dark text-[14px] w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{disabled ? loadingText : text}
+            className="bg-gold text-gold-dark text-[14px] w-full rounded-xl py-3 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:opacity-93">{disabled ? loadingText : text}
         </button>)
 }
