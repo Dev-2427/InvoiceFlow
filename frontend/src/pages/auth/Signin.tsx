@@ -4,7 +4,9 @@ import { signinSchema, type SigninInput } from "../../validation/authValidation"
 import authStore from "../../store/authStore";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
+import GoogleButton from "../../components/auth/GoogleButton";
+import AuthInput from "../../components/auth/AuthInput";
+import AuthButton from "../../components/auth/AuthButton";
 
 export default function Signin() {
 
@@ -41,31 +43,11 @@ export default function Signin() {
                 <span className='text-text-md text-[15px]'>Sign in to your InvoiceFlow account</span>
             </div>
 
-            <div className='flex justify-center items-center gap-2 my-5 border-text-sm border w-full rounded-2xl py-2 cursor-pointer'>
-                <FcGoogle size={20} />
-                <span className='text-text font-semibold text-[14px]'>Sign in with Google</span>
-            </div>
-
-
-            <div className="flex justify-between items-center gap-1 w-full mb-5">
-                <hr className='border-text-sm  w-full' />
-                <span className='text-text-sm text-sm font-semibold'>OR</span>
-                <hr className='border-text-sm w-full' />
-            </div>
+            <GoogleButton text="Sign in" />
 
             <div className="flex flex-col justify-center w-full">
 
-                <div className="flex flex-col gap-1.5">
-                    <label htmlFor="email" className='text-text-sm font-bold text-[11px]'>EMAIL</label>
-                    <input {...register("email")}
-                        className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-                        placeholder='Email'
-                        type="email" id="email" />
-
-                    <p className="min-h-5 text-xs text-red-500">
-                        {errors.email?.message}
-                    </p>
-                </div>
+                <AuthInput id="email" placeholder="Email" register={register("email")} type="email" errorMessage={errors.email?.message} label="EMAIL" />
 
 
                 <div className="flex flex-col gap-1.5">
@@ -89,11 +71,7 @@ export default function Signin() {
             </div>
 
 
-            <button
-                type="submit"
-                disabled={isSigningIn}
-                className="bg-gold text-gold-dark text-[14px] mt-5 w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isSigningIn ? "Signing in..." : "Sign in"}
-            </button>
+            <AuthButton disabled={isSigningIn} loadingText="Signing in..." text="Sign in" />
 
 
             <div className="flex gap-1 mt-3 text-[14px]">

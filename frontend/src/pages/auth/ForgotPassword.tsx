@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../store/authStore"
 import toast from "react-hot-toast";
 import { HiKey } from "react-icons/hi2";
+import AuthInput from "../../components/auth/AuthInput";
+import AuthButton from "../../components/auth/AuthButton";
 
 export default function ForgotPassword() {
 
@@ -45,25 +47,13 @@ export default function ForgotPassword() {
             </div>
 
 
-            <div className="flex flex-col gap-1 w-full">
-                <label htmlFor="email" className='text-text-sm font-bold text-[11px]'>EMAIL ADDRESS</label>
-                <input {...register("email")}
-                    className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-                    placeholder='Email'
-                    type="email" id="email" />
-
-                <p className="min-h-5 text-xs text-red-500">
-                    {errors.email?.message}
-                </p>
+            <div className="w-full">
+                <AuthInput id="email" placeholder="Email" register={register("email")} type="email" errorMessage={errors.email?.message} label="EMAIL ADDRESS" />
             </div>
 
 
 
-            <button
-                type="submit"
-                disabled={isSendingMail}
-                className="bg-gold text-gold-dark text-[14px] w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isSendingMail ? "Sending..." : "Send Email"}
-            </button>
+            <AuthButton disabled={isSendingMail} loadingText="Sending..." text="Send Email" />
 
 
             <div className="flex gap-1 mt-3 text-[14px]" >

@@ -5,6 +5,8 @@ import authStore from "../../store/authStore";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { HiArrowLeft, HiLockClosed } from "react-icons/hi";
+import AuthInput from "../../components/auth/AuthInput";
+import AuthButton from "../../components/auth/AuthButton";
 
 export default function ResetPassword() {
 
@@ -43,38 +45,14 @@ export default function ResetPassword() {
 
       <div className="flex flex-col gap-1 w-full">
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="newPassword" className='text-text-sm font-bold text-[11px]'>NEW PASSWORD</label>
-          <input {...register("password")}
-            className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-            placeholder='New password'
-            type="password" id="newPassword" />
+        <AuthInput id="newPassword" placeholder="New Password" register={register("password")} type="password" errorMessage={errors.password?.message} label="NEW PASSWORD" />
 
-          <p className="min-h-5 text-xs text-red-500">
-            {errors.password?.message}
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="confirmPassword" className='text-text-sm font-bold text-[11px]'>CONFIRM NEW PASSWORD</label>
-          <input {...register("confirmPassword")}
-            className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-            placeholder='New password'
-            type="password" id="confirmPassword" />
-
-          <p className="min-h-5 text-xs text-red-500">
-            {errors.confirmPassword?.message}
-          </p>
-        </div>
+        <AuthInput id="confirmPassword" placeholder="Re-enter your password" register={register("confirmPassword")} type="password" errorMessage={errors.confirmPassword?.message} label="CONFIRM PASSWORD" />
 
       </div>
 
 
-      <button
-        type="submit"
-        disabled={isResettingPassword}
-        className="bg-gold text-gold-dark text-[14px] mt-5 w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isResettingPassword ? "Resetting..." : "Reset Password"}
-      </button>
+      <AuthButton disabled={isResettingPassword} loadingText="Resetting..." text="Reset Password" />
 
       <button
         type="button"

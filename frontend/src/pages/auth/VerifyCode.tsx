@@ -6,6 +6,8 @@ import useAuth from "../../store/authStore"
 import toast from "react-hot-toast";
 import { useEffect } from "react"
 import { HiOutlineEnvelope, HiArrowLeft } from "react-icons/hi2";
+import AuthInput from "../../components/auth/AuthInput";
+import AuthButton from "../../components/auth/AuthButton";
 
 export default function VerifyCode() {
 
@@ -53,7 +55,7 @@ export default function VerifyCode() {
             <div className='flex flex-col justify-center items-center gap-2 mb-4'>
 
                 <div className="flex justify-center items-center border-gold border-2 rounded-lg w-14 h-14 bg-gold-light">
-                    <HiOutlineEnvelope className="text-3xl text-blue-400" />
+                    <HiOutlineEnvelope className="text-3xl text-gold" />
                 </div>
 
                 <h1 className='font-bold text-text text-[20px]'>Check your email</h1>
@@ -64,24 +66,12 @@ export default function VerifyCode() {
             </div>
 
 
-            <div className="flex flex-col gap-1 w-full">
-                <input {...register("verificationCode")}
-                    className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-                    placeholder='Code' maxLength={6}
-                    type="text"/>
-
-                <p className="min-h-5 text-xs text-red-500">
-                    {errors.verificationCode?.message}
-                </p>
+            <div className="w-full">
+                <AuthInput id="code" placeholder="Code" register={register("verificationCode")} type="text" errorMessage={errors.verificationCode?.message} />
             </div>
 
 
-
-            <button
-                type="submit"
-                disabled={isVerifyingCode}
-                className="bg-gold text-gold-dark text-[14px] w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isVerifyingCode ? "Verifying..." : "Verify Email"}
-            </button>
+            <AuthButton disabled={isVerifyingCode} loadingText="Verifying..." text="Verify Email" />
 
 
             <hr className='border-text-sm border-1.0 w-full my-5 opacity-50' />

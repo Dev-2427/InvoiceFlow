@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signupSchema, type SignupInput } from "../../validation/authValidation"
-import { FcGoogle } from "react-icons/fc";
 import authStore from "../../store/authStore";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import AuthInput from "../../components/auth/AuthInput";
+import AuthButton from "../../components/auth/AuthButton";
+import GoogleButton from "../../components/auth/GoogleButton";
 
 export default function Signup() {
 
@@ -36,100 +38,28 @@ export default function Signup() {
         <span className='text-text-md text-[15px]'>Start managing your invoice for free</span>
       </div>
 
-      <div className='flex justify-center items-center gap-2 my-5 border-text-sm border w-full rounded-2xl py-2 cursor-pointer'>
-        <FcGoogle size={20} />
-        <span className='text-text font-semibold text-[14px]'>Sign up with Google</span>
-      </div>
-
-
-      <div className="flex justify-between items-center gap-1 w-full mb-5">
-        <hr className='border-text-sm  w-full' />
-        <span className='text-text-sm text-sm font-semibold'>OR</span>
-        <hr className='border-text-sm w-full' />
-      </div>
+      <GoogleButton text="Sign up" />
 
       <div className="flex flex-col gap-1">
         <div className="flex justify-center items-center gap-3">
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="firstName" className='text-text-sm font-bold text-[11px]'>FIRST NAME</label>
-            <input {...register("firstName")}
-              className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm w-40 text-[13px]'
-              placeholder='John'
-              type="text" id="firstName" />
+          <AuthInput id="firstName" placeholder="First name" type="text" label="FIRST NAME" register={register("firstName")} errorMessage={errors.firstName?.message} />
 
-            <p className="min-h-5 text-xs text-red-500">
-              {errors.firstName?.message}
-            </p>
-          </div>
+          <AuthInput id="lastName" placeholder="Last name" type="text" label="LAST NAME" register={register("lastName")} errorMessage={errors.lastName?.message} optional={true} />
 
-          <div className="flex flex-col gap-1.5">
-            <div className="flex gap-1">
-              <label htmlFor="lastName" className='text-text-sm font-bold text-[11px]'>LAST NAME</label>
-
-              <span className="text-text-sm font-semibold text-[11px]">(Optional)</span>
-            </div>
-            <input {...register("lastName")}
-              className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm w-40 text-sm text-[13px]'
-              placeholder='Doe'
-              type="text" id="lastName" />
-
-            <p className="min-h-5 text-xs text-red-500">
-              {errors.lastName?.message}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <div className="flex gap-1">
-            <label htmlFor="country" className='text-text-sm font-bold text-[11px]'>COUNTRY</label>
-
-            <span className="text-text-sm font-semibold text-[11px]">(Optional)</span>
-          </div>
-          <input {...register("country")}
-            className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-            placeholder='Country'
-            type="text" id="country" />
-
-          <p className="min-h-5 text-xs text-red-500">
-            {errors.country?.message}
-          </p>
         </div>
 
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className='text-text-sm font-bold text-[11px]'>EMAIL</label>
-          <input {...register("email")}
-            className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-            placeholder='Email'
-            type="email" id="email" />
+        <AuthInput id="country" placeholder="Country" register={register("country")} type="text" errorMessage={errors.country?.message} label="COUNTRY" optional={true} />
 
-          <p className="min-h-5 text-xs text-red-500">
-            {errors.email?.message}
-          </p>
-        </div>
+        <AuthInput id="email" placeholder="Email" register={register("email")} type="email" errorMessage={errors.email?.message} label="EMAIL" />
 
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className='text-text-sm font-bold text-[11px]'>PASSWORD</label>
-          <input {...register("password")}
-            className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
-            placeholder='Password'
-            type="password" id="password" />
-
-          <p className="min-h-5 text-xs text-red-500">
-            {errors.password?.message}
-          </p>
-        </div>
+        <AuthInput id="password" placeholder="Password" register={register("password")} type="password" errorMessage={errors.password?.message} label="PASSWORD" />
 
       </div>
 
 
-      <button
-        type="submit"
-        disabled={isSigningUp}
-        className="bg-gold text-gold-dark text-[14px] mt-5 w-full rounded-lg py-2.5 cursor-pointer font-bold disabled:opacity-60 disabled:cursor-not-allowed">{isSigningUp ? "Creating..." : "Create Account"}
-      </button>
+      <AuthButton disabled={isSigningUp} loadingText="Creating..." text="Create Account" />
 
       <div className="flex gap-1 mt-3 text-[14px]" >
         <p className="text-text-sm">Already have an account?</p>
