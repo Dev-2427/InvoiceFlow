@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput } from "../validation/authValidation"
-import { forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import { checkAuthApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { User } from "../types/auth.types"
 
@@ -11,6 +11,8 @@ interface IAuthStore {
     isSendingMail: boolean,
     isVerifyingResetCode: boolean,
     isResettingPassword: boolean,
+    isCheckingAuth: boolean,
+    isAuthenticated: boolean,
 
     signup: (data: SignupInput) => Promise<ApiResponse<{ userId: string }>>,
     verifyCode: (data: VerifyCodeInput) => Promise<ApiResponse<{ userData: User }>>
@@ -19,6 +21,8 @@ interface IAuthStore {
     verifyResetCode: (data: VerifyCodeInput) => Promise<ApiResponse<null>>
     resetPassword: (data: ResetPasswordInput) => Promise<ApiResponse<null>>
     googleAuth: (code: string) => Promise<ApiResponse<{ userData: User }>>
+    checkAuth: () => Promise<ApiResponse<{ userData: User }>>
+    forceLogout: () => void,
 
     user: User | null
 }
@@ -30,6 +34,8 @@ const authStore = create<IAuthStore>((set) => ({
     isSendingMail: false,
     isVerifyingResetCode: false,
     isResettingPassword: false,
+    isCheckingAuth: true,
+    isAuthenticated: false,
 
     user: null,
 
@@ -60,7 +66,7 @@ const authStore = create<IAuthStore>((set) => ({
             const res = await verifyCodeApi(data)
 
             if (res.data.success) {
-                set({ user: res.data.data.userData })
+                set({ user: res.data.data.userData, isAuthenticated: true })
             }
 
             return res.data
@@ -83,7 +89,7 @@ const authStore = create<IAuthStore>((set) => ({
             const res = await signinApi(data)
 
             if (res.data.success) {
-                set({ user: res.data.data.userData })
+                set({ user: res.data.data.userData, isAuthenticated: true })
             }
 
             return res.data
@@ -159,7 +165,7 @@ const authStore = create<IAuthStore>((set) => ({
             const res = await googleAuthApi(code)
 
             if (res.data.success) {
-                set({ user: res.data.data.userData })
+                set({ user: res.data.data.userData, isAuthenticated: true })
             }
 
             return res.data
@@ -170,6 +176,31 @@ const authStore = create<IAuthStore>((set) => ({
                 message: "Google authentication failed"
             }
         }
+    },
+
+    async checkAuth() {
+        try {
+            const res = await checkAuthApi()
+
+            if (res.data.success) {
+                set({ user: res.data.data.userData, isAuthenticated: true })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to fetch user data:", error)
+
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isCheckingAuth: false })
+        }
+    },
+
+    forceLogout() {
+        set({ user: null, isAuthenticated: false })
     }
 
 }))

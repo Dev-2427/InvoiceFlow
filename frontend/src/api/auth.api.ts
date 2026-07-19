@@ -28,3 +28,7 @@ export function resetPasswordApi(data: ResetPasswordInput) {
 export function googleAuthApi(code: string) {
     return api.post("/api/auth/google", { code })
 }
+
+export function checkAuthApi() {
+    return api.get("/api/auth/me")
+}
