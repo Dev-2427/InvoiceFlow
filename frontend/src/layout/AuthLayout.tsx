@@ -15,7 +15,7 @@ export default function AuthLayout() {
     return (
         <main className='min-h-screen flex flex-col justify-center items-center px-4 py-8 bg-navy-900 sm:px-6 lg:px-8'>
 
-            <div className="flex flex-col justify-center items-center gap-8 bg-card max-w-md w-full rounded-2xl py-8 px-6 sm:px-8 sm:py-10 shadow-2xl">
+            <div className="flex flex-col justify-center items-center gap-8 bg-page max-w-md w-full rounded-2xl py-8 px-6 sm:px-8 sm:py-10 shadow-2xl">
 
                 <div className='flex flex-col justify-center items-center gap-2'>
 

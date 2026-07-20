@@ -9,10 +9,7 @@ function App() {
   const checkAuth = authStore((state) => state.checkAuth)
 
   useEffect(() => {
-    async function runCheckAuth() {
-      await checkAuth()
-    }
-    runCheckAuth()
+    checkAuth()
   }, [])
 
   return (
