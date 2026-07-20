@@ -6,6 +6,7 @@ import morgan from "morgan"
 import cookieParser from "cookie-parser";
 import { getDBStatus } from "./config/database.js";
 import authRouter from "./routes/auth.route.js"
+import organizationRouter from "./routes/organization.route.js"
 
 const app = express()
 
@@ -28,5 +29,6 @@ app.get("/health", (_, res) => {
 })
 
 app.use("/api/auth", authRouter)
+app.use("/api/organization", organizationRouter)
 
 export default app
