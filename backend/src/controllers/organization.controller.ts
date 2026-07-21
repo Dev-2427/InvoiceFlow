@@ -52,6 +52,7 @@ async function createOrganization(req: Request, res: Response) {
         const organizationData = {
             id: organization._id.toString(),
             organizationName: organization.organizationName,
+            logo: organization.logo.url,
             email: organization.email,
             phone: organization.phone,
             gstNumber: organization.gstNumber,
@@ -99,7 +100,7 @@ async function getOrganization(req: Request, res: Response) {
             _id: organizationId,
             owner: userId
         })
-            .select("organizationName email phone gstNumber currency address termsAndConditions createdAt")
+            .select("organizationName logo.url email phone gstNumber currency address termsAndConditions createdAt")
             .lean()
 
         if (!organization) {
@@ -113,4 +114,28 @@ async function getOrganization(req: Request, res: Response) {
     }
 }
 
-export { createOrganization, getOrganization }
+async function getOrganizations(req: Request, res: Response) {
+
+    const userId = req.user?.userId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const organizations = await Organization.find({ owner: userId })
+            .select("organizationName logo.url currency createdAt")
+            .sort({ createdAt: -1 })
+            .lean()
+
+
+        return sendResponse(res, { status: 200, message: "Organizations fetched successfully", data: { organizations } })
+
+    } catch (error) {
+        console.error("Failed to fetch user's organizations:", error)
+        return sendResponse(res, { status: 500, message: "Failed to fetch user's organizations" })
+    }
+
+}
+
+export { createOrganization, getOrganization, getOrganizations }
