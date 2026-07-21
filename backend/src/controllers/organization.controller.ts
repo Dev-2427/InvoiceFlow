@@ -57,7 +57,8 @@ async function createOrganization(req: Request, res: Response) {
             gstNumber: organization.gstNumber,
             currency: organization.currency,
             address: organization.address,
-            termsAndConditions: organization.termsAndConditions
+            termsAndConditions: organization.termsAndConditions,
+            createdAt: organization.createdAt
         }
 
         return sendResponse(res, { status: 201, message: "Organization created successfully", data: { organizationData } })
@@ -80,4 +81,36 @@ async function createOrganization(req: Request, res: Response) {
     }
 }
 
-export { createOrganization }
+async function getOrganization(req: Request, res: Response) {
+
+    const organizationId = req.params.organizationId
+    const userId = req.user?.userId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 400, message: "Organization ID not found" })
+    }
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const organization = await Organization.findOne({
+            _id: organizationId,
+            owner: userId
+        })
+            .select("organizationName email phone gstNumber currency address termsAndConditions createdAt")
+            .lean()
+
+        if (!organization) {
+            return sendResponse(res, { status: 404, message: "Organization not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Organization fetched successfully", data: { organizationData: organization } })
+    } catch (error) {
+        console.error("Failed to get organization data:", error)
+        return sendResponse(res, { status: 500, message: "Failed to get organization data" })
+    }
+}
+
+export { createOrganization, getOrganization }

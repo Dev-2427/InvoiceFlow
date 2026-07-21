@@ -23,7 +23,9 @@ interface IOrganization {
         country: string
     },
     invoiceCounter: number,
-    termsAndConditions: string
+    termsAndConditions: string,
+    createdAt: Date,
+    updatedAt: Date
 }
 
 const organizationSchema = new Schema<IOrganization>({
