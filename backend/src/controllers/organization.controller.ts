@@ -4,6 +4,8 @@ import User from "../models/User.js";
 import Organization from "../models/Organization.js";
 import mongoose from "mongoose";
 import { currencies } from "../config/constants.js";
+import imagekit from "../services/imagekit.js";
+import crypto from "crypto";
 
 type OrganizationParams = {
     organizationId: string
@@ -197,4 +199,131 @@ async function updateOrganization(req: Request<OrganizationParams>, res: Respons
     }
 }
 
-export { createOrganization, getOrganization, getOrganizations, updateOrganization }
+async function updateLogo(req: Request<OrganizationParams>, res: Response) {
+    const userId = req.user?.userId
+    const organizationId = req.params.organizationId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!req.file) {
+        return sendResponse(res, { status: 400, message: "File is required to update logo" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+        return sendResponse(res, { status: 400, message: "Invalid organization ID" })
+    }
+
+    let uploadedFileId: string | null = null
+
+    try {
+
+        const organization = await Organization.findOne({
+            _id: organizationId,
+            owner: userId
+        })
+
+        if (!organization) {
+            return sendResponse(res, { status: 404, message: "Organization not found" })
+        }
+
+        let ext = "jpg"
+
+        if (req.file.mimetype.endsWith("jpeg")) ext = "jpeg"
+        if (req.file.mimetype.endsWith("png")) ext = "png"
+        if (req.file.mimetype.endsWith("webp")) ext = "webp"
+
+        const fileName = `logo-${organizationId}-${crypto.randomBytes(3).toString("hex")}-${Date.now()}.${ext}`
+
+        const uploadResponse = await imagekit.upload({
+            file: req.file.buffer,
+            fileName,
+            folder: "/organization-logos",
+            useUniqueFileName: false
+        })
+
+        uploadedFileId = uploadResponse.fileId
+
+        let deletableFile = organization.logo.fileId || null
+
+        organization.logo = {
+            url: uploadResponse.url,
+            fileId: uploadResponse.fileId
+        }
+
+        await organization.save()
+
+        if (deletableFile) {
+            try {
+                await imagekit.deleteFile(deletableFile)
+            } catch (error) {
+                console.error("Failed to delete old logo:", error);
+            }
+        }
+
+        return sendResponse(res, { status: 200, message: "Logo updated successfully", data: { logoUrl: organization.logo.url } })
+
+    } catch (error) {
+
+        if (uploadedFileId) {
+            try {
+                await imagekit.deleteFile(uploadedFileId)
+            } catch (cleanupError) {
+                console.error("Failed to clean up orphan image:", cleanupError);
+            }
+        }
+
+        console.error("Failed to update organization logo:", error);
+        return sendResponse(res, { status: 500, message: "Failed to update organization logo" })
+    }
+}
+
+async function removeLogo(req: Request<OrganizationParams>, res: Response) {
+    const userId = req.user?.userId
+    const organizationId = req.params.organizationId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+        return sendResponse(res, { status: 400, message: "Invalid organization ID" })
+    }
+
+    try {
+        const organization = await Organization.findOne({
+            _id: organizationId,
+            owner: userId
+        })
+
+        if (!organization) {
+            return sendResponse(res, { status: 404, message: "Organization not found" })
+        }
+
+        if (organization.logo.fileId) {
+            try {
+                await imagekit.deleteFile(organization.logo.fileId)
+            } catch (error) {
+                console.error("Error deleting logo from imagekit:", error)
+                return sendResponse(res, { status: 500, message: " Error occured while removing logo" })
+            }
+        } else {
+            return sendResponse(res, { status: 404, message: "No logo found" })
+        }
+
+        organization.logo.url = null
+        organization.logo.fileId = null
+        await organization.save()
+
+        return sendResponse(res, { status: 200, message: "Organization logo removed successfully" })
+
+    } catch (error) {
+        console.error("Failed to delete organization logo:", error);
+        return sendResponse(res, { status: 500, message: "Failed to delete organization logo" })
+    }
+
+
+}
+
+export { createOrganization, getOrganization, getOrganizations, updateOrganization, updateLogo, removeLogo }
