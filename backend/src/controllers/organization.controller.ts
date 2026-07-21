@@ -5,6 +5,10 @@ import Organization from "../models/Organization.js";
 import mongoose from "mongoose";
 import { currencies } from "../config/constants.js";
 
+type OrganizationParams = {
+    organizationId: string
+}
+
 async function createOrganization(req: Request, res: Response) {
     const { organizationName, email, phone, gstNumber, currencyCode, address, termsAndConditions } = req.body
     const userId = req.user?.userId
@@ -82,13 +86,20 @@ async function createOrganization(req: Request, res: Response) {
     }
 }
 
-async function getOrganization(req: Request, res: Response) {
+async function getOrganization(req: Request<OrganizationParams>, res: Response) {
 
     const organizationId = req.params.organizationId
     const userId = req.user?.userId
 
     if (!organizationId) {
         return sendResponse(res, { status: 400, message: "Organization ID not found" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+        return sendResponse(res, {
+            status: 400,
+            message: "Invalid organization ID"
+        });
     }
 
     if (!userId) {
@@ -138,4 +149,52 @@ async function getOrganizations(req: Request, res: Response) {
 
 }
 
-export { createOrganization, getOrganization, getOrganizations }
+async function updateOrganization(req: Request<OrganizationParams>, res: Response) {
+    const userId = req.user?.userId
+    const organizationId = req.params.organizationId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+        return sendResponse(res, {
+            status: 400,
+            message: "Invalid organization ID"
+        });
+    }
+
+    try {
+        const updatedOrganization = await Organization.findOneAndUpdate(
+            { _id: organizationId, owner: userId },
+            req.body,
+            {
+                returnDocument: "after",
+                runValidators: true
+            }
+        )
+            .select("organizationName logo.url email phone gstNumber currency address termsAndConditions createdAt")
+            .lean()
+
+        if (!updatedOrganization) {
+            return sendResponse(res, { status: 404, message: "Organization not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Organization updated successfully", data: { organizationData: updatedOrganization } })
+
+    } catch (error) {
+        const mongoError = error as { code?: number };
+
+        if (mongoError.code === 11000) {
+            return sendResponse(res, {
+                status: 409,
+                message: "Organization name already exists"
+            });
+        }
+
+        console.error("Failed to update organization data:", error);
+        return sendResponse(res, { status: 500, message: "Failed to update organization data" })
+    }
+}
+
+export { createOrganization, getOrganization, getOrganizations, updateOrganization }

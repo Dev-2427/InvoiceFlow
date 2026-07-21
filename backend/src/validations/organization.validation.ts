@@ -18,3 +18,15 @@ export const createOrganizationSchema = z.object({
     address: address,
     termsAndConditions: z.string().trim().optional()
 })
+
+export const updateOrganizationSchema = z.object({
+    organizationName: z.string().trim().min(1).optional(),
+    email: z.email().trim().toLowerCase().optional(),
+    phone: z.string().trim().optional(),
+    gstNumber: z.string().trim().optional(),
+    address: address.optional(),
+    termsAndConditions: z.string().trim().optional()
+})
+    .refine(data => Object.keys(data).length > 0, {
+        message: "No data provided to update"
+    })
