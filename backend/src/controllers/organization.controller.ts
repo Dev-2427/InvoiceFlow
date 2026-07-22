@@ -160,10 +160,7 @@ async function updateOrganization(req: Request<OrganizationParams>, res: Respons
     }
 
     if (!mongoose.Types.ObjectId.isValid(organizationId)) {
-        return sendResponse(res, {
-            status: 400,
-            message: "Invalid organization ID"
-        });
+        return sendResponse(res, { status: 400, message: "Invalid organization ID" });
     }
 
     try {
@@ -326,4 +323,47 @@ async function removeLogo(req: Request<OrganizationParams>, res: Response) {
 
 }
 
-export { createOrganization, getOrganization, getOrganizations, updateOrganization, updateLogo, removeLogo }
+async function switchOrganization(req: Request<OrganizationParams>, res: Response) {
+    const userId = req.user?.userId
+    const organizationIdToSwitch = req.params.organizationId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(organizationIdToSwitch)) {
+        return sendResponse(res, { status: 400, message: "Invalid organization ID" });
+    }
+
+    try {
+        const organization = await Organization.findOne({
+            _id: organizationIdToSwitch,
+            owner: userId
+        })
+            .select("organizationName logo.url email phone gstNumber currency address termsAndConditions createdAt")
+            .lean()
+
+        if (!organization) {
+            return sendResponse(res, { status: 404, message: "Organization not found" });
+        }
+
+        const user = await User.findByIdAndUpdate(userId,
+            { currentOrg: organization._id },
+            {
+                returnDocument: "after",
+            }
+        ).lean()
+
+        if (!user) {
+            return sendResponse(res, { status: 404, message: "User not found" });
+        }
+
+        return sendResponse(res, { status: 200, message: "Organization switched successfully", data: { organizationData: organization } })
+
+    } catch (error) {
+        console.error("Failed to change organization:", error);
+        return sendResponse(res, { status: 500, message: "Failed to change organization" })
+    }
+}
+
+export { createOrganization, getOrganization, getOrganizations, updateOrganization, updateLogo, removeLogo, switchOrganization }
