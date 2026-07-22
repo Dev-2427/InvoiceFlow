@@ -2,10 +2,13 @@ import type { Request, Response } from "express";
 import sendResponse from "../utils/sendResponse.js";
 import User from "../models/User.js";
 import Organization from "../models/Organization.js";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import { currencies } from "../config/constants.js";
 import imagekit from "../services/imagekit.js";
 import crypto from "crypto";
+import Invoice from "../models/Invoice.js";
+import Client from "../models/Client.js";
+import { Session } from "inspector";
 
 type OrganizationParams = {
     organizationId: string
@@ -366,4 +369,77 @@ async function switchOrganization(req: Request<OrganizationParams>, res: Respons
     }
 }
 
-export { createOrganization, getOrganization, getOrganizations, updateOrganization, updateLogo, removeLogo, switchOrganization }
+async function deleteOrganization(req: Request<OrganizationParams>, res: Response) {
+    const userId = req.user?.userId
+    const organizationId = req.params.organizationId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(organizationId)) {
+        return sendResponse(res, { status: 400, message: "Invalid organization ID" })
+    }
+
+    let anotherOrganization;
+    const session = await mongoose.startSession()
+
+    try {
+        session.startTransaction()
+
+        const user = await User.findById(userId).session(session)
+
+        if (!user) {
+            return sendResponse(res, { status: 404, message: "User not found" })
+        }
+
+        const organization = await Organization.findOne({
+            _id: organizationId,
+            owner: userId
+        }).session(session)
+
+        if (!organization) {
+            return sendResponse(res, { status: 404, message: "Organization not found" })
+        }
+
+        await Invoice.deleteMany({ organization: organization._id }, { session })
+
+        await Client.deleteMany({ organization: organization._id }, { session })
+
+        await organization.deleteOne({ session })
+
+        if (user.currentOrg?.equals(organization._id)) {
+            anotherOrganization = await Organization.findOne(
+                { owner: user._id }
+            )
+                .select("organizationName logo.url email phone gstNumber currency address termsAndConditions createdAt")
+                .lean()
+                .session(session)
+
+            user.currentOrg = anotherOrganization?._id ?? null
+            await user.save({ session })
+        }
+
+        await session.commitTransaction()
+
+        if (organization.logo.fileId) {
+            try {
+                await imagekit.deleteFile(organization.logo.fileId)
+            } catch (error) {
+                console.error("Failed to delete organization logo:", error)
+            }
+        }
+
+        return sendResponse(res, { status: 200, message: "Organization deleted successfully", data: { organization: anotherOrganization ?? null } })
+
+    } catch (error) {
+        await session.abortTransaction()
+
+        console.error("Failed to delete organization:", error)
+        return sendResponse(res, { status: 500, message: "Failed to delete organization" })
+    } finally {
+        await session.endSession()
+    }
+}
+
+export { createOrganization, getOrganization, getOrganizations, updateOrganization, updateLogo, removeLogo, switchOrganization, deleteOrganization }
