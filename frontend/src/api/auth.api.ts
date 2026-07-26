@@ -32,3 +32,7 @@ export function googleAuthApi(code: string) {
 export function checkAuthApi() {
     return api.get("/api/auth/me")
 }
+
+export function signoutApi() {
+    return api.post("/api/auth/signout")
+}

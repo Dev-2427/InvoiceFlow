@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput } from "../validation/authValidation"
-import { checkAuthApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import { checkAuthApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { User } from "../types/auth.types"
 
@@ -11,6 +11,7 @@ interface IAuthStore {
     isSendingMail: boolean,
     isVerifyingResetCode: boolean,
     isResettingPassword: boolean,
+    isSigningout: boolean,
     isCheckingAuth: boolean,
     isAuthenticated: boolean,
 
@@ -22,6 +23,7 @@ interface IAuthStore {
     resetPassword: (data: ResetPasswordInput) => Promise<ApiResponse<null>>
     googleAuth: (code: string) => Promise<ApiResponse<{ userData: User }>>
     checkAuth: () => Promise<ApiResponse<{ userData: User }>>
+    signout: () => Promise<ApiResponse<null>>
     forceLogout: () => void,
 
     user: User | null
@@ -34,8 +36,9 @@ const authStore = create<IAuthStore>((set) => ({
     isSendingMail: false,
     isVerifyingResetCode: false,
     isResettingPassword: false,
-    isCheckingAuth: true,
+    isSigningout: false,
     isAuthenticated: false,
+    isCheckingAuth: true,
 
     user: null,
 
@@ -196,6 +199,28 @@ const authStore = create<IAuthStore>((set) => ({
             }
         } finally {
             set({ isCheckingAuth: false })
+        }
+    },
+
+    async signout() {
+        set({ isSigningout: true })
+
+        try {
+            const res = await signoutApi()
+
+            if (res.data.success) {
+                set({ user: null, isAuthenticated: false })
+            }
+
+            return res.data
+        } catch (error) {
+            console.error("Failed to sign out:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isSigningout: false })
         }
     },
 

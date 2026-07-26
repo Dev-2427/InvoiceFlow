@@ -275,10 +275,10 @@ async function signout(req: Request, res: Response) {
             return sendResponse(res, { status: 401, message: "Token not found" })
         }
 
-        return sendResponse(res, { status: 200, message: "Logged out successfully" })
+        return sendResponse(res, { status: 200, message: "Signed out successfully" })
     } catch (error) {
-        console.error("Error on logout:", error)
-        return sendResponse(res, { status: 500, message: "Log out failed" })
+        console.error("Error on sign out:", error)
+        return sendResponse(res, { status: 500, message: "Failed to sign out" })
     }
 }
 
@@ -490,7 +490,7 @@ async function googleAuth(req: Request, res: Response) {
 
     try {
 
-        const { tokens } = await googleClient.getToken({code, redirect_uri: "postmessage"})
+        const { tokens } = await googleClient.getToken({ code, redirect_uri: "postmessage" })
 
         if (!tokens.id_token) {
             return sendResponse(res, { status: 401, message: "Failed to retrieve Google ID token" })
