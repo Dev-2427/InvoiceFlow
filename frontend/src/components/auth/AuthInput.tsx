@@ -12,7 +12,7 @@ interface IAuthInput {
 
 export default function AuthInput({ id, optional = false, label, type, placeholder, register, errorMessage }: IAuthInput) {
     return (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 w-full">
             <div className="flex gap-1">
                 {label &&
                     <label htmlFor={id} className='text-text-sm font-bold text-[11px]'>{label}</label>
@@ -22,11 +22,12 @@ export default function AuthInput({ id, optional = false, label, type, placehold
                 }
             </div>
             <input {...register}
+                spellCheck={false}
                 className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
                 placeholder={placeholder}
                 type={type} id={id} />
 
-            <p className="min-h-[20px] text-xs text-red-500">
+            <p className="min-h-5 text-xs text-overdue">
                 {errorMessage}
             </p>
         </div>)

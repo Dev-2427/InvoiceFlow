@@ -7,6 +7,7 @@ body,
     min-height: 100%;
 }
 
+
 @theme {
   /* ── Navy ── */
   --color-navy-900: #0D1F33;  /* sidebar dark, toast bg, auth gradient */
@@ -46,4 +47,35 @@ body,
   --color-text-md: #334155;  /* body text, secondary headings */
   --color-text-sm: #64748B;  /* labels, table headers, helper text */
   --color-text-xs: #94A3B8;  /* muted text, chart axis, timestamps */
+}
+
+
+
+/* Global Scrollbar */
+
+/* Width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.45);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background 0.2s ease;
+}
+
+/* Hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(113, 113, 122, 0.7);
+  border: 2px solid transparent;
+  background-clip: content-box;
 }

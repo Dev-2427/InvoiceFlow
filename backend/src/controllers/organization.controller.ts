@@ -8,7 +8,6 @@ import imagekit from "../services/imagekit.js";
 import crypto from "crypto";
 import Invoice from "../models/Invoice.js";
 import Client from "../models/Client.js";
-import { Session } from "inspector";
 
 type OrganizationParams = {
     organizationId: string
@@ -39,16 +38,15 @@ async function createOrganization(req: Request, res: Response) {
             return sendResponse(res, { status: 401, message: "User not found" })
         }
 
-
         const organization = new Organization({
             owner: userId,
             organizationName,
             email,
-            phone: phone ?? null,
-            gstNumber: gstNumber ?? null,
+            phone: phone || null,
+            gstNumber: gstNumber || null,
             currency: { code: selectedCurrency.code, symbol: selectedCurrency.symbol },
             address,
-            termsAndConditions: termsAndConditions ?? ""
+            termsAndConditions: termsAndConditions || ""
         })
 
         await organization.save({ session })

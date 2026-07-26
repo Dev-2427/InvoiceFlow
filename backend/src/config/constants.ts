@@ -51,12 +51,6 @@ export const currencies = [
         "flag": "🇸🇬"
     },
     {
-        "code": "NZD",
-        "name": "New Zealand Dollar",
-        "symbol": "NZ$",
-        "flag": "🇳🇿"
-    },
-    {
         "code": "JPY",
         "name": "Japanese Yen",
         "symbol": "¥",
@@ -99,22 +93,10 @@ export const currencies = [
         "flag": "🇩🇰"
     },
     {
-        "code": "ZAR",
-        "name": "South African Rand",
-        "symbol": "R",
-        "flag": "🇿🇦"
-    },
-    {
         "code": "BRL",
         "name": "Brazilian Real",
         "symbol": "R$",
         "flag": "🇧🇷"
-    },
-    {
-        "code": "MXN",
-        "name": "Mexican Peso",
-        "symbol": "Mex$",
-        "flag": "🇲🇽"
     },
     {
         "code": "SAR",

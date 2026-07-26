@@ -8,7 +8,6 @@ import { generateAccessToken, generateRefreshToken, cookieOptions, clearAllCooki
 import RefreshToken from "../models/RefreshToken.js"
 import jwt from "jsonwebtoken"
 import { env } from "../config/env.js"
-import Organization from "../models/Organization.js"
 import forgotPasswordVerificationTemplate from "../services/email/templates/forgotPasswordVerification.js"
 import { googleClient } from "../config/google.js"
 import { getDeviceDetails } from "../utils/getDeviceDetails.js"
