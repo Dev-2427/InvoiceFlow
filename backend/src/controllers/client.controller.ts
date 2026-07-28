@@ -4,6 +4,10 @@ import User from "../models/User.js";
 import Client from "../models/Client.js";
 import mongoose from "mongoose";
 
+type clientParams = {
+    clientId: string
+}
+
 async function createClient(req: Request, res: Response) {
 
     const userId = req.user?.userId
@@ -49,4 +53,35 @@ async function createClient(req: Request, res: Response) {
     }
 }
 
-export { createClient }
+async function getClientDetails(req: Request<clientParams>, res: Response) {
+
+    const organizationId = req.organization?.organizationId
+    const clientId = req.params.clientId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(clientId)) {
+        return sendResponse(res, { status: 400, message: "Invalid client ID" })
+    }
+
+    try {
+
+        const client = await Client.findOne({
+            _id: clientId,
+            organization: organizationId
+        }).lean()
+
+        if (!client) {
+            return sendResponse(res, { status: 404, message: "Client not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Client details fetched successfully", data: { clientData: client } })
+    } catch (error) {
+        console.error("Failed to get client details:", error);
+        return sendResponse(res, { status: 500, message: "Failed to get client details" })
+    }
+}
+
+export { createClient, getClientDetails }
