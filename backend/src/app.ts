@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 import { getDBStatus } from "./config/database.js";
 import authRouter from "./routes/auth.route.js"
 import organizationRouter from "./routes/organization.route.js"
+import clientRouter from "./routes/client.route.js"
+import authCheck from "./middleware/authCheck.js"
 
 const app = express()
 
@@ -29,6 +31,7 @@ app.get("/health", (_, res) => {
 })
 
 app.use("/api/auth", authRouter)
-app.use("/api/organization", organizationRouter)
+app.use("/api/organization", authCheck, organizationRouter)
+app.use("/api/client", authCheck, clientRouter)
 
 export default app

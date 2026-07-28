@@ -7,13 +7,13 @@ import upload from "../middleware/upload.js";
 
 const route = Router()
 
-route.post("/", authCheck, validate(createOrganizationSchema), createOrganization)
-route.get("/", authCheck, getOrganizations)
-route.get("/:organizationId", authCheck, getOrganization)
-route.patch("/:organizationId", authCheck, validate(updateOrganizationSchema), updateOrganization)
-route.patch("/:organizationId/logo", authCheck, upload.single("logo"), updateLogo)
-route.patch("/switch/:organizationId", authCheck, switchOrganization)
-route.delete("/:organizationId/logo", authCheck, removeLogo)
-route.delete("/:organizationId", authCheck, deleteOrganization)
+route.post("/", validate(createOrganizationSchema), createOrganization)
+route.get("/", getOrganizations)
+route.get("/:organizationId", getOrganization)
+route.patch("/:organizationId", validate(updateOrganizationSchema), updateOrganization)
+route.patch("/:organizationId/logo", upload.single("logo"), updateLogo)
+route.patch("/switch/:organizationId", switchOrganization)
+route.delete("/:organizationId/logo", removeLogo)
+route.delete("/:organizationId", deleteOrganization)
 
 export default route

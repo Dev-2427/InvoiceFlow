@@ -12,20 +12,20 @@ interface IClient {
     email: string | null,
     phone: string | null,
     billingAddress: {
-        street1: { type: String },
-        street2: { type: String },
-        city: { type: String },
-        state: { type: String },
-        pincode: { type: String },
-        country: { type: String },
+        street1: string,
+        street2: string,
+        city: string,
+        state: string,
+        pincode: string,
+        country: string,
     },
     shippingAddress: {
-        street1: { type: String },
-        street2: { type: String },
-        city: { type: String },
-        state: { type: String },
-        pincode: { type: String },
-        country: { type: String },
+        street1: string,
+        street2: string,
+        city: string,
+        state: string,
+        pincode: string,
+        country: string,
     }
 }
 
