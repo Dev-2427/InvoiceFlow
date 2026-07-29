@@ -2,14 +2,14 @@ import { z } from "zod";
 
 export function optionalString(schema: z.ZodString) {
     return z.preprocess(
-        value => value === "" ? undefined : value,
-        schema.optional()
+        value => value === "" ? null : value,
+        schema.nullable().optional()
     )
 }
 
 export function optionalEmail() {
     return z.preprocess(
         value => value === "" ? undefined : value,
-        z.email().trim().toLowerCase().optional()
+        z.email().trim().toLowerCase().nullable().optional()
     )
 }

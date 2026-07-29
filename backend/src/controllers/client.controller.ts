@@ -3,6 +3,7 @@ import sendResponse from "../utils/sendResponse.js";
 import User from "../models/User.js";
 import Client from "../models/Client.js";
 import mongoose from "mongoose";
+import { completeClientSchema } from "../validations/client.validation.js";
 
 type clientParams = {
     clientId: string
@@ -84,4 +85,51 @@ async function getClientDetails(req: Request<clientParams>, res: Response) {
     }
 }
 
-export { createClient, getClientDetails }
+async function updateClient(req: Request<clientParams>, res: Response) {
+    const organizationId = req.organization?.organizationId
+    const clientId = req.params.clientId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(clientId)) {
+        return sendResponse(res, { status: 400, message: "Invalid client ID" })
+    }
+
+    try {
+        const client = await Client.findOne({
+            _id: clientId,
+            organization: organizationId
+        })
+
+        if (!client) {
+            return sendResponse(res, { status: 404, message: "Client not found" })
+        }
+
+        const finalData = {
+            ...client.toObject(),
+            ...req.body
+        }
+
+        const result = completeClientSchema.safeParse(finalData)
+
+        if (!result.success) {
+            return sendResponse(res, { status: 400, message: result.error.issues[0]?.message ?? "Validation failed" })
+        }
+
+        Object.assign(client, result.data)
+        await client.save()
+
+        return sendResponse(res, { status: 200, message: "Client updated successfully", data: { clientData: client } })
+    } catch (error) {
+        if (error instanceof mongoose.mongo.MongoServerError && error.code === 11000) {
+            return sendResponse(res, { status: 409, message: "A client with this display name already exists" })
+        }
+
+        console.error("Failed to update client:", error);
+        return sendResponse(res, { status: 500, message: "Failed to update client" })
+    }
+}
+
+export { createClient, getClientDetails, updateClient }
