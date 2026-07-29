@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { optionalEmail, optionalString } from "../utils/validationHelper.js";
+import mongoose from "mongoose";
 
 const clientType = z.enum(["business", "individual"])
 const salutation = z.enum(["Mr", "Mrs", "Ms", "Dr", "Prof"])
@@ -65,3 +66,8 @@ export const completeClientSchema = clientBaseSchema.extend({
     status
 })
     .superRefine(validateClient)
+
+export const deleteClientsSchema = z.object({
+    clientIds: z.array(z.string().refine(mongoose.Types.ObjectId.isValid, "Invalid client ID")
+    ).min(1, "At least one client is required")
+})

@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import Client from "../models/Client.js";
 import mongoose from "mongoose";
 import { completeClientSchema } from "../validations/client.validation.js";
+import Invoice from "../models/Invoice.js";
 
 type clientParams = {
     clientId: string
@@ -132,4 +133,43 @@ async function updateClient(req: Request<clientParams>, res: Response) {
     }
 }
 
-export { createClient, getClientDetails, updateClient }
+async function deleteClients(req: Request<clientParams>, res: Response) {
+    const organizationId = req.organization?.organizationId
+    const { clientIds } = req.body
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    const session = await mongoose.startSession()
+    try {
+        session.startTransaction()
+
+        const clients = await Client.deleteMany({
+            organization: organizationId,
+            _id: { $in: clientIds }
+        }).session(session)
+
+        if (clients.deletedCount !== clientIds.length) {
+            await session.abortTransaction()
+            return sendResponse(res, { status: 404, message: "One or more clients were not found" })
+        }
+
+        await Invoice.deleteMany({
+            organization: organizationId,
+            client: { $in: clientIds }
+        }).session(session)
+
+        await session.commitTransaction()
+
+        return sendResponse(res, { status: 200, message: "Clients deleted successfully" })
+    } catch (error) {
+        await session.abortTransaction()
+        console.error("Failed to delete clients:", error);
+        return sendResponse(res, { status: 500, message: "Failed to delete clients" })
+    } finally {
+        await session.endSession()
+    }
+}
+
+export { createClient, getClientDetails, updateClient, deleteClients }
