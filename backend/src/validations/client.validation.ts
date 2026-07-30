@@ -71,3 +71,7 @@ export const deleteClientsSchema = z.object({
     clientIds: z.array(z.string().refine(mongoose.Types.ObjectId.isValid, "Invalid client ID")
     ).min(1, "At least one client is required")
 })
+
+export const changeClientStatusSchema = deleteClientsSchema.extend({
+    status: z.enum(["active", "inactive"], { message: "Invalid status" })
+})

@@ -133,7 +133,7 @@ async function updateClient(req: Request<clientParams>, res: Response) {
     }
 }
 
-async function deleteClients(req: Request<clientParams>, res: Response) {
+async function deleteClients(req: Request, res: Response) {
     const organizationId = req.organization?.organizationId
     const { clientIds } = req.body
 
@@ -172,4 +172,32 @@ async function deleteClients(req: Request<clientParams>, res: Response) {
     }
 }
 
-export { createClient, getClientDetails, updateClient, deleteClients }
+async function changeClientStatus(req: Request, res: Response) {
+    const organizationId = req.organization?.organizationId
+    const { clientIds, status } = req.body
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+
+        const result = await Client.updateMany({
+            organization: organizationId,
+            _id: { $in: clientIds }
+        }, {
+            status
+        })
+
+        if (result.matchedCount === 0) {
+            return sendResponse(res, { status: 404, message: "No clients found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Client status updated successfully" })
+    } catch (error) {
+        console.error("Failed to update client status:", error);
+        return sendResponse(res, { status: 500, message: "Failed to update client status" })
+    }
+}
+
+export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus }
