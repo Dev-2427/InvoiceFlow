@@ -1,6 +1,6 @@
 import { Schema, model, type Types } from "mongoose";
 
-interface IClient {
+export interface IClient {
     organization: Types.ObjectId,
     clientType: "individual" | "business",
     status: "active" | "inactive",

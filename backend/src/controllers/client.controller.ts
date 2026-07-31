@@ -1,10 +1,11 @@
 import type { Request, Response } from "express";
 import sendResponse from "../utils/sendResponse.js";
 import User from "../models/User.js";
-import Client from "../models/Client.js";
-import mongoose from "mongoose";
-import { completeClientSchema } from "../validations/client.validation.js";
+import Client, { type IClient } from "../models/Client.js";
+import mongoose, { Types } from "mongoose";
+import { completeClientSchema, getClientsSchema } from "../validations/client.validation.js";
 import Invoice from "../models/Invoice.js";
+import type { QueryFilter } from "mongoose"
 
 type clientParams = {
     clientId: string
@@ -200,4 +201,152 @@ async function changeClientStatus(req: Request, res: Response) {
     }
 }
 
-export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus }
+async function getClients(req: Request, res: Response) {
+    const passedQuery = getClientsSchema.safeParse(req.query)
+    const organizationId = req.organization?.organizationId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!passedQuery.success) {
+        return sendResponse(res, { status: 400, message: "Invalid queries" })
+    }
+
+    try {
+
+        const { limit, order, page, sortBy, filter, search } = passedQuery.data
+
+        const skip = (page - 1) * limit
+
+        const query: QueryFilter<IClient> = { organization: new Types.ObjectId(organizationId) }
+
+        if (filter === "active" || filter === "inactive") {
+            query.status = filter
+        } else if (filter === "business" || filter === "individual") {
+            query.clientType = filter
+        }
+
+
+        if (search) {
+            query.$or = [
+                { displayName: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } },
+                { companyName: { $regex: search, $options: "i" } },
+                { firstName: { $regex: search, $options: "i" } },
+                { lastName: { $regex: search, $options: "i" } },
+            ]
+        }
+
+        const sort: Record<string, 1 | -1> = { [sortBy]: order === "asc" ? 1 : -1 }
+
+        const [clients, totalItems] = await Promise.all([
+            Client.aggregate([
+                { $match: query },
+                { $sort: sort },
+                { $skip: skip },
+                { $limit: limit },
+                {
+                    $project: {
+                        organization: 1,
+                        displayName: 1,
+                        companyName: 1,
+                        email: 1,
+                        phone: 1
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "invoices",
+                        let: {
+                            clientId: "$_id",
+                            organizationId: "$organization"
+                        },
+
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$client", "$$clientId"] },
+                                            { $eq: ["$organization", "$$organizationId"] }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+
+                                $group: {
+                                    _id: null,
+
+                                    totalBilled: {
+                                        $sum: "$totalAmount"
+                                    },
+
+                                    totalReceivable: {
+                                        $sum: {
+                                            $cond: [
+                                                {
+                                                    $in: [
+                                                        "$status",
+                                                        ["unpaid", "overdue"]
+                                                    ]
+                                                },
+                                                "$totalAmount",
+                                                0
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                        ],
+                        as: "stats"
+                    }
+                },
+                {
+                    $unwind: {
+                        path: "$stats",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $addFields: {
+                        totalBilled: {
+                            $ifNull: ["$stats.totalBilled", 0]
+                        },
+                        totalReceivable: {
+                            $ifNull: ["$stats.totalReceivable", 0]
+                        },
+                    }
+                },
+                {
+                    $project: {
+                        stats: 0,
+                        organization: 0
+                    }
+                }
+            ]),
+
+            Client.countDocuments(query)
+        ])
+
+        return sendResponse(res, {
+            status: 200, message: "Clients fetched successfully", data: {
+                clients,
+                pagination: {
+                    page,
+                    limit,
+                    totalItems,
+                    totalPages: Math.ceil(totalItems / limit)
+                }
+            }
+        })
+
+    } catch (error) {
+        console.error("Failed to get client:", error);
+        return sendResponse(res, { status: 500, message: "Failed to get clients" })
+    }
+
+}
+
+export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus, getClients }
