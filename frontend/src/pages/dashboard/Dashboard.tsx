@@ -1,6 +1,9 @@
+import Header from "../../components/ui/Header";
 
 export default function Dashboard() {
     return (
-        <div>Dashboard</div>
+        <>
+            <Header header="Dashboard" />
+        </>
     )
 }
