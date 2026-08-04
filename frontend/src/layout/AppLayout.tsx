@@ -1,10 +1,14 @@
-import { NavLink, Outlet } from "react-router-dom"
+import { Link, NavLink, Outlet } from "react-router-dom"
 import { HiSquares2X2, HiOutlineDocumentText, HiUsers, HiChartBar, HiCog6Tooth, HiBuildingOffice2 } from "react-icons/hi2"
-import { TbLayoutSidebar } from "react-icons/tb";
+import { RiArrowDownSFill } from "react-icons/ri";
+import { TbLayoutSidebar, TbPlus } from "react-icons/tb";
 import authStore from "../store/authStore"
 import { HiXMark } from "react-icons/hi2";
 import uiStore from "../store/uiStore";
 import Tooltip from "../components/ui/Tooltip";
+import organizationStore from "../store/organizationStore";
+import { useEffect, useRef, useState } from "react";
+import OrganizationSkeleton from "../components/loading/OrganizationSkeleton";
 
 export default function AppLayout() {
 
@@ -38,11 +42,30 @@ export default function AppLayout() {
 
     const user = authStore((state) => state.user)
 
+    const organization = organizationStore((state) => state.organization)
+
     const isSidebarOpen = uiStore((state) => state.isSidebarOpen)
     const closeSidebar = uiStore((state) => state.closeSidebar)
-
     const isSidebarCollapsed = uiStore((state) => state.isSidebarCollapsed)
     const toggleSidebarCollapsed = uiStore((state) => state.toggleSidebarCollapsed)
+
+    const [showOrgContextMenu, setShowOrgContextMenu] = useState(false)
+
+    const orgContextRef = useRef<HTMLButtonElement>(null)
+
+    useEffect(() => {
+        function handleOutsideClick(e: MouseEvent) {
+            if (orgContextRef.current && !orgContextRef.current.contains(e.target as Node)) {
+                setShowOrgContextMenu(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleOutsideClick)
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick)
+        }
+    }, [])
 
     return (
         <div className="flex min-h-screen overflow-y-auto">
@@ -54,8 +77,10 @@ export default function AppLayout() {
                 />
             )}
 
-            <aside className={`fixed lg:static top-0 left-0 flex flex-col h-screen w-64 shrink-0 bg-navy-800 p-5 gap-5 transition-all duration-300 ease-in-out z-50 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 ${isSidebarCollapsed && "lg:w-18 lg:items-center"}`}>
+            {/* sidebar  */}
+            <aside className={`fixed lg:static top-0 left-0 flex flex-col h-screen w-64 shrink-0 bg-navy-800 p-5 gap-7 transition-all duration-300 ease-in-out z-50 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 ${isSidebarCollapsed && "lg:w-18 lg:items-center"}`}>
 
+                {/* branding */}
                 <div className="flex justify-between items-center">
 
                     <div className={`flex items-center gap-3 ${isSidebarCollapsed && "lg:hidden"}`}>
@@ -78,9 +103,71 @@ export default function AppLayout() {
                 </div>
 
 
-                {/* todo - current organization details */}
+                {/* organization section  */}
+                {!organization ?
+                    <OrganizationSkeleton />
+                    :
+                    <button
+                        ref={orgContextRef}
+                        type="button"
+                        onClick={() => setShowOrgContextMenu(prev => !prev)}
+                        className="flex relative justify-between items-center bg-navy-700 border border-border/10 p-3 rounded-lg cursor-pointer">
 
 
+                        <div className="flex gap-2 items-center">
+                            {organization.logo?.url ?
+                                (
+                                    <img className="rounded-lg h-8 w-8 object-cover shrink-0" src={organization.logo?.url} />
+                                )
+                                :
+                                (
+                                    <div className="flex justify-center items-center rounded-lg w-8 h-8 bg-gold text-gold-dark font-bold text-lg shrink-0">
+                                        {organization.organizationName.charAt(0).toUpperCase()}
+                                    </div>
+                                )
+                            }
+
+                            <div className={`min-w-0 text-start ${isSidebarCollapsed && "lg:hidden"}`}>
+                                <p className="truncate text-card text-sm font-bold">{organization.organizationName}</p>
+                                <p className="truncate text-text-xs text-xs">{organization.currency.code}</p>
+                            </div>
+
+                        </div>
+
+                        <RiArrowDownSFill className={`shrink-0 ${showOrgContextMenu && "rotate-180"} text-text-xs transition-transform duration-200 ${isSidebarCollapsed && "lg:hidden"}`} size={25} />
+
+                        {/* organization context menu  */}
+                        {showOrgContextMenu &&
+                            <div className={`absolute top-full left-0 right-0 z-50 mt-1 px-3 w-full bg-navy-900 text-gold rounded-lg border border-border/20 text-xs font-bold ${isSidebarCollapsed && "lg:top-0 lg:left-full lg:right-auto lg:w-fit lg:whitespace-nowrap lg:ml-3"}`}>
+
+                                <Link
+                                    to={"/create-organization"}
+                                    onClick={() => {
+                                        closeSidebar()
+                                        setShowOrgContextMenu(false)
+                                    }}
+                                    className="flex items-center gap-1 py-3 border-b hover:text-gold/70 border-border/20">
+                                    <TbPlus />
+                                    <span>Create Organization</span>
+                                </Link>
+
+                                <Link
+                                    to={"/settings"}
+                                    onClick={() => {
+                                        closeSidebar()
+                                        setShowOrgContextMenu(false)
+                                    }}
+                                    className="flex items-center gap-1 py-3 hover:text-gold/70">
+                                    <HiCog6Tooth />
+                                    <span>Organization Settings</span>
+                                </Link>
+                            </div>
+                        }
+                    </button>
+                }
+
+
+                {/* navlinks  */}
                 <div className="space-y-1">
 
                     {navItems.map((item) => {
@@ -105,6 +192,7 @@ export default function AppLayout() {
                 </div>
 
 
+                {/* user section  */}
                 <div className="flex gap-2 items-center mt-auto border-t border-border/30 pt-5">
                     {user.avatar ?
                         (
