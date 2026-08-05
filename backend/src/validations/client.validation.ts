@@ -81,7 +81,7 @@ export const getClientsSchema = z.object({
     limit: z.coerce.number().min(1).max(100).default(10),
 
     filter: z.enum(["active", "inactive", "business", "individual"]).optional(),
-    sortBy: z.enum(["display", "companyName", "createdAt"]).default("createdAt"),
+    sortBy: z.enum(["displayName", "companyName", "createdAt"]).default("createdAt"),
     order: z.enum(["asc", "desc"]).default("desc"),
     search: z.string().trim().optional()
 })

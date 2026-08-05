@@ -13,6 +13,7 @@ import CreateOrganization from "../pages/organization/CreateOrganization";
 import HomeRedirect from "../pages/common/HomeRedirect";
 import NotFound from "../pages/common/NotFound";
 import AppLayout from "../layout/AppLayout";
+import Clients from "../pages/client/Clients";
 
 export const router = createBrowserRouter([
     {
@@ -67,6 +68,10 @@ export const router = createBrowserRouter([
                     {
                         path: "/dashboard",
                         element: <Dashboard />
+                    }, 
+                    {
+                        path: "/clients",
+                        element: <Clients/>
                     }
                 ]
             }

@@ -10,7 +10,7 @@ export default function Header({ header }: HeaderProps) {
     const openSidebar = uiStore((state) => state.openSidebar)
 
     return (
-        <header className="lg:hidden flex items-center gap-3 bg-card w-full h-14 px-5 border-b border-border">
+        <header className="lg:hidden flex items-center gap-2 bg-card w-full h-13 px-5 border-b border-border">
             <button
                 type="button"
                 onClick={() => openSidebar()}
