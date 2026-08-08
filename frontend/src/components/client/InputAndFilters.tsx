@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { HiChevronDown, HiMagnifyingGlass } from "react-icons/hi2";
 import clientStore from "../../store/clientStore";
-import type { ClientFilterType, IClientSort } from "../../types/clientTypes";
+import type { IClientFilter, IClientSort } from "../../types/clientTypes";
 
 const sortProperties: IClientSort[] = [
     {
@@ -36,13 +36,12 @@ const sortProperties: IClientSort[] = [
     },
 ]
 
-const filterProperties: Array<ClientFilterType> = [
-    "All",
-    "Business",
-    "Individual",
-    "Active",
-    "Inactive",
-    "Overdue"
+const filterProperties: Array<IClientFilter> = [
+    { label: "All", filter: "all" },
+    { label: "Business", filter: "business" },
+    { label: "Individual", filter: "individual" },
+    { label: "Active", filter: "active" },
+    { label: "Inactive", filter: "inactive" },
 ]
 
 export default function InputAndFilters() {
@@ -81,7 +80,7 @@ export default function InputAndFilters() {
                 {/* search input */}
                 <div className="relative grow">
                     <input
-                        className="bg-card pl-8 pr-3 border-[1.5px] text-sm border-border rounded-lg h-10 text-text-xs placeholder:text-text-xs outline-none w-full"
+                        className="bg-card pl-8 pr-3 border-[1.5px] text-sm border-border rounded-[10px] h-10 text-text-xs placeholder:text-text-xs outline-none w-full"
                         type="text"
                         value={clientSearch}
                         onChange={(e) => setClientSearch(e.target.value)}
@@ -98,7 +97,7 @@ export default function InputAndFilters() {
                     <button
                         onClick={() => setIsDrawerOpen(prev => !prev)}
                         type="button"
-                        className="relative flex justify-between items-center gap-2 bg-card px-5 py-2 border-[1.5px] border-border rounded-lg text-sm text-text cursor-pointer min-w-44"
+                        className="relative flex justify-between items-center gap-2 bg-card px-5 py-2 border-[1.5px] border-border rounded-[10px] text-sm text-text cursor-pointer min-w-44"
                     >
                         <span>{clientSort.label}</span>
                         <HiChevronDown className={`transition-transform duration-200 ${isDrawerOpen && "rotate-180"}`} />
@@ -129,16 +128,18 @@ export default function InputAndFilters() {
 
             {/* filters  */}
             <div className="flex flex-wrap gap-2">
-                {filterProperties.map((property) => (
-                    <button
-                        key={property}
-                        type="button"
-                        onClick={() => setClientFilter(property)}
-                        className={`px-3 py-2 rounded-lg text-sm cursor-pointer transition-colors ${clientFilter === property ? "bg-navy-700 text-card" : "bg-card border-[1.5px] border-border text-text"}`}
-                    >
-                        {property}
-                    </button>
-                ))}
+                {filterProperties.map((property) => {
+                    return (
+                        <button
+                            key={property.filter}
+                            type="button"
+                            onClick={() => setClientFilter(property)}
+                            className={`px-3 py-2 rounded-[10px] text-[12px] cursor-pointer transition-colors ${clientFilter.label === property.label ? "bg-navy-700 text-card" : "bg-card border-[1.5px] border-border text-text font-semibold hover:bg-navy-50"}`}
+                        >
+                            {property.label}
+                        </button>
+                    )
+                })}
             </div>
         </div>
     )

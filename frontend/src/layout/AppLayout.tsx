@@ -54,21 +54,25 @@ export default function AppLayout() {
     const orgContextRef = useRef<HTMLButtonElement>(null)
 
     useEffect(() => {
+
+        document.body.classList.add("bg-page")
+        
         function handleOutsideClick(e: MouseEvent) {
             if (orgContextRef.current && !orgContextRef.current.contains(e.target as Node)) {
                 setShowOrgContextMenu(false)
             }
         }
-
+        
         document.addEventListener("mousedown", handleOutsideClick)
-
+        
         return () => {
             document.removeEventListener("mousedown", handleOutsideClick)
+            document.body.classList.remove("bg-page")
         }
     }, [])
 
     return (
-        <div className="flex min-h-screen overflow-y-auto">
+        <div className="flex min-h-screen ">
 
             {isSidebarOpen && (
                 <div
@@ -78,7 +82,7 @@ export default function AppLayout() {
             )}
 
             {/* sidebar  */}
-            <aside className={`fixed lg:static top-0 left-0 flex flex-col h-screen w-64 shrink-0 bg-navy-800 p-5 gap-7 transition-all duration-300 ease-in-out z-50 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 ${isSidebarCollapsed && "lg:w-18 lg:items-center"}`}>
+            <aside className={`fixed lg:sticky top-0 left-0 flex flex-col h-screen w-64 shrink-0 bg-navy-800 p-5 gap-7 transition-all duration-300 ease-in-out z-50 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 ${isSidebarCollapsed && "lg:w-18 lg:items-center"}`}>
 
                 {/* branding */}
                 <div className="flex justify-between items-center">

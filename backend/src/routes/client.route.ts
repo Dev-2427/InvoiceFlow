@@ -7,7 +7,7 @@ import loadCurrentOrganization from "../middleware/loadCurrentOrganization.js";
 const route = Router()
 
 route.post("/", validate(createClientSchema), createClient)
-route.get("/get_clients", loadCurrentOrganization, validate(getClientsSchema), getClients)
+route.get("/get_clients", loadCurrentOrganization, getClients)
 route.get("/:clientId", loadCurrentOrganization, getClientDetails)
 route.patch("/status", loadCurrentOrganization, validate(changeClientStatusSchema), changeClientStatus)
 route.patch("/:clientId", loadCurrentOrganization, validate(updateClientSchema), updateClient)
