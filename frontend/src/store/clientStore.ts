@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams } from "../types/clientTypes";
 import type { ApiResponse } from "../types/api.types";
-import { getClientsApi } from "../api/client";
+import { changeClientStatusApi, getClientsApi } from "../api/client";
 
 interface IClientStore {
     clientSort: IClientSort,
@@ -13,6 +13,8 @@ interface IClientStore {
     selectedClientIds: string[],
     changeSelectedClientsIds: (id: string) => void,
     emptySelectedClientsIds: () => void,
+    allClientIdSelected: boolean,
+    handleSelectAllClients: () => void,
 
     setClientSortAndOrder: (sort: IClientSort) => void,
     setClientFilter: (filter: IClientFilter) => void,
@@ -20,6 +22,9 @@ interface IClientStore {
 
     nextClientPage: number,
     clientPageLimit: number,
+
+    isPerformingAction: boolean,
+    changeClientStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
 
     getClients: (page: number) => Promise<ApiResponse<{ data: GetClientsResponseData }>>
 }
@@ -37,6 +42,8 @@ const clientStore = create<IClientStore>((set, get) => ({
     clientPageLimit: 10,
     clients: null,
 
+    isPerformingAction: false,
+    allClientIdSelected: false,
     selectedClientIds: [],
 
     changeSelectedClientsIds(id) {
@@ -50,10 +57,29 @@ const clientStore = create<IClientStore>((set, get) => ({
                     [...state.selectedClientIds, id]
             }
         })
+
+        if (get().selectedClientIds.length === get().clients.clients.length) {
+            set({ allClientIdSelected: true })
+        } else {
+            set({ allClientIdSelected: false })
+        }
     },
 
     emptySelectedClientsIds() {
-        set({ selectedClientIds: [] })
+        set({ selectedClientIds: [], allClientIdSelected: false })
+    },
+
+    handleSelectAllClients() {
+        const selectedAll = get().allClientIdSelected
+
+        if (selectedAll) {
+            get().emptySelectedClientsIds()
+        } else {
+            const clientIds = []
+            get().clients.clients.map((client) => clientIds.push(client._id))
+
+            set({ selectedClientIds: clientIds, allClientIdSelected: true })
+        }
     },
 
     setClientSortAndOrder(sort) {
@@ -66,6 +92,32 @@ const clientStore = create<IClientStore>((set, get) => ({
 
     setClientSearch(text) {
         set({ clientSearch: text })
+    },
+
+    async changeClientStatus(status) {
+        set({ isPerformingAction: true })
+
+
+        try {
+            const clientIds = get().selectedClientIds
+
+            const res = await changeClientStatusApi(clientIds, status)
+
+            if (res.data.success) {
+                get().emptySelectedClientsIds()
+                await get().getClients(1)
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to update client status:", error);
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingAction: false })
+        }
     },
 
     async getClients(page) {

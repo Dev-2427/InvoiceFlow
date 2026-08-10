@@ -4,3 +4,7 @@ import api from "./axios";
 export function getClientsApi(query: getClientsParams) {
     return api.get("/api/client/get_clients", { params: query })
 }
+
+export function changeClientStatusApi(clientIds: string[], status: "active" | "inactive") {
+    return api.patch("/api/client/status", { clientIds, status })
+}
