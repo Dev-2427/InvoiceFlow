@@ -8,3 +8,7 @@ export function getClientsApi(query: getClientsParams) {
 export function changeClientStatusApi(clientIds: string[], status: "active" | "inactive") {
     return api.patch("/api/client/status", { clientIds, status })
 }
+
+export function deleteClientsApi(clientIds: string[]) {
+    return api.delete("/api/client/", { data: { clientIds } })
+}

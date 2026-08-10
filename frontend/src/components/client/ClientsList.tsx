@@ -8,10 +8,12 @@ import { NavLink } from "react-router-dom";
 export default function ClientsList() {
 
     const isGettingClients = clientStore((state) => state.isGettingClients)
-    const clientsData = clientStore((state) => state.clients)
-    const selectedClientIds = clientStore((state) => state.selectedClientIds)
-    const changeSelectedClientsIds = clientStore((state) => state.changeSelectedClientsIds)
     const getClients = clientStore((state) => state.getClients)
+    const clientsData = clientStore((state) => state.clients)
+
+    const changeSelectedClientsIds = clientStore((state) => state.changeSelectedClientsIds)
+    const isPerformingAction = clientStore((state) => state.isPerformingAction)
+    const selectedClientIds = clientStore((state) => state.selectedClientIds)
     const emptySelectedClientsIds = clientStore((state) => state.emptySelectedClientsIds)
 
     const organization = organizationStore((state) => state.organization)
@@ -72,12 +74,15 @@ export default function ClientsList() {
                             {/* checkbox */}
                             <div
                                 onClick={(e) => {
+
+                                    if (isPerformingAction) return
+
                                     e.preventDefault()
                                     e.stopPropagation()
                                     changeSelectedClientsIds(client._id)
                                 }
                                 }
-                                className={`shrink-0 flex justify-center items-center w-3.5 h-3.5 border-[1.5px] border-text-sm rounded-sm cursor-pointer ${selectedClientIds.includes(client._id) && "bg-navy-700 text-card border-none"}`}>
+                                className={`shrink-0 flex justify-center items-center w-3.5 h-3.5 border-[1.5px] border-text-sm rounded-sm ${isPerformingAction ? "opacity-50 cursor-default" : "cursor-pointer"}  ${selectedClientIds.includes(client._id) && "bg-navy-700 text-card border-none"}`}>
 
                                 {selectedClientIds.includes(client._id) &&
                                     <TbCheck />

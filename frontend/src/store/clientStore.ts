@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams } from "../types/clientTypes";
 import type { ApiResponse } from "../types/api.types";
-import { changeClientStatusApi, getClientsApi } from "../api/client";
+import { changeClientStatusApi, deleteClientsApi, getClientsApi } from "../api/client";
 
 interface IClientStore {
     clientSort: IClientSort,
@@ -20,11 +20,11 @@ interface IClientStore {
     setClientFilter: (filter: IClientFilter) => void,
     setClientSearch: (text: string) => void
 
-    nextClientPage: number,
     clientPageLimit: number,
 
     isPerformingAction: boolean,
     changeClientStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
+    deleteClients: () => Promise<ApiResponse<null>>,
 
     getClients: (page: number) => Promise<ApiResponse<{ data: GetClientsResponseData }>>
 }
@@ -38,7 +38,6 @@ const clientStore = create<IClientStore>((set, get) => ({
     clientFilter: { label: "All", filter: "all" },
     clientSearch: "",
     isGettingClients: false,
-    nextClientPage: 1,
     clientPageLimit: 10,
     clients: null,
 
@@ -111,6 +110,32 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update client status:", error);
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingAction: false })
+        }
+    },
+
+    async deleteClients() {
+        set({ isPerformingAction: true })
+
+        try {
+            const clientIds = get().selectedClientIds
+
+            const res = await deleteClientsApi(clientIds)
+
+            if (res.data.success) {
+                get().emptySelectedClientsIds()
+               await get().getClients(1)
+            }
+
+            return res.data
+
+        } catch (error: any) {
+            console.error("Failed to delete clients:", error);
             return {
                 success: false,
                 message: "Something went wrong, please try again."
