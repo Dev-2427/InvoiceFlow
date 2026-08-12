@@ -1,13 +1,15 @@
 import { create } from "zustand";
 import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams } from "../types/clientTypes";
 import type { ApiResponse } from "../types/api.types";
-import { changeClientStatusApi, deleteClientsApi, getClientsApi } from "../api/client";
+import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientsApi } from "../api/client";
+import type { CreateClientInput } from "../validation/clientValidation";
 
 interface IClientStore {
     clientSort: IClientSort,
     clientFilter: IClientFilter,
     clientSearch: string,
     isGettingClients: boolean,
+    isCreatingClient: boolean,
     clients: GetClientsResponseData | null,
 
     selectedClientIds: string[],
@@ -25,6 +27,8 @@ interface IClientStore {
     isPerformingAction: boolean,
     changeClientStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
     deleteClients: () => Promise<ApiResponse<null>>,
+
+    createClient: (data: CreateClientInput) => Promise<ApiResponse<{ clientId: string }>>,
 
     getClients: (page: number) => Promise<ApiResponse<{ data: GetClientsResponseData }>>
 }
@@ -44,6 +48,8 @@ const clientStore = create<IClientStore>((set, get) => ({
     isPerformingAction: false,
     allClientIdSelected: false,
     selectedClientIds: [],
+
+    isCreatingClient: false,
 
     changeSelectedClientsIds(id) {
 
@@ -129,7 +135,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
             if (res.data.success) {
                 get().emptySelectedClientsIds()
-               await get().getClients(1)
+                await get().getClients(1)
             }
 
             return res.data
@@ -186,6 +192,25 @@ const clientStore = create<IClientStore>((set, get) => ({
             }
         } finally {
             set({ isGettingClients: false })
+        }
+    },
+
+    async createClient(data) {
+        set({ isCreatingClient: true })
+
+        try {
+            const res = await createClientApi(data)
+
+            return res.data
+
+        } catch (error: any) {
+            console.error("Failed to create client:", error);
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isCreatingClient: false })
         }
     },
 }))

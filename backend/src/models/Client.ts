@@ -4,7 +4,7 @@ export interface IClient {
     organization: Types.ObjectId,
     clientType: "individual" | "business",
     status: "active" | "inactive",
-    salutation: "Mr" | "Mrs" | "Ms" | "Dr" | "Prof" | null,
+    salutation: "Mr." | "Mrs." | "Ms." | "Dr." | "Prof." | null,
     firstName: string | null,
     lastName: string | null,
     companyName: string | null,
@@ -48,7 +48,7 @@ const clientSchema = new Schema<IClient>({
     },
     salutation: {
         type: String,
-        enum: ["Mr", "Mrs", "Ms", "Dr", "Prof"],
+        enum: ["Mr.", "Mrs.", "Ms.", "Dr.", "Prof."],
         default: null
     },
     firstName: {

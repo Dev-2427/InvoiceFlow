@@ -50,7 +50,7 @@ export default function ClientsList() {
                 {/* card  */}
                 {clientsData?.clients.map((client) => (
                     <NavLink
-                        to={`/client/${client._id}`}
+                        to={`/clients/${client._id}`}
                         key={client._id}
                         className={`flex flex-col gap-1 bg-card border-[1.5px] border-border rounded-[14px] p-4 cursor-pointer shadow-lg ${selectedClientIds.includes(client._id) && "border-navy-700"}`}
                     >

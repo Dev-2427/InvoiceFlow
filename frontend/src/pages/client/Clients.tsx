@@ -7,6 +7,7 @@ import ClientsList from "../../components/client/ClientsList";
 import SelectedClientsAction from "../../components/client/SelectedClientsAction";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Clients() {
 
@@ -19,6 +20,8 @@ export default function Clients() {
   const emptySelectedClientsIds = clientStore((state) => state.emptySelectedClientsIds)
 
   const [debounceSearch, setDebounceSearch] = useState(clientSearch)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -48,10 +51,10 @@ export default function Clients() {
   }, [debounceSearch, clientSort, clientFilter])
 
   return (
-    <main className="bg-page min-h-screen space-y-4">
+    <main className="min-h-screen space-y-4">
 
       <Header header="Clients" />
-      <PageHeader title="Clients" buttonText="New Client" subtitle={`${clients?.pagination.totalItems ?? 0} clients`} icon={TbPlus} onClick={() => { }} />
+      <PageHeader title="Clients" buttonText="New Client" subtitle={`${clients?.pagination.totalItems ?? 0} clients`} icon={TbPlus} onClick={() => {navigate("/clients/new") }} />
 
       <InputAndFilters />
 

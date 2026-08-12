@@ -7,6 +7,7 @@ type ClientSortOrderType = "asc" | "desc"
 type FilterType = "All" | "Business" | "Individual" | "Active" | "Inactive"
 type LowercaseFilterType = "all" | "business" | "individual" | "active" | "inactive"
 
+
 export interface IClientFilter {
     label: FilterType,
     filter: LowercaseFilterType

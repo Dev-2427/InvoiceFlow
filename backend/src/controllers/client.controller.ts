@@ -45,7 +45,7 @@ async function createClient(req: Request, res: Response) {
             shippingAddress: shippingAddress || null
         })
 
-        return sendResponse(res, { status: 201, message: "Client created successfully", data: { clientData: client } })
+        return sendResponse(res, { status: 201, message: "Client created successfully", data: {clientId : client._id}})
 
     } catch (error) {
         if (error instanceof mongoose.mongo.MongoServerError && error.code === 11000) {

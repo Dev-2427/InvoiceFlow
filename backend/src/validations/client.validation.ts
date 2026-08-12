@@ -3,9 +3,10 @@ import { optionalEmail, optionalString } from "../utils/validationHelper.js";
 import mongoose from "mongoose";
 
 const clientType = z.enum(["business", "individual"])
-const salutation = z.enum(["Mr", "Mrs", "Ms", "Dr", "Prof"])
+const salutation = z.enum(["Mr.", "Mrs.", "Ms.", "Dr.", "Prof."])
     .nullable()
-    .optional(); const name = optionalString(z.string().trim().min(2).max(50))
+    .optional();
+const name = optionalString(z.string().trim().min(2).max(50))
 const companyName = optionalString(z.string().trim().min(2).max(50))
 const displayName = z.string().trim().min(2).max(100)
 const email = optionalEmail()

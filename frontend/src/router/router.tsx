@@ -14,6 +14,8 @@ import HomeRedirect from "../pages/common/HomeRedirect";
 import NotFound from "../pages/common/NotFound";
 import AppLayout from "../layout/AppLayout";
 import Clients from "../pages/client/Clients";
+import CreateClient from "../pages/client/CreateClient";
+import ClientDetails from "../pages/client/ClientDetails";
 
 export const router = createBrowserRouter([
     {
@@ -68,11 +70,20 @@ export const router = createBrowserRouter([
                     {
                         path: "/dashboard",
                         element: <Dashboard />
-                    }, 
+                    },
                     {
                         path: "/clients",
-                        element: <Clients/>
+                        element: <Clients />
+                    },
+                    {
+                        path: "/clients/new",
+                        element: <CreateClient />
+                    },
+                    {
+                        path: "/clients/:id",
+                        element: <ClientDetails />
                     }
+
                 ]
             }
         ]

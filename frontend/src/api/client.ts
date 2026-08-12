@@ -1,4 +1,5 @@
 import type { getClientsParams } from "../types/clientTypes";
+import type { CreateClientInput } from "../validation/clientValidation";
 import api from "./axios";
 
 export function getClientsApi(query: getClientsParams) {
@@ -11,4 +12,8 @@ export function changeClientStatusApi(clientIds: string[], status: "active" | "i
 
 export function deleteClientsApi(clientIds: string[]) {
     return api.delete("/api/client/", { data: { clientIds } })
+}
+
+export function createClientApi(data: CreateClientInput) {
+    return api.post("/api/client/", data)
 }
