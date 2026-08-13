@@ -8,12 +8,12 @@ type FilterType = "All" | "Business" | "Individual" | "Active" | "Inactive"
 type LowercaseFilterType = "all" | "business" | "individual" | "active" | "inactive"
 
 interface Address {
-    street1: String,
-    street2: String,
-    city: String,
-    state: String,
-    pincode: String,
-    country: String,
+    street1: string,
+    street2: string,
+    city: string,
+    state: string,
+    pincode: string,
+    country: string,
 }
 
 export interface IClientFilter {
@@ -69,6 +69,6 @@ export interface ClientData {
     phone: string | null,
     billingAddress: Address | null,
     shippingAddress: Address | null,
-    createdAt: Date,
-    updatedAt: Date,
+    createdAt: string,
+    updatedAt: string,
 }

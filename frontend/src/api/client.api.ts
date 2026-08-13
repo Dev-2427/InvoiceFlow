@@ -17,3 +17,7 @@ export function deleteClientsApi(clientIds: string[]) {
 export function createClientApi(data: CreateClientInput) {
     return api.post("/api/client/", data)
 }
+
+export function getClientOverviewApi(id: string) {
+    return api.get(`/api/client/${id}`)
+}

@@ -1,16 +1,13 @@
 import { create } from "zustand";
-import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams } from "../types/clientTypes";
+import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData } from "../types/clientTypes";
 import type { ApiResponse } from "../types/api.types";
-import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientsApi } from "../api/client";
+import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi } from "../api/client.api";
 import type { CreateClientInput } from "../validation/clientValidation";
 
 interface IClientStore {
     clientSort: IClientSort,
     clientFilter: IClientFilter,
     clientSearch: string,
-    isGettingClients: boolean,
-    isCreatingClient: boolean,
-    clients: GetClientsResponseData | null,
 
     selectedClientIds: string[],
     changeSelectedClientsIds: (id: string) => void,
@@ -21,16 +18,24 @@ interface IClientStore {
     setClientSortAndOrder: (sort: IClientSort) => void,
     setClientFilter: (filter: IClientFilter) => void,
     setClientSearch: (text: string) => void
-
     clientPageLimit: number,
 
     isPerformingAction: boolean,
     changeClientStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
     deleteClients: () => Promise<ApiResponse<null>>,
 
+    isCreatingClient: boolean,
     createClient: (data: CreateClientInput) => Promise<ApiResponse<{ clientId: string }>>,
 
+    isGettingClients: boolean,
     getClients: (page: number) => Promise<ApiResponse<{ data: GetClientsResponseData }>>
+    clients: GetClientsResponseData | null,
+
+    isGettingClientOverview: boolean,
+    getClientOverview: (id: string) => Promise<ApiResponse<{ clientData: ClientData }>>
+    clientOverviewData: ClientData | null,
+    changeClientOverviewStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
+    deleteOverviewClient: () => Promise<ApiResponse<null>>
 }
 
 const clientStore = create<IClientStore>((set, get) => ({
@@ -50,6 +55,9 @@ const clientStore = create<IClientStore>((set, get) => ({
     selectedClientIds: [],
 
     isCreatingClient: false,
+
+    isGettingClientOverview: false,
+    clientOverviewData: null,
 
     changeSelectedClientsIds(id) {
 
@@ -211,6 +219,95 @@ const clientStore = create<IClientStore>((set, get) => ({
             set({ isCreatingClient: false })
         }
     },
+
+    async getClientOverview(id) {
+        set({ isGettingClientOverview: true })
+
+        try {
+            const res = await getClientOverviewApi(id)
+
+            if (res.data.success) {
+                set({ clientOverviewData: res.data.data.clientData })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to get client overview:", error);
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isGettingClientOverview: false })
+        }
+    },
+
+    async changeClientOverviewStatus(status) {
+        set({ isPerformingAction: true })
+
+        try {
+            const clientId = get().clientOverviewData?._id
+
+            if (!clientId) {
+                return {
+                    success: false,
+                    message: "Client not found"
+                }
+            }
+
+            const res = await changeClientStatusApi([clientId], status)
+
+            if (res.data.success) {
+                set((state) => ({
+                    clientOverviewData: state.clientOverviewData ?
+                        { ...state.clientOverviewData, status } : null
+                }))
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to update client status:", error);
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingAction: false })
+        }
+    },
+
+    async deleteOverviewClient() {
+        set({ isPerformingAction: true })
+
+        try {
+            const clientId = get().clientOverviewData?._id
+
+            if (!clientId) {
+                return {
+                    success: false,
+                    message: "Client not found"
+                }
+            }
+
+            const res = await deleteClientsApi([clientId])
+
+            if (res.data.success) {
+                set({ clientOverviewData: null })
+            }
+
+            return res.data
+
+        } catch (error: any) {
+            console.error("Failed to delete the client:", error);
+            return {
+                success: false,
+                message: "Something went wrong, please try again"
+            }
+        } finally {
+            set({ isPerformingAction: false })
+        }
+    }
+
 }))
 
 export default clientStore
