@@ -1,9 +1,9 @@
 import clientStore from "../../store/clientStore"
-import organizationStore from "../../store/organizationStore"
 import { HiEnvelope, HiPhone } from "react-icons/hi2";
 import { TbCheck, TbArrowLeft, TbArrowRight } from "react-icons/tb";
 import ClientsCardSkeleton from "../loading/ClientsCardSkeleton";
 import { NavLink } from "react-router-dom";
+import useOrganization from "../../hooks/useOrganization";
 
 export default function ClientsList() {
 
@@ -16,7 +16,7 @@ export default function ClientsList() {
     const selectedClientIds = clientStore((state) => state.selectedClientIds)
     const emptySelectedClientsIds = clientStore((state) => state.emptySelectedClientsIds)
 
-    const organization = organizationStore((state) => state.organization)
+    const organization = useOrganization()
 
     if (isGettingClients) {
         return <ClientsCardSkeleton />

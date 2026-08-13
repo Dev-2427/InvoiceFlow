@@ -22,12 +22,12 @@ export default function Review() {
 
             <div className="flex items-center gap-2 p-5 bg-navy-700 rounded-lg w-full">
                 <div className="flex justify-center items-center w-10 h-10 bg-gold text-gold-dark rounded-lg text-2xl font-bold">
-                    {values.organizationName.charAt(0).toUpperCase()}
+                    {values.organizationName?.charAt(0).toUpperCase()}
                 </div>
 
                 <div className="flex flex-col items-start overflow-hidden">
                     <p className="text-page font-bold text-md">{values.organizationName}</p>
-                    <p className="text-navy-200 text-sm">{values.address.state}, {values.address.country}</p>
+                    <p className="text-navy-200 text-sm">{values.address?.state}, {values.address?.country}</p>
                 </div>
             </div>
 
@@ -69,21 +69,21 @@ export default function Review() {
 
                 <div className="flex justify-between items-center w-full">
                     <span className="text-text-sm text-[12px] font-semibold">Street 1</span>
-                    <span className="text-text font-bold text-[12px]">{values.address.street1}</span>
+                    <span className="text-text font-bold text-[12px]">{values.address?.street1}</span>
                 </div>
 
                 <hr className="border border-border w-full" />
 
                 <div className="flex justify-between items-center w-full">
                     <span className="text-text-sm text-[12px] font-semibold">Street 2</span>
-                    <span className="text-text font-bold text-[12px]">{values.address.street2 || "—"}</span>
+                    <span className="text-text font-bold text-[12px]">{values.address?.street2 || "—"}</span>
                 </div>
 
                 <hr className="border border-border w-full" />
 
                 <div className="flex justify-between items-center w-full">
                     <span className="text-text-sm text-[12px] font-semibold">City</span>
-                    <span className="text-text font-bold text-[12px]">{values.address.city}</span>
+                    <span className="text-text font-bold text-[12px]">{values.address?.city}</span>
                 </div>
 
                 <hr className="border border-border w-full" />
@@ -91,7 +91,7 @@ export default function Review() {
 
                 <div className="flex justify-between items-center w-full">
                     <span className="text-text-sm text-[12px] font-semibold">Pincode</span>
-                    <span className="text-text font-bold text-[12px]">{values.address.pincode}</span>
+                    <span className="text-text font-bold text-[12px]">{values.address?.pincode}</span>
                 </div>
 
                 <hr className="border border-border w-full" />
@@ -99,7 +99,7 @@ export default function Review() {
 
                 <div className="flex justify-between items-center w-full">
                     <span className="text-text-sm text-[12px] font-semibold">State</span>
-                    <span className="text-text font-bold text-[12px]">{values.address.state}</span>
+                    <span className="text-text font-bold text-[12px]">{values.address?.state}</span>
                 </div>
 
                 <hr className="border border-border w-full" />
@@ -107,7 +107,7 @@ export default function Review() {
 
                 <div className="flex justify-between items-center w-full">
                     <span className="text-text-sm text-[12px] font-semibold">Country</span>
-                    <span className="text-text font-bold text-[12px]">{values.address.country}</span>
+                    <span className="text-text font-bold text-[12px]">{values.address?.country}</span>
                 </div>
 
                 <hr className="border border-border w-full" />

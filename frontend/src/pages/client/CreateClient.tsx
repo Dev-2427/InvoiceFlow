@@ -427,7 +427,7 @@ export default function CreateClient() {
                             placeholder={"Street line 1"} id="streetLine1" />
 
                         <p className="min-h-5 text-xs text-overdue">
-                            {errors.billingAddress?.street1.message}
+                            {errors.billingAddress?.street1?.message}
                         </p>
                     </div>
 
@@ -441,7 +441,7 @@ export default function CreateClient() {
                             placeholder={"Street line 2"} id="streetLine2" />
 
                         <p className="min-h-5 text-xs text-overdue">
-                            {errors.billingAddress?.street2.message}
+                            {errors.billingAddress?.street2?.message}
                         </p>
                     </div>
 

@@ -14,12 +14,12 @@ export default function ProtectedLayout() {
     const getOrganizationData = organizationStore((state) => state.getOrganizationData)
 
     useEffect(() => {
-        if (!isAuthenticated) return
+        if (!isAuthenticated || !user || !user.currentOrganization) return
 
-        if (!user?.currentOrganization) return
+        const organisationId = user.currentOrganization
 
         async function initializeOrganization() {
-            const res = await getOrganizationData(user.currentOrganization)
+            const res = await getOrganizationData(organisationId)
 
             if (!res.success) {
                 toast.error(res.message)

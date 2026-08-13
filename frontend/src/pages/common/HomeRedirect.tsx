@@ -12,7 +12,7 @@ export default function HomeRedirect() {
         return <Loading />
     }
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
         return <Navigate to="/signin" replace />
     }
 

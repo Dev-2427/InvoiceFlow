@@ -63,7 +63,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             }
         })
 
-        if (get().selectedClientIds.length === get().clients.clients.length) {
+        if (get().selectedClientIds.length === get().clients?.clients.length) {
             set({ allClientIdSelected: true })
         } else {
             set({ allClientIdSelected: false })
@@ -80,8 +80,7 @@ const clientStore = create<IClientStore>((set, get) => ({
         if (selectedAll) {
             get().emptySelectedClientsIds()
         } else {
-            const clientIds = []
-            get().clients.clients.map((client) => clientIds.push(client._id))
+            const clientIds = get().clients?.clients.map((client) => client._id)
 
             set({ selectedClientIds: clientIds, allClientIdSelected: true })
         }
@@ -101,7 +100,6 @@ const clientStore = create<IClientStore>((set, get) => ({
 
     async changeClientStatus(status) {
         set({ isPerformingAction: true })
-
 
         try {
             const clientIds = get().selectedClientIds

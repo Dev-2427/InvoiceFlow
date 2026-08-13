@@ -91,7 +91,7 @@ export default function CurrencyForm() {
           maxLength={500}
         />
 
-        <p className="text-text-xs self-end text-xs">{termsAndConditions.length}/500 characters</p>
+        <p className="text-text-xs self-end text-xs">{termsAndConditions?.length}/500 characters</p>
 
         <p className="text-text-xs text-xs">This text will appear at the bottom of every invoice you send</p>
       </div>

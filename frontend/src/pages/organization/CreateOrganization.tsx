@@ -1,6 +1,5 @@
 import { HiOutlineDocumentText, HiBuildingOffice2 } from "react-icons/hi2";
 import { BsCaretDownFill } from "react-icons/bs";
-import authStore from "../../store/authStore";
 import Steps from "../../components/organization/Steps";
 import BasicInfo from "../../components/organization/forms/BasicInfoForm";
 import { FormProvider, useForm } from "react-hook-form";
@@ -16,6 +15,7 @@ import { HiOfficeBuilding } from "react-icons/hi";
 import CurrencyForm from "../../components/organization/forms/CurrencyForm";
 import Review from "../../components/organization/forms/Review";
 import UserContextMenu from "../../components/organization/UserContextMenu";
+import useAuthUser from "../../hooks/useAuthUser";
 
 export default function CreateOrganization() {
 
@@ -28,7 +28,7 @@ export default function CreateOrganization() {
     }, [])
 
 
-    const user = authStore((state) => state.user)
+    const user = useAuthUser()
     const CreateOrganization = organizationStore((state) => state.createOrganization)
     const isCreatingOrganization = organizationStore((state) => state.isCreatingOrganization)
 

@@ -2,13 +2,13 @@ import { Link, NavLink, Outlet } from "react-router-dom"
 import { HiSquares2X2, HiOutlineDocumentText, HiUsers, HiChartBar, HiCog6Tooth, HiBuildingOffice2 } from "react-icons/hi2"
 import { RiArrowDownSFill } from "react-icons/ri";
 import { TbLayoutSidebar, TbPlus } from "react-icons/tb";
-import authStore from "../store/authStore"
 import { HiXMark } from "react-icons/hi2";
 import uiStore from "../store/uiStore";
 import Tooltip from "../components/ui/Tooltip";
 import organizationStore from "../store/organizationStore";
 import { useEffect, useRef, useState } from "react";
 import OrganizationSkeleton from "../components/loading/OrganizationSkeleton";
+import useAuthUser from "../hooks/useAuthUser";
 
 export default function AppLayout() {
 
@@ -40,7 +40,7 @@ export default function AppLayout() {
         }
     ]
 
-    const user = authStore((state) => state.user)
+    const user = useAuthUser()
 
     const organization = organizationStore((state) => state.organization)
 
@@ -56,15 +56,15 @@ export default function AppLayout() {
     useEffect(() => {
 
         document.body.classList.add("bg-page")
-        
+
         function handleOutsideClick(e: MouseEvent) {
             if (orgContextRef.current && !orgContextRef.current.contains(e.target as Node)) {
                 setShowOrgContextMenu(false)
             }
         }
-        
+
         document.addEventListener("mousedown", handleOutsideClick)
-        
+
         return () => {
             document.removeEventListener("mousedown", handleOutsideClick)
             document.body.classList.remove("bg-page")
