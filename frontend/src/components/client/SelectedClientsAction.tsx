@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import clientStore from "../../store/clientStore"
 import { HiXMark, HiTrash } from "react-icons/hi2";
-import { TbCheck, TbPencil } from "react-icons/tb";
+import { TbCheck, TbPencilFilled } from "react-icons/tb";
 import DeleteClientsContext from "./DeleteClientsContext";
 import { useState } from "react";
 
@@ -65,7 +65,7 @@ export default function SelectedClientsAction() {
                         type="button"
                         disabled={isPerformingAction}
                         className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-[11px] font-semibold bg-card text-text cursor-pointer hover:bg-page disabled:opacity-50 disabled:cursor-default`}>
-                        <TbPencil />
+                        <TbPencilFilled />
                         <span>Edit</span>
                     </button>
                 }

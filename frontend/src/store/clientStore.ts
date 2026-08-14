@@ -34,6 +34,7 @@ interface IClientStore {
     isGettingClientOverview: boolean,
     getClientOverview: (id: string) => Promise<ApiResponse<{ clientData: ClientData }>>
     clientOverviewData: ClientData | null,
+    clearClientOverviewData: () => void,
     changeClientOverviewStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
     deleteOverviewClient: () => Promise<ApiResponse<null>>
 }
@@ -56,7 +57,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
     isCreatingClient: false,
 
-    isGettingClientOverview: false,
+    isGettingClientOverview: true,
     clientOverviewData: null,
 
     changeSelectedClientsIds(id) {
@@ -240,6 +241,10 @@ const clientStore = create<IClientStore>((set, get) => ({
         } finally {
             set({ isGettingClientOverview: false })
         }
+    },
+
+    clearClientOverviewData() {
+        set({ clientOverviewData: null })
     },
 
     async changeClientOverviewStatus(status) {
