@@ -3,7 +3,7 @@ import { HiEnvelope, HiPhone } from "react-icons/hi2";
 import { TbCheck, TbArrowLeft, TbArrowRight } from "react-icons/tb";
 import ClientsCardSkeleton from "../loading/ClientsCardSkeleton";
 import { NavLink } from "react-router-dom";
-import useOrganization from "../../hooks/useOrganization";
+import organizationStore from "../../store/organizationStore";
 
 export default function ClientsList() {
 
@@ -16,7 +16,7 @@ export default function ClientsList() {
     const selectedClientIds = clientStore((state) => state.selectedClientIds)
     const emptySelectedClientsIds = clientStore((state) => state.emptySelectedClientsIds)
 
-    const organization = useOrganization()
+    const organization = organizationStore((state) => state.organization)
 
     if (isGettingClients) {
         return <ClientsCardSkeleton />
@@ -134,11 +134,11 @@ export default function ClientsList() {
                         <div className="flex justify-between items-center">
                             <div className="flex flex-col items-start">
                                 <span className="text-xs text-text-xs font-semibold">RECEIVABLE</span>
-                                <span className="text-unpaid">{organization.currency.symbol}{client.totalReceivable}</span>
+                                <span className="text-unpaid">{organization?.currency.symbol}{client.totalReceivable}</span>
                             </div>
                             <div className="flex flex-col items-start">
                                 <span className="text-xs text-text-xs font-semibold">TOTAL BILLED</span>
-                                <span className="text-paid">{organization.currency.symbol}{client.totalBilled}</span>
+                                <span className="text-paid">{organization?.currency.symbol}{client.totalBilled}</span>
                             </div>
 
                         </div>

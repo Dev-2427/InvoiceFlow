@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData } from "../types/clientTypes";
 import type { ApiResponse } from "../types/api.types";
-import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi } from "../api/client.api";
-import type { CreateClientInput } from "../validation/clientValidation";
+import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi, updateClientApi } from "../api/client.api";
+import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
 
 interface IClientStore {
     clientSort: IClientSort,
@@ -36,7 +36,10 @@ interface IClientStore {
     clientOverviewData: ClientData | null,
     clearClientOverviewData: () => void,
     changeClientOverviewStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
-    deleteOverviewClient: () => Promise<ApiResponse<null>>
+    deleteOverviewClient: () => Promise<ApiResponse<null>>,
+
+    isUpdatingClient: boolean,
+    updateClient: (data: BaseClientInput) => Promise<ApiResponse<{ clientId: string }>>,
 }
 
 const clientStore = create<IClientStore>((set, get) => ({
@@ -56,6 +59,7 @@ const clientStore = create<IClientStore>((set, get) => ({
     selectedClientIds: [],
 
     isCreatingClient: false,
+    isUpdatingClient: false,
 
     isGettingClientOverview: true,
     clientOverviewData: null,
@@ -311,7 +315,35 @@ const clientStore = create<IClientStore>((set, get) => ({
         } finally {
             set({ isPerformingAction: false })
         }
-    }
+    },
+
+    async updateClient(data) {
+        set({ isUpdatingClient: true })
+
+
+        try {
+            const clientId = get().clientOverviewData?._id
+
+            if (!clientId) {
+                return {
+                    success: false,
+                    message: "Client not found"
+                }
+            }
+
+            const res = await updateClientApi(data, clientId)
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to update client:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isUpdatingClient: false })
+        }
+    },
 
 }))
 

@@ -69,4 +69,8 @@ export const createClientSchema = z.object({
     }
 })
 
+export const baseClientSchema = createClientSchema
+
 export type CreateClientInput = z.infer<typeof createClientSchema>
+
+export type BaseClientInput = z.infer<typeof baseClientSchema>

@@ -1,10 +1,11 @@
 import useClientOverviewData from "../../../hooks/useClientOverviewData"
-import useOrganization from "../../../hooks/useOrganization"
+import organizationStore from "../../../store/organizationStore"
 
 export default function OverviewDetails() {
 
     const clientOverviewData = useClientOverviewData()
-    const organization = useOrganization()
+
+    const organization = organizationStore((state) => state.organization)
 
     return (
         <div className="px-5 space-y-5">
@@ -51,7 +52,7 @@ export default function OverviewDetails() {
 
                     <div className="flex justify-between items-center text-[13px]">
                         <span className="text-text-sm">Currency</span>
-                        <span className="text-text font-semibold">{organization.currency.code}</span>
+                        <span className="text-text font-semibold">{organization?.currency.code}</span>
                     </div>
 
                     <hr className="border border-border/40" />

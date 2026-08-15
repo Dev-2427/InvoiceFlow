@@ -60,6 +60,7 @@ export default function ActionButtons() {
                 {/* edit  */}
                 <button
                     type="button"
+                    onClick={() => navigate(`/clients/${clientOverviewData?._id}/edit`)}
                     disabled={isPerformingAction}
                     className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-[11px] font-semibold bg-navy-700 text-card cursor-pointer hover:bg-navy-800 disabled:opacity-50 disabled:cursor-default`}>
                     <TbPencilFilled />

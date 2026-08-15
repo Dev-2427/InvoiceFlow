@@ -1,5 +1,5 @@
 import type { getClientsParams } from "../types/clientTypes";
-import type { CreateClientInput } from "../validation/clientValidation";
+import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
 import api from "./axios";
 
 export function getClientsApi(query: getClientsParams) {
@@ -20,4 +20,8 @@ export function createClientApi(data: CreateClientInput) {
 
 export function getClientOverviewApi(id: string) {
     return api.get(`/api/client/${id}`)
+}
+
+export function updateClientApi(data: BaseClientInput, id: string) {
+    return api.patch(`/api/client/${id}`, data)
 }

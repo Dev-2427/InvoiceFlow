@@ -4,6 +4,7 @@ import { HiXMark, HiTrash } from "react-icons/hi2";
 import { TbCheck, TbPencilFilled } from "react-icons/tb";
 import DeleteClientsContext from "./DeleteClientsContext";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SelectedClientsAction() {
 
@@ -17,6 +18,8 @@ export default function SelectedClientsAction() {
     const deleteClients = clientStore((state) => state.deleteClients)
 
     const [showDeleteContextMenu, setShowDeleteContextMenu] = useState(false)
+
+    const navigate = useNavigate()
 
     async function handleChangeClientStatus(status: "active" | "inactive") {
         const res = await changeClientStatus(status)
@@ -63,6 +66,7 @@ export default function SelectedClientsAction() {
                 {selectedClientIds.length === 1 &&
                     <button
                         type="button"
+                        onClick={() => navigate(`/clients/${selectedClientIds}/edit`)}
                         disabled={isPerformingAction}
                         className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-[11px] font-semibold bg-card text-text cursor-pointer hover:bg-page disabled:opacity-50 disabled:cursor-default`}>
                         <TbPencilFilled />

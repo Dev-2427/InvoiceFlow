@@ -45,7 +45,7 @@ async function createClient(req: Request, res: Response) {
             shippingAddress: shippingAddress || null
         })
 
-        return sendResponse(res, { status: 201, message: "Client created successfully", data: {clientId : client._id}})
+        return sendResponse(res, { status: 201, message: "Client created successfully", data: { clientId: client._id } })
 
     } catch (error) {
         if (error instanceof mongoose.mongo.MongoServerError && error.code === 11000) {
@@ -123,7 +123,7 @@ async function updateClient(req: Request<clientParams>, res: Response) {
         Object.assign(client, result.data)
         await client.save()
 
-        return sendResponse(res, { status: 200, message: "Client updated successfully", data: { clientData: client } })
+        return sendResponse(res, { status: 200, message: "Client updated successfully", data: { clientId: client._id } })
     } catch (error) {
         if (error instanceof mongoose.mongo.MongoServerError && error.code === 11000) {
             return sendResponse(res, { status: 409, message: "A client with this display name already exists" })

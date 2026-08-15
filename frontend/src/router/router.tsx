@@ -16,6 +16,7 @@ import AppLayout from "../layout/AppLayout";
 import Clients from "../pages/client/Clients";
 import CreateClient from "../pages/client/CreateClient";
 import ClientDetails from "../pages/client/ClientDetails";
+import EditClient from "../pages/client/EditClient";
 
 export const router = createBrowserRouter([
     {
@@ -82,6 +83,10 @@ export const router = createBrowserRouter([
                     {
                         path: "/clients/:id",
                         element: <ClientDetails />
+                    },
+                    {
+                        path: "/clients/:id/edit",
+                        element: <EditClient />
                     }
 
                 ]

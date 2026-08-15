@@ -108,7 +108,9 @@ export default function CreateClient() {
             </header>
 
 
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form
+                className="space-y-5"
+                onSubmit={handleSubmit(onSubmit)}>
 
                 {/* customer type */}
                 <div className="bg-card p-5 mx-5 rounded-[14px] space-y-2">
@@ -607,7 +609,7 @@ export default function CreateClient() {
                     <button
                         type="button"
                         onClick={() => navigate("/clients", { replace: true })}
-                        className={`w-1/2 border-[1.5px] border-border bg-card text-text rounded-[14px] py-2.5 text-[14px] font-semibold cursor-pointer`}>Cancel</button>
+                        className="w-1/2 border-[1.5px] border-border bg-card text-text rounded-[14px] py-2.5 text-[14px] font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-default">Cancel</button>
 
                 </div>
 
