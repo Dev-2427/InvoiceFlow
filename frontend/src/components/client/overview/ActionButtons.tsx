@@ -1,8 +1,8 @@
-import { TbArrowLeft, TbPencilFilled } from "react-icons/tb"
+import { TbArrowLeft, TbCopy, TbPencilFilled } from "react-icons/tb"
 import { useNavigate } from "react-router-dom"
 import clientStore from "../../../store/clientStore"
 import toast from "react-hot-toast"
-import { HiClipboard, HiTrash } from "react-icons/hi2"
+import { HiTrash } from "react-icons/hi2"
 import { useState } from "react"
 import DeleteClientsContext from "../DeleteClientsContext"
 
@@ -79,11 +79,15 @@ export default function ActionButtons() {
                 {/* clone */}
                 <button
                     type="button"
-                    onClick={() => { }}
+                    onClick={() => {
+                        navigate("/clients/new", {
+                            state: { cloneClient: clientOverviewData }
+                        })
+                    }}
                     disabled={isPerformingAction}
                     className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-xs text-[11px] font-semibold bg-card text-text cursor-pointer disabled:opacity-50 disabled:cursor-default hover:bg-navy-50`}
                 >
-                    <HiClipboard />
+                    <TbCopy />
                     <span>Clone</span>
                 </button>
 

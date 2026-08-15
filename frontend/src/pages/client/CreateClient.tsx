@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import { TbXFilled, TbChevronDown, TbCheck } from "react-icons/tb";
 import { HiLockClosed } from "react-icons/hi2";
@@ -10,12 +10,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createClientSchema, type CreateClientInput } from "../../validation/clientValidation";
 import clientStore from "../../store/clientStore";
 import toast from "react-hot-toast";
+import type { ClientData } from "../../types/clientTypes";
 
 const SALUTATIONS = ["Mr.", "Mrs.", "Ms.", "Dr.", "Prof."] as const
 
 export default function CreateClient() {
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const cloneClient = location.state?.cloneClient as ClientData | undefined
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [search, setSearch] = useState("")
@@ -31,7 +35,7 @@ export default function CreateClient() {
 
     const organization = organizationStore((state) => state.organization)
 
-    const { register, watch, handleSubmit, setValue, clearErrors, formState: { errors } } = useForm({
+    const { register, reset, watch, handleSubmit, setValue, clearErrors, formState: { errors } } = useForm({
         resolver: zodResolver(createClientSchema),
         defaultValues: {
             clientType: "business",
@@ -47,6 +51,25 @@ export default function CreateClient() {
     const createClient = clientStore((state) => state.createClient)
     const isCreatingClient = clientStore((state) => state.isCreatingClient)
 
+    useEffect(() => {
+        if (!cloneClient) return
+
+        const [phoneCode, phone] = cloneClient.phone?.split(" ") || ["+91", ""]
+
+        reset({
+            clientType: cloneClient.clientType,
+            salutation: cloneClient.salutation || "Mr.",
+            firstName: cloneClient.firstName || "",
+            lastName: cloneClient.lastName || "",
+            companyName: cloneClient.companyName || "",
+            displayName: "",
+            email: cloneClient.email || "",
+            phoneCode,
+            phone,
+            billingAddress: cloneClient.billingAddress || undefined,
+            shippingAddress: cloneClient.shippingAddress || undefined
+        })
+    }, [cloneClient])
 
     useEffect(() => {
         function salutationOutsideClick(e: MouseEvent) {
