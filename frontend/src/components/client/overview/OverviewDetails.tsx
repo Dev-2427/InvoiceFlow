@@ -1,5 +1,6 @@
 import useClientOverviewData from "../../../hooks/useClientOverviewData"
 import organizationStore from "../../../store/organizationStore"
+import formatLocalDate from "../../../utils/dateUtils"
 
 export default function OverviewDetails() {
 
@@ -66,14 +67,14 @@ export default function OverviewDetails() {
 
                     <div className="flex justify-between items-center text-[13px]">
                         <span className="text-text-sm">Created</span>
-                        <span className="text-text font-semibold capitalize">{clientOverviewData.createdAt}</span>
+                        <span className="text-text font-semibold capitalize">{formatLocalDate(clientOverviewData.createdAt)}</span>
                     </div>
 
                     <hr className="border border-border/40" />
 
                     <div className="flex justify-between items-center text-[13px]">
                         <span className="text-text-sm">Updated</span>
-                        <span className="text-text font-semibold capitalize">{clientOverviewData.updatedAt || "—"}</span>
+                        <span className="text-text font-semibold capitalize">{formatLocalDate(clientOverviewData.updatedAt)}</span>
                     </div>
 
                 </div>
