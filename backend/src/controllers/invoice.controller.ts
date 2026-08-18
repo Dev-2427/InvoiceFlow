@@ -244,7 +244,7 @@ async function changeInvoiceStatus(req: Request<InvoiceParams>, res: Response) {
 
 }
 
-async function softDeleteInvoice(req: Request<InvoiceParams>, res: Response) {
+async function softDeleteInvoice(req: Request, res: Response) {
 
     const organizationId = req.organization?.organizationId
     const { invoiceIds } = req.body
@@ -276,5 +276,35 @@ async function softDeleteInvoice(req: Request<InvoiceParams>, res: Response) {
     }
 }
 
+async function restoreDeletedInvoices(req: Request, res: Response) {
+    const { invoiceIds } = req.body
+    const organizationId = req.organization?.organizationId
 
-export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice }
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const invoices = await Invoice.updateMany({
+            _id: { $in: invoiceIds },
+            organization: organizationId,
+            isDeleted: true
+        },
+            {
+                isDeleted: false,
+                deletedAt: null
+            })
+
+        if (invoices.modifiedCount === 0) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: `${invoiceIds.length === 1 ? "Invoice" : "Invoices"} restored successfully` })
+
+    } catch (error) {
+        console.error("Failed to restore invoices");
+        return sendResponse(res, { status: 500, message: "Failed to restore invoices" })
+    }
+}
+
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices }
