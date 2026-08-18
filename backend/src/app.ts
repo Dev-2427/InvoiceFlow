@@ -35,6 +35,6 @@ app.get("/health", (_, res) => {
 app.use("/api/auth", authRouter)
 app.use("/api/organization", authCheck, organizationRouter)
 app.use("/api/client", authCheck, clientRouter)
-app.use("/api/invoice", authCheck, loadCurrentOrganization)
+app.use("/api/invoice", authCheck, loadCurrentOrganization, invoiceRouter)
 
 export default app

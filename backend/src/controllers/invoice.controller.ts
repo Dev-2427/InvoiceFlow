@@ -4,7 +4,7 @@ import Organization from "../models/Organization.js";
 import Client from "../models/Client.js";
 import Invoice from "../models/Invoice.js";
 import mongoose from "mongoose";
-import type { CreateInvoiceData, UpdateInvoiceData } from "../validations/invoice.validation.js";
+import type { ChangeInvoiceStatusData, CreateInvoiceData, UpdateInvoiceData } from "../validations/invoice.validation.js";
 
 type InvoiceParams = {
     invoiceId: string
@@ -189,4 +189,60 @@ async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
 
 }
 
-export { createInvoice, updateInvoice }
+async function changeInvoiceStatus(req: Request<InvoiceParams>, res: Response) {
+
+    const { status, payment }: ChangeInvoiceStatusData = req.body
+
+    const organizationId = req.organization?.organizationId
+    const invoiceId = req.params.invoiceId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized user" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(invoiceId)) {
+        return sendResponse(res, { status: 400, message: "Invalid invoice ID" })
+    }
+
+    try {
+
+        const invoice = await Invoice.findOne({
+            _id: invoiceId,
+            organization: organizationId
+        })
+
+        if (!invoice) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        if (status === "paid") {
+            payment.amount = invoice.totalAmount
+            invoice.status = "paid"
+            invoice.payment = payment
+        } else if (status === "unpaid") {
+            if (invoice.dueDate < new Date()) {
+                invoice.status = "overdue"
+            } else {
+                invoice.status = "unpaid"
+            }
+            invoice.payment = {
+                mode: null,
+                receivedDate: null,
+                amount: null,
+                note: ""
+            }
+        }
+
+        await invoice.save()
+
+        return sendResponse(res, { status: 200, message: "Invoice status changed successfully" })
+
+    } catch (error) {
+        console.error("Failed to change invoice status");
+        return sendResponse(res, { status: 500, message: "Failed to change invoice status" })
+    }
+
+}
+
+
+export { createInvoice, updateInvoice, changeInvoiceStatus }
