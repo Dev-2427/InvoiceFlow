@@ -36,4 +36,10 @@ export const createInvoiceSchema = z.object({
     }
 })
 
+export const updateInvoiceSchema = createInvoiceSchema.omit({
+    clientId: true,
+    showLogo: true
+})
+
 export type CreateInvoiceData = z.infer<typeof createInvoiceSchema>
+export type UpdateInvoiceData = z.infer<typeof updateInvoiceSchema>

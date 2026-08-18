@@ -4,10 +4,14 @@ import Organization from "../models/Organization.js";
 import Client from "../models/Client.js";
 import Invoice from "../models/Invoice.js";
 import mongoose from "mongoose";
-import type { CreateInvoiceData } from "../validations/invoice.validation.js";
+import type { CreateInvoiceData, UpdateInvoiceData } from "../validations/invoice.validation.js";
+
+type InvoiceParams = {
+    invoiceId: string
+}
 
 async function createInvoice(req: Request, res: Response) {
-    const { clientId, status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, termsAndConditions, payment, showLogo }: CreateInvoiceData = req.body
+    const { clientId, status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, termsAndConditions, payment }: CreateInvoiceData = req.body
 
     const organizationId = req.organization?.organizationId
 
@@ -89,14 +93,13 @@ async function createInvoice(req: Request, res: Response) {
             notes,
             termsAndConditions,
             payment,
-            showLogo
         })
 
         await invoice.save({ session })
 
         await session.commitTransaction()
 
-        return sendResponse(res, { status: 201, message: "Invoice created successfully" })
+        return sendResponse(res, { status: 201, message: "Invoice created successfully", data: { invoiceId: invoice._id } })
     } catch (error) {
         await session.abortTransaction()
         console.error("Failed to create an invoice");
@@ -107,4 +110,83 @@ async function createInvoice(req: Request, res: Response) {
 
 }
 
-export { createInvoice }
+async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
+    const { status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, termsAndConditions, payment }: UpdateInvoiceData = req.body
+
+    const organizationId = req.organization?.organizationId
+    const invoiceId = req.params.invoiceId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(invoiceId)) {
+        return sendResponse(res, { status: 400, message: "Invalid invoice ID" })
+    }
+
+    try {
+
+        let finalStatus: "draft" | "unpaid" | "paid" | "overdue";
+
+        if (status === "draft") {
+            finalStatus = "draft"
+        } else if (payment.mode && payment.receivedDate && payment.amount !== null) {
+            finalStatus = "paid"
+        } else if (dueDate < new Date()) {
+            finalStatus = "overdue"
+        } else {
+            finalStatus = "unpaid"
+        }
+
+        const calculatedLineItems = lineItems.map((item) => ({
+            ...item,
+            amount: item.quantity * item.rate
+        }))
+
+        const subtotal: number = calculatedLineItems.reduce((prev, curr) => {
+            return prev + curr.amount
+        }, 0)
+
+        const discountAmount = subtotal * (discountValue / 100)
+        const taxAmount = (subtotal - discountAmount) * (taxValue / 100)
+        const totalAmount = subtotal - discountAmount + taxAmount
+
+        if (finalStatus === "paid") {
+            payment.amount = totalAmount
+        }
+
+        const invoice = await Invoice.findOneAndUpdate({
+            _id: invoiceId,
+            organization: organizationId,
+        },
+            {
+                status: finalStatus,
+                issueDate,
+                dueDate,
+                lineItems: calculatedLineItems,
+                discountValue,
+                discountAmount,
+                taxValue,
+                taxAmount,
+                subtotal,
+                totalAmount,
+                notes,
+                termsAndConditions,
+                payment
+            }).lean()
+
+        if (!invoice) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Invoice updated successfully", data: { invoiceId: invoice._id } })
+
+    } catch (error) {
+        console.error("Failed to update invoice:", error);
+        return sendResponse(res, { status: 500, message: "Failed to update invoice" })
+    }
+
+
+}
+
+export { createInvoice, updateInvoice }
