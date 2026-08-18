@@ -1,0 +1,39 @@
+import mongoose from "mongoose"
+import z from "zod"
+
+export const createInvoiceSchema = z.object({
+    clientId: z.string().refine(mongoose.Types.ObjectId.isValid, "Invalid client ID"),
+    status: z.enum(["draft", "unpaid", "paid", "overdue"]),
+    issueDate: z.coerce.date(),
+    dueDate: z.coerce.date(),
+    lineItems: z.array(
+        z.object({
+            description: z.string().min(1, "description is required"),
+            quantity: z.number().min(1, "Quantity is required"),
+            rate: z.number().positive("Rate must be greater than 0"),
+            amount: z.number().nonnegative("Amount cannot be negative"),
+        })
+    ).min(1, "At least one line item is required"),
+    discountValue: z.number(),
+    taxValue: z.number(),
+    notes: z.string(),
+    termsAndConditions: z.string(),
+    payment: z.object({
+        mode: z.enum(["cash", "bank_transfer", "credit_card", "debit_card", "upi", "cheque", "paypal", "other"]).nullable(),
+        receivedDate: z.coerce.date().nullable(),
+        amount: z.number().nullable(),
+        note: z.string()
+    }),
+    showLogo: z.boolean()
+}).superRefine((data, ctx) => {
+    if (data.status === "paid" &&
+        (!data.payment.mode || !data.payment.receivedDate || !data.payment.amount)) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["payment"],
+            message: "Payment details are required"
+        })
+    }
+})
+
+export type CreateInvoiceData = z.infer<typeof createInvoiceSchema>

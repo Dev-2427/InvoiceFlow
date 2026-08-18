@@ -8,7 +8,9 @@ import { getDBStatus } from "./config/database.js";
 import authRouter from "./routes/auth.route.js"
 import organizationRouter from "./routes/organization.route.js"
 import clientRouter from "./routes/client.route.js"
+import invoiceRouter from "./routes/invoice.route.js"
 import authCheck from "./middleware/authCheck.js"
+import loadCurrentOrganization from "./middleware/loadCurrentOrganization.js"
 
 const app = express()
 
@@ -33,5 +35,6 @@ app.get("/health", (_, res) => {
 app.use("/api/auth", authRouter)
 app.use("/api/organization", authCheck, organizationRouter)
 app.use("/api/client", authCheck, clientRouter)
+app.use("/api/invoice", authCheck, loadCurrentOrganization)
 
 export default app
