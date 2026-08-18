@@ -197,7 +197,7 @@ async function changeInvoiceStatus(req: Request<InvoiceParams>, res: Response) {
     const invoiceId = req.params.invoiceId
 
     if (!organizationId) {
-        return sendResponse(res, { status: 401, message: "Unauthorized user" })
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
     }
 
     if (!mongoose.Types.ObjectId.isValid(invoiceId)) {
@@ -244,5 +244,37 @@ async function changeInvoiceStatus(req: Request<InvoiceParams>, res: Response) {
 
 }
 
+async function softDeleteInvoice(req: Request<InvoiceParams>, res: Response) {
 
-export { createInvoice, updateInvoice, changeInvoiceStatus }
+    const organizationId = req.organization?.organizationId
+    const { invoiceIds } = req.body
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const invoices = await Invoice.updateMany({
+            _id: { $in: invoiceIds },
+            organization: organizationId,
+            isDeleted: false
+        },
+            {
+                isDeleted: true,
+                deletedAt: new Date()
+            }
+        )
+
+        if (invoices.modifiedCount === 0) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: `${invoiceIds.length === 1 ? "Invoice" : "Invoices"} deleted successfully, can be restored within 30 days.` })
+    } catch (error) {
+        console.error("Failed to delete invoice");
+        return sendResponse(res, { status: 500, message: "Failed to delete invoice" })
+    }
+}
+
+
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice }
