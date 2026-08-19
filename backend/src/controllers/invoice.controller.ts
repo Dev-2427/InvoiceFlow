@@ -342,4 +342,37 @@ async function updateInvoiceLogoVisibility(req: Request<InvoiceParams>, res: Res
     }
 }
 
-export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility }
+async function getInvoiceData(req: Request<InvoiceParams>, res: Response) {
+
+    const organizationId = req.organization?.organizationId
+    const invoiceId = req.params.invoiceId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(invoiceId)) {
+        return sendResponse(res, { status: 400, message: "Invalid invoice ID" })
+    }
+
+    try {
+        const invoice = await Invoice.findOne({
+            _id: invoiceId,
+            organization: organizationId,
+        }).lean()
+
+        if (!invoice) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Data fetched successfully", data: { invoiceData: invoice } })
+
+
+    } catch (error) {
+        console.error("Failed to get invoice data:", error)
+        return sendResponse(res, { status: 500, message: "Failed to get invoice data" })
+    }
+
+}
+
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData }
