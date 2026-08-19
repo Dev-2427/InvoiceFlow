@@ -307,4 +307,39 @@ async function restoreDeletedInvoices(req: Request, res: Response) {
     }
 }
 
-export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices }
+async function updateInvoiceLogoVisibility(req: Request<InvoiceParams>, res: Response) {
+
+    const invoiceId = req.params.invoiceId
+    const organizationId = req.organization?.organizationId
+
+    const { showLogo } = req.body
+
+    if (!mongoose.Types.ObjectId.isValid(invoiceId)) {
+        return sendResponse(res, { status: 400, message: "Invalid invoice ID" })
+    }
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const invoice = await Invoice.findOneAndUpdate({
+            _id: invoiceId,
+            organization: organizationId
+        },
+            { showLogo }
+        ).lean()
+
+        if (!invoice) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: "Logo status changed successfully" })
+
+    } catch (error) {
+        console.error("Failed to change logo status:", error);
+        return sendResponse(res, { status: 500, message: "Failed to change logo status" })
+    }
+}
+
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility }

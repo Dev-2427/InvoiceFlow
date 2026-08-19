@@ -63,6 +63,10 @@ export const deleteInvoiceSchema = z.object({
     invoiceIds: z.array(z.string().refine(mongoose.Types.ObjectId.isValid, "Invalid invoice ID")).min(1, "At least 1 invoice ID is required")
 })
 
+export const updateInvoiceLogoVisibilitySchema = z.object({
+    showLogo: z.boolean()
+})
+
 
 export type CreateInvoiceData = z.infer<typeof createInvoiceSchema>
 export type UpdateInvoiceData = z.infer<typeof updateInvoiceSchema>
