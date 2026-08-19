@@ -158,6 +158,7 @@ async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
         const invoice = await Invoice.findOneAndUpdate({
             _id: invoiceId,
             organization: organizationId,
+            isDeleted: false
         },
             {
                 status: finalStatus,
@@ -208,7 +209,8 @@ async function changeInvoiceStatus(req: Request<InvoiceParams>, res: Response) {
 
         const invoice = await Invoice.findOne({
             _id: invoiceId,
-            organization: organizationId
+            organization: organizationId,
+            isDeleted: false
         })
 
         if (!invoice) {
@@ -325,7 +327,8 @@ async function updateInvoiceLogoVisibility(req: Request<InvoiceParams>, res: Res
     try {
         const invoice = await Invoice.findOneAndUpdate({
             _id: invoiceId,
-            organization: organizationId
+            organization: organizationId,
+            isDeleted: false
         },
             { showLogo }
         ).lean()
