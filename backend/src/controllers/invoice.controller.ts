@@ -397,7 +397,10 @@ async function getInvoices(req: Request, res: Response) {
     try {
         const skip = (page - 1) * limit
 
-        const query: QueryFilter<IInvoice> = { organization: new mongoose.Types.ObjectId(organizationId) }
+        const query: QueryFilter<IInvoice> = {
+            organization: new mongoose.Types.ObjectId(organizationId),
+            isDeleted: false
+        }
         const sort: Record<string, 1 | -1> = {}
 
         const sortOrder = order === "asc" ? 1 : -1
@@ -453,6 +456,7 @@ async function getInvoices(req: Request, res: Response) {
                                 dueDate: 1,
                                 totalAmount: 1,
                                 status: 1,
+                                currency: 1,
                                 client: {
                                     displayName: "$client.displayName",
                                     companyName: "$client.companyName",
@@ -467,7 +471,13 @@ async function getInvoices(req: Request, res: Response) {
             }
         )
 
-        const result = await Invoice.aggregate(pipeline)
+        const [result, deletedCount] = await Promise.all([
+            Invoice.aggregate(pipeline),
+            Invoice.countDocuments({
+                organization: organizationId,
+                isDeleted: true
+            })
+        ])
 
         const invoices = result[0].invoices
         const totalItems = result[0].count[0]?.totalItems ?? 0
@@ -481,7 +491,8 @@ async function getInvoices(req: Request, res: Response) {
                     limit,
                     totalItems,
                     totalPages: Math.ceil(totalItems / limit)
-                }
+                },
+                deletedCount
             }
         })
 
