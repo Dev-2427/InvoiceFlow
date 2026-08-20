@@ -77,6 +77,11 @@ export const getInvoicesSchema = z.object({
     search: z.string().trim().optional()
 })
 
+export const getSoftDeletedInvoicesSchema = z.object({
+    page: z.coerce.number().default(1),
+    limit: z.coerce.number().max(100).default(10),
+})
+
 
 export type CreateInvoiceData = z.infer<typeof createInvoiceSchema>
 export type UpdateInvoiceData = z.infer<typeof updateInvoiceSchema>

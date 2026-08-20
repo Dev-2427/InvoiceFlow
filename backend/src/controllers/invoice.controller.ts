@@ -4,7 +4,7 @@ import Organization from "../models/Organization.js";
 import Client from "../models/Client.js";
 import Invoice, { type IInvoice } from "../models/Invoice.js";
 import mongoose, { type PipelineStage, type QueryFilter } from "mongoose";
-import { getInvoicesSchema, type ChangeInvoiceStatusData, type CreateInvoiceData, type UpdateInvoiceData } from "../validations/invoice.validation.js";
+import { getInvoicesSchema, getSoftDeletedInvoicesSchema, type ChangeInvoiceStatusData, type CreateInvoiceData, type UpdateInvoiceData } from "../validations/invoice.validation.js";
 
 type InvoiceParams = {
     invoiceId: string
@@ -502,6 +502,53 @@ async function getInvoices(req: Request, res: Response) {
     }
 }
 
+async function getSoftDeletedInvoices(req: Request, res: Response) {
+
+    const organizationId = req.organization?.organizationId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    const passedQuery = getSoftDeletedInvoicesSchema.safeParse(req.query)
+
+    if (!passedQuery.success) {
+        return sendResponse(res, { status: 400, message: "Invalid query" })
+    }
+
+    const { page, limit } = passedQuery.data
+
+    try {
+        const skip = (page - 1) * limit
+
+        const [invoices, totalItems] = await Promise.all([
+            Invoice.find(
+                {
+                    organization: organizationId,
+                    isDeleted: true
+                }
+            )
+                .select("invoiceNumber totalAmount deletedAt")
+                .populate("client", "displayName -_id")
+                .sort({ deletedAt: -1 })
+                .skip(skip)
+                .limit(limit)
+            ,
+
+            Invoice.countDocuments({
+                organization: organizationId,
+                isDeleted: true
+            })
+        ])
+
+        return sendResponse(res, { status: 200, message: "Deleted Invoices fetched successfully", data: { invoices, pagination: { page, limit, totalPages: Math.ceil(totalItems / limit), totalItems } } })
+
+    } catch (error) {
+        console.error("Failed to fetch deleted invoices:", error);
+        return sendResponse(res, { status: 500, message: "Failed to fetch deleted invoices" })
+    }
+}
+
 async function deleteInvoicesPermanently(req: Request, res: Response) {
 
     const { invoiceIds } = req.body
@@ -531,4 +578,4 @@ async function deleteInvoicesPermanently(req: Request, res: Response) {
 
 }
 
-export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData, getInvoices, deleteInvoicesPermanently }
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData, getInvoices, deleteInvoicesPermanently, getSoftDeletedInvoices }
