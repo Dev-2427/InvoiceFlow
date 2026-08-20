@@ -67,7 +67,18 @@ export const updateInvoiceLogoVisibilitySchema = z.object({
     showLogo: z.boolean()
 })
 
+export const getInvoicesSchema = z.object({
+    page: z.coerce.number().default(1),
+    limit: z.coerce.number().max(100).default(10),
+
+    filter: z.enum(["paid", "unpaid", "overdue", "draft"]).optional(),
+    sortBy: z.enum(["createdAt", "dueDate", "amount", "client"]).default("createdAt"),
+    order: z.enum(["asc", "desc"]),
+    search: z.string().trim().optional()
+})
+
 
 export type CreateInvoiceData = z.infer<typeof createInvoiceSchema>
 export type UpdateInvoiceData = z.infer<typeof updateInvoiceSchema>
 export type ChangeInvoiceStatusData = z.infer<typeof changeInvoiceStatusSchema>
+export type GetInvoicesData = z.infer<typeof getInvoicesSchema>

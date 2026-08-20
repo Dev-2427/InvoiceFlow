@@ -1,6 +1,6 @@
 import { Schema, Types, model } from "mongoose";
 
-interface IInvoice {
+export interface IInvoice {
     organization: Types.ObjectId,
     client: Types.ObjectId,
     invoiceNumber: string,

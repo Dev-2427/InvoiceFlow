@@ -2,9 +2,9 @@ import type { Request, Response } from "express";
 import sendResponse from "../utils/sendResponse.js";
 import Organization from "../models/Organization.js";
 import Client from "../models/Client.js";
-import Invoice from "../models/Invoice.js";
-import mongoose from "mongoose";
-import type { ChangeInvoiceStatusData, CreateInvoiceData, UpdateInvoiceData } from "../validations/invoice.validation.js";
+import Invoice, { type IInvoice } from "../models/Invoice.js";
+import mongoose, { type PipelineStage, type PopulateOption, type QueryFilter } from "mongoose";
+import { getInvoicesSchema, type ChangeInvoiceStatusData, type CreateInvoiceData, type GetInvoicesData, type UpdateInvoiceData } from "../validations/invoice.validation.js";
 
 type InvoiceParams = {
     invoiceId: string
@@ -378,4 +378,117 @@ async function getInvoiceData(req: Request<InvoiceParams>, res: Response) {
 
 }
 
-export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData }
+async function getInvoices(req: Request, res: Response) {
+
+    const organizationId = req.organization?.organizationId
+
+    const passedQuery = getInvoicesSchema.safeParse(req.body)
+
+    if (!passedQuery.success) {
+        return sendResponse(res, { status: 400, message: "Invalid Queries" })
+    }
+
+    const { limit, page, filter, sortBy, order, search } = passedQuery.data
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const skip = (page - 1) * limit
+
+        const query: QueryFilter<IInvoice> = { organization: new mongoose.Types.ObjectId(organizationId) }
+        const sort: Record<string, 1 | -1> = {}
+
+        const sortOrder = order === "asc" ? 1 : -1
+
+        if (filter) {
+            query.status = filter
+        }
+
+        if (sortBy === "client") {
+            sort["client.displayName"] = sortOrder
+        } else if (sortBy === "amount") {
+            sort.totalAmount = sortOrder
+        } else {
+            sort[sortBy] = sortOrder
+        }
+
+
+        const pipeline: PipelineStage[] = [
+            { $match: query },
+            {
+                $lookup: {
+                    as: "client",
+                    from: "clients",
+                    foreignField: "_id",
+                    localField: "client"
+                }
+            },
+            { $unwind: "$client" }
+        ]
+
+        if (search) {
+            pipeline.push({
+                $match: {
+                    $or: [
+                        { invoiceNumber: { $regex: search, $options: "i" } },
+                        { "client.displayName": { $regex: search, $options: "i" } }
+                    ]
+                }
+            })
+        }
+
+        pipeline.push(
+            {
+                $facet: {
+                    invoices: [
+                        { $sort: sort },
+                        { $skip: skip },
+                        { $limit: limit },
+                        {
+                            $project: {
+                                invoiceNumber: 1,
+                                issueDate: 1,
+                                dueDate: 1,
+                                totalAmount: 1,
+                                status: 1,
+                                client: {
+                                    displayName: "$client.displayName",
+                                    companyName: "$client.companyName",
+                                }
+                            }
+                        }
+                    ],
+                    count: [
+                        { $count: "totalItems" }
+                    ]
+                }
+            }
+        )
+
+        const result = await Invoice.aggregate(pipeline)
+
+        const invoices = result[0].invoices
+        const totalItems = result[0].count[0]?.totalItems ?? 0
+
+        return sendResponse(res, {
+            status: 200, message: "Invoices fetched successfully",
+            data: {
+                invoices,
+                pagination: {
+                    page,
+                    limit,
+                    totalItems,
+                    totalPages: Math.ceil(totalItems / limit)
+                }
+            }
+        })
+
+    } catch (error) {
+        console.error("Failed to fetch invoices:", error)
+        return sendResponse(res, { status: 500, message: "Failed to fetch invoices" })
+    }
+}
+
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData, getInvoices }
