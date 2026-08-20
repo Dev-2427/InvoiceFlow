@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 import z from "zod"
 
-export const createInvoiceSchema = z.object({
+const invoiceSchema = z.object({
     clientId: z.string().refine(mongoose.Types.ObjectId.isValid, "Invalid client ID"),
     status: z.enum(["draft", "unpaid", "paid", "overdue"]),
     issueDate: z.coerce.date(),
@@ -25,9 +25,11 @@ export const createInvoiceSchema = z.object({
         note: z.string()
     }),
     showLogo: z.boolean()
-}).superRefine((data, ctx) => {
+})
+
+export const createInvoiceSchema = invoiceSchema.superRefine((data, ctx) => {
     if (data.status === "paid" &&
-        (!data.payment.mode || !data.payment.receivedDate || !data.payment.amount)) {
+        (!data.payment.mode || !data.payment.receivedDate || data.payment.amount === null)) {
         ctx.addIssue({
             code: "custom",
             path: ["payment"],
@@ -36,9 +38,18 @@ export const createInvoiceSchema = z.object({
     }
 })
 
-export const updateInvoiceSchema = createInvoiceSchema.omit({
+export const updateInvoiceSchema = invoiceSchema.omit({
     clientId: true,
     showLogo: true
+}).superRefine((data, ctx) => {
+    if (data.status === "paid" &&
+        (!data.payment.mode || !data.payment.receivedDate || data.payment.amount === null)) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["payment"],
+            message: "Payment details are required"
+        })
+    }
 })
 
 export const changeInvoiceStatusSchema = z.object({
