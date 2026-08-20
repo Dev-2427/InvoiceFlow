@@ -3,8 +3,8 @@ import sendResponse from "../utils/sendResponse.js";
 import Organization from "../models/Organization.js";
 import Client from "../models/Client.js";
 import Invoice, { type IInvoice } from "../models/Invoice.js";
-import mongoose, { type PipelineStage, type PopulateOption, type QueryFilter } from "mongoose";
-import { getInvoicesSchema, type ChangeInvoiceStatusData, type CreateInvoiceData, type GetInvoicesData, type UpdateInvoiceData } from "../validations/invoice.validation.js";
+import mongoose, { type PipelineStage, type QueryFilter } from "mongoose";
+import { getInvoicesSchema, type ChangeInvoiceStatusData, type CreateInvoiceData, type UpdateInvoiceData } from "../validations/invoice.validation.js";
 
 type InvoiceParams = {
     invoiceId: string
@@ -491,4 +491,33 @@ async function getInvoices(req: Request, res: Response) {
     }
 }
 
-export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData, getInvoices }
+async function deleteInvoicesPermanently(req: Request, res: Response) {
+
+    const { invoiceIds } = req.body
+    const organizationId = req.organization?.organizationId
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    try {
+        const deleteResult = await Invoice.deleteMany({
+            _id: { $in: invoiceIds },
+            organization: organizationId,
+            isDeleted: true
+        })
+
+        if (deleteResult.deletedCount === 0) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        return sendResponse(res, { status: 200, message: `${invoiceIds.length === 1 ? "Invoice" : "Invoices"} deleted successfully` })
+
+    } catch (error) {
+        console.error("Failed to delete Invoices:", error);
+        return sendResponse(res, { status: 500, message: "Failed to delete Invoices" })
+    }
+
+}
+
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData, getInvoices, deleteInvoicesPermanently }
