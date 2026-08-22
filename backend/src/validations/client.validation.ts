@@ -86,3 +86,7 @@ export const getClientsSchema = z.object({
     order: z.enum(["asc", "desc"]).default("desc"),
     search: z.string().trim().optional()
 })
+
+export const searchClientSchema = z.object({
+    search: z.string().trim().min(1, "At least one character is required")
+})

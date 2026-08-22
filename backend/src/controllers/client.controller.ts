@@ -3,7 +3,7 @@ import sendResponse from "../utils/sendResponse.js";
 import User from "../models/User.js";
 import Client, { type IClient } from "../models/Client.js";
 import mongoose, { Types } from "mongoose";
-import { completeClientSchema, getClientsSchema } from "../validations/client.validation.js";
+import { completeClientSchema, getClientsSchema, searchClientSchema } from "../validations/client.validation.js";
 import Invoice from "../models/Invoice.js";
 import type { QueryFilter } from "mongoose"
 
@@ -349,4 +349,90 @@ async function getClients(req: Request, res: Response) {
 
 }
 
-export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus, getClients }
+async function searchClient(req: Request, res: Response) {
+
+    const organizationId = req.organization?.organizationId
+
+    const passedQuery = searchClientSchema.safeParse(req.query)
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!passedQuery.success) {
+        return sendResponse(res, { status: 400, message: "Invalid query" })
+    }
+
+    const { search } = passedQuery.data
+
+    const compatibleOrganizationId = new mongoose.Types.ObjectId(organizationId)
+
+    try {
+        const clients = await Client.aggregate([
+            {
+                $match: {
+                    organization: compatibleOrganizationId,
+                    $or: [
+                        { displayName: { $regex: search, $options: "i" } },
+                        { companyName: { $regex: search, $options: "i" } }
+                    ]
+                }
+            },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: "invoices",
+                    let: { clientId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$client", "$$clientId"] },
+                                        { $in: ["$status", ["unpaid", "overdue"]] },
+                                        { $eq: ["$isDeleted", false] }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                receivable: { $sum: "$totalAmount" }
+                            }
+                        }
+                    ],
+                    as: "receivableData"
+                }
+            },
+            {
+                $project: {
+                    clientType: 1,
+                    companyName: 1,
+                    displayName: 1,
+                    email: 1,
+                    phone: 1,
+                    currency: 1,
+                    status: 1,
+                    city: "$billingAddress.city",
+                    receivable: {
+                        $ifnull: [
+                            { $arrayElemAt: ["$receivableData.receivable", 0] },
+                            0
+                        ]
+                    }
+                }
+            }
+
+        ])
+
+        return sendResponse(res, { status: 200, message: "Searched clients fetched successfully", data: { searchedClients: { clients } } })
+
+
+    } catch (error) {
+        console.error("Failed to fetch searched clients:", error)
+        return sendResponse(res, { status: 500, message: "Failed to fetch searched clients" })
+    }
+}
+
+export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus, getClients, searchClient }
