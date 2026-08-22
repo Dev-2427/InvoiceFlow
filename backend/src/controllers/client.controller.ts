@@ -412,11 +412,10 @@ async function searchClient(req: Request, res: Response) {
                     displayName: 1,
                     email: 1,
                     phone: 1,
-                    currency: 1,
                     status: 1,
                     city: "$billingAddress.city",
                     receivable: {
-                        $ifnull: [
+                        $ifNull: [
                             { $arrayElemAt: ["$receivableData.receivable", 0] },
                             0
                         ]
