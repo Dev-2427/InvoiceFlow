@@ -72,3 +72,16 @@ export interface ClientData {
     createdAt: string,
     updatedAt: string,
 }
+
+export interface searchClients {
+    _id: string,
+    clientType: "individual" | "business",
+    companyName: string | null,
+    displayName: string,
+    salutation: "Mr." | "Mrs." | "Ms." | "Dr." | "Prof." | null,
+    email: string | null,
+    phone: string | null,
+    status: "active" | "inactive",
+    city: string | null,
+    receivable: number
+}

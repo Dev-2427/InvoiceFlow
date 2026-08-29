@@ -17,6 +17,9 @@ import Clients from "../pages/client/Clients";
 import CreateClient from "../pages/client/CreateClient";
 import ClientDetails from "../pages/client/ClientDetails";
 import EditClient from "../pages/client/EditClient";
+import Invoice from "../pages/invoice/Invoice";
+import CreateInvoice from "../pages/invoice/CreateInvoice";
+import InvoiceDetails from "../pages/invoice/InvoiceDetails";
 
 export const router = createBrowserRouter([
     {
@@ -87,6 +90,18 @@ export const router = createBrowserRouter([
                     {
                         path: "/clients/:id/edit",
                         element: <EditClient />
+                    },
+                    {
+                        path: "/invoices",
+                        element: <Invoice />
+                    },
+                    {
+                        path: "/invoices/new",
+                        element: <CreateInvoice />
+                    },
+                    {
+                        path: "/invoices/:invoiceId",
+                        element: <InvoiceDetails />
                     }
 
                 ]

@@ -118,10 +118,6 @@ const invoiceSchema = new Schema<IInvoice>({
         type: String,
         default: ""
     },
-    termsAndConditions: {
-        type: String,
-        default: ""
-    },
     payment: {
         mode: {
             type: String,

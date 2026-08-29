@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData } from "../types/clientTypes";
+import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData, searchClients } from "../types/clientTypes";
 import type { ApiResponse } from "../types/api.types";
-import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi, updateClientApi } from "../api/client.api";
+import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi, searchClientApi, updateClientApi } from "../api/client.api";
 import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
 
 interface IClientStore {
@@ -40,7 +40,16 @@ interface IClientStore {
 
     isUpdatingClient: boolean,
     updateClient: (data: BaseClientInput) => Promise<ApiResponse<{ clientId: string }>>,
+
+    searchedClients: searchClients[] | null,
+    clientSearchString: string,
+    isSearchingClient: boolean,
+    searchClient: () => Promise<ApiResponse<{ searchedClients: searchClients }>>,
+    setClientSearchString: (text: string) => void,
+    handleSearchedClientClick: (client: searchClients) => void,
+    selectedClient: searchClients | null
 }
+
 
 const clientStore = create<IClientStore>((set, get) => ({
     clientSort: {
@@ -63,6 +72,11 @@ const clientStore = create<IClientStore>((set, get) => ({
 
     isGettingClientOverview: true,
     clientOverviewData: null,
+
+    searchedClients: null,
+    clientSearchString: "",
+    isSearchingClient: false,
+    selectedClient: null,
 
     changeSelectedClientsIds(id) {
 
@@ -343,6 +357,54 @@ const clientStore = create<IClientStore>((set, get) => ({
         } finally {
             set({ isUpdatingClient: false })
         }
+    },
+
+    setClientSearchString(text) {
+        set({ clientSearchString: text, selectedClient: null })
+    },
+
+    async searchClient() {
+        set({
+            isSearchingClient: true,
+            selectedClient: null
+        })
+
+        try {
+
+            const search = get().clientSearchString
+
+            if (!search.trim()) {
+                set({ searchedClients: null })
+                return {
+                    success: true,
+                    message: "Search cleared"
+                }
+            }
+
+            const res = await searchClientApi(search)
+
+            if (res.data.success) {
+                set({ searchedClients: res.data.data.searchedClients })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to search client:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isSearchingClient: false })
+        }
+    },
+
+    handleSearchedClientClick(client) {
+        set({
+            clientSearchString: client.displayName,
+            searchedClients: null,
+            selectedClient: client
+        })
     },
 
 }))

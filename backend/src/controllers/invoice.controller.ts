@@ -11,7 +11,7 @@ type InvoiceParams = {
 }
 
 async function createInvoice(req: Request, res: Response) {
-    const { clientId, status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, termsAndConditions, payment }: CreateInvoiceData = req.body
+    const { clientId, status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, payment }: CreateInvoiceData = req.body
 
     const organizationId = req.organization?.organizationId
 
@@ -46,13 +46,16 @@ async function createInvoice(req: Request, res: Response) {
 
         let finalStatus: "draft" | "unpaid" | "paid" | "overdue";
 
+        const today = new Date().setHours(0, 0, 0, 0)
+        const due = new Date(dueDate).setHours(0, 0, 0, 0)
+
         if (status === "draft") {
             finalStatus = "draft"
         }
         else if (payment.mode && payment.receivedDate && payment.amount !== null) {
             finalStatus = "paid"
         }
-        else if (dueDate < new Date()) {
+        else if (due <= today) {
             finalStatus = "overdue"
         } else {
             finalStatus = "unpaid"
@@ -91,7 +94,6 @@ async function createInvoice(req: Request, res: Response) {
             taxValue,
             totalAmount,
             notes,
-            termsAndConditions,
             payment,
         })
 
@@ -111,7 +113,7 @@ async function createInvoice(req: Request, res: Response) {
 }
 
 async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
-    const { status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, termsAndConditions, payment }: UpdateInvoiceData = req.body
+    const { status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, payment }: UpdateInvoiceData = req.body
 
     const organizationId = req.organization?.organizationId
     const invoiceId = req.params.invoiceId
@@ -172,7 +174,6 @@ async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
                 subtotal,
                 totalAmount,
                 notes,
-                termsAndConditions,
                 payment
             }).lean()
 

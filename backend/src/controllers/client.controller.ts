@@ -410,6 +410,7 @@ async function searchClient(req: Request, res: Response) {
                     clientType: 1,
                     companyName: 1,
                     displayName: 1,
+                    salutation: 1,
                     email: 1,
                     phone: 1,
                     status: 1,
@@ -425,7 +426,7 @@ async function searchClient(req: Request, res: Response) {
 
         ])
 
-        return sendResponse(res, { status: 200, message: "Searched clients fetched successfully", data: { searchedClients: { clients } } })
+        return sendResponse(res, { status: 200, message: "Searched clients fetched successfully", data: { searchedClients: clients } })
 
 
     } catch (error) {

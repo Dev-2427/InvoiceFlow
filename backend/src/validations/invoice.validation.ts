@@ -11,20 +11,18 @@ const invoiceSchema = z.object({
             description: z.string().min(1, "description is required"),
             quantity: z.number().min(1, "Quantity is required"),
             rate: z.number().positive("Rate must be greater than 0"),
-            amount: z.number().nonnegative("Amount cannot be negative"),
+            amount: z.number().optional().default(0)
         })
     ).min(1, "At least one line item is required"),
-    discountValue: z.number(),
-    taxValue: z.number(),
+    discountValue: z.number().min(0, "Discount value cannot be negative").max(100, "Discount value cannot exceed 100"),
+    taxValue: z.number().min(0, "Tax value cannot be negative").max(100, "Tax value cannot exceed 100"),
     notes: z.string(),
-    termsAndConditions: z.string(),
     payment: z.object({
         mode: z.enum(["cash", "bank_transfer", "credit_card", "debit_card", "upi", "cheque", "paypal", "other"]).nullable(),
         receivedDate: z.coerce.date().nullable(),
         amount: z.number().nullable(),
         note: z.string()
-    }),
-    showLogo: z.boolean()
+    })
 })
 
 export const createInvoiceSchema = invoiceSchema.superRefine((data, ctx) => {
@@ -39,8 +37,7 @@ export const createInvoiceSchema = invoiceSchema.superRefine((data, ctx) => {
 })
 
 export const updateInvoiceSchema = invoiceSchema.omit({
-    clientId: true,
-    showLogo: true
+    clientId: true
 }).superRefine((data, ctx) => {
     if (data.status === "paid" &&
         (!data.payment.mode || !data.payment.receivedDate || data.payment.amount === null)) {

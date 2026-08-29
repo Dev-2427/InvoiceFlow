@@ -25,3 +25,7 @@ export function getClientOverviewApi(id: string) {
 export function updateClientApi(data: BaseClientInput, id: string) {
     return api.patch(`/api/client/${id}`, data)
 }
+
+export function searchClientApi(search: string) {
+    return api.get("/api/client/search", { params: { search } })
+}
