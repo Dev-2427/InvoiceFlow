@@ -47,7 +47,8 @@ interface IClientStore {
     searchClient: () => Promise<ApiResponse<{ searchedClients: searchClients }>>,
     setClientSearchString: (text: string) => void,
     handleSearchedClientClick: (client: searchClients) => void,
-    selectedClient: searchClients | null
+    selectedClient: searchClients | null,
+    clearSearchedAndSelectedClient: () => void
 }
 
 
@@ -77,6 +78,10 @@ const clientStore = create<IClientStore>((set, get) => ({
     clientSearchString: "",
     isSearchingClient: false,
     selectedClient: null,
+
+    clearSearchedAndSelectedClient() {
+        set({ searchedClients: null, selectedClient: null })
+    },
 
     changeSelectedClientsIds(id) {
 

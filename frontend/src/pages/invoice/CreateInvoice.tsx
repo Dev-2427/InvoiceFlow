@@ -26,6 +26,7 @@ export default function CreateInvoice() {
     const searchClient = clientStore((state) => state.searchClient)
     const searchedClients = clientStore((state) => state.searchedClients)
     const selectedClient = clientStore((state) => state.selectedClient)
+    const clearSearchedAndSelectedClient = clientStore((state) => state.clearSearchedAndSelectedClient)
 
     const organization = organizationStore((state) => state.organization)
 
@@ -96,6 +97,7 @@ export default function CreateInvoice() {
 
         return (() => {
             clearTimeout(searchTimeout)
+            clearSearchedAndSelectedClient()
         })
     }, [clientSearchString])
 
