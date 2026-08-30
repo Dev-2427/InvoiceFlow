@@ -383,7 +383,7 @@ async function getInvoices(req: Request, res: Response) {
 
     const organizationId = req.organization?.organizationId
 
-    const passedQuery = getInvoicesSchema.safeParse(req.body)
+    const passedQuery = getInvoicesSchema.safeParse(req.query)
 
     if (!passedQuery.success) {
         return sendResponse(res, { status: 400, message: "Invalid Queries" })
