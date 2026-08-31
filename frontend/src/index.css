@@ -4,49 +4,82 @@
 html,
 body,
 #root {
-    min-height: 100%;
+  min-height: 100%;
 }
 
 
 @theme {
   /* ── Navy ── */
-  --color-navy-900: #0D1F33;  /* sidebar dark, toast bg, auth gradient */
-  --color-navy-800: #152E4D;  /* sidebar background */
-  --color-navy-700: #1E3A5F;  /* primary buttons, active states, links */
-  --color-navy-200: #C7D2E8;  /* chart bars inactive, light navy */
-  --color-navy-50:  #EEF2FF;  /* bulk action bar, light highlights */
+  --color-navy-900: #0D1F33;
+  /* sidebar dark, toast bg, auth gradient */
+  --color-navy-800: #152E4D;
+  /* sidebar background */
+  --color-navy-700: #1E3A5F;
+  /* primary buttons, active states, links */
+  --color-navy-200: #C7D2E8;
+  /* chart bars inactive, light navy */
+  --color-navy-50: #EEF2FF;
+  /* bulk action bar, light highlights */
 
   /* ── Gold ── */
-  --color-gold:       #E4B429;  /* logo, CTA buttons, active nav, chart highlight */
-  --color-gold-light: #FEF9EC;  /* gold backgrounds, badge bg */
-  --color-gold-dark:  #7A5C0E;  /* text ON gold backgrounds */
-  --color-gold-mid:   #B88C1A;  /* hover states on gold */
+  --color-gold: #E4B429;
+  /* logo, CTA buttons, active nav, chart highlight */
+  --color-gold-light: #FEF9EC;
+  /* gold backgrounds, badge bg */
+  --color-gold-dark: #7A5C0E;
+  /* text ON gold backgrounds */
+  --color-gold-mid: #B88C1A;
+  /* hover states on gold */
 
   /* ── Status: Paid ── */
-  --color-paid:          #059669;  /* badge text, success, collected amount */
-  --color-paid-bg:       #ECFDF5;  /* badge background, payment section bg */
-  --color-paid-border:   #6EE7B7;  /* badge border */
+  --color-paid: #059669;
+  /* badge text, success, collected amount */
+  --color-paid-bg: #ECFDF5;
+  /* badge background, payment section bg */
+  --color-paid-border: #6EE7B7;
+  /* badge border */
 
   /* ── Status: Unpaid / Warning ── */
-  --color-unpaid:        #D97706;  /* badge text, upcoming due, receivable */
-  --color-unpaid-bg:     #FFFBEB;  /* badge background, warning banners */
-  --color-unpaid-border: #FCD34D;  /* badge border */
+  --color-unpaid: #D97706;
+  /* badge text, upcoming due, receivable */
+  --color-unpaid-bg: #FFFBEB;
+  /* badge background, warning banners */
+  --color-unpaid-border: #FCD34D;
+  /* badge border */
 
   /* ── Status: Overdue / Danger ── */
-  --color-overdue:        #DC2626;  /* badge text, delete buttons, errors */
-  --color-overdue-bg:     #FEF2F2;  /* badge bg, danger zone bg, delete btn bg */
-  --color-overdue-border: #FCA5A5;  /* badge border, danger zone border */
+  --color-overdue: #DC2626;
+  /* badge text, delete buttons, errors */
+  --color-overdue-bg: #FEF2F2;
+  /* badge bg, danger zone bg, delete btn bg */
+  --color-overdue-border: #FCA5A5;
+  /* badge border, danger zone border */
 
   /* ── Neutrals ── */
-  --color-page:   #F4F6F9;  /* every page background, table header row */
-  --color-card:   #FFFFFF;  /* cards, modals, inputs, auth card */
-  --color-border: #E2E8F0;  /* all borders, dividers, table row lines */
+  --color-page: #F4F6F9;
+  /* every page background, table header row */
+  --color-card: #FFFFFF;
+  /* cards, modals, inputs, auth card */
+  --color-border: #E2E8F0;
+  /* all borders, dividers, table row lines */
+
+  /* Draft status */
+  --color-draft: #475569;
+  /* text color */
+  --color-draft-bg: #F1F5F9;
+  /* background */
+  --color-draft-border: #CBD5E1;
+  /* border */
 
   /* ── Text Scale ── */
-  --color-text:    #0F172A;  /* headings, important values, amounts */
-  --color-text-md: #334155;  /* body text, secondary headings */
-  --color-text-sm: #64748B;  /* labels, table headers, helper text */
-  --color-text-xs: #94A3B8;  /* muted text, chart axis, timestamps */
+  --color-text: #0F172A;
+  /* headings, important values, amounts */
+  --color-text-md: #334155;
+  /* body text, secondary headings */
+  --color-text-sm: #64748B;
+  /* labels, table headers, helper text */
+  --color-text-xs: #94A3B8;
+  /* muted text, chart axis, timestamps */
 }
 
 

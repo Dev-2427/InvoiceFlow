@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
-import { createInvoiceApi, getInvoicesApi } from "../api/invoice.api";
+import { createInvoiceApi, deleteInvoicesApi, getInvoicesApi } from "../api/invoice.api";
 import type { CreateInvoiceInput } from "../validation/invoice.validation";
 import type { getInvoiceParams, GetInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice";
 
@@ -15,11 +15,14 @@ interface IInvoiceStore {
     setInvoiceFilter: (filter: InvoiceFilterType) => void,
     setInvoiceSearch: (text: string) => void
 
-    //  selectedClientIds: string[],
-    //     changeSelectedClientsIds: (id: string) => void,
-    //     emptySelectedClientsIds: () => void,
-    //     allClientIdSelected: boolean,
-    //     handleSelectAllClients: () => void,
+    selectedInvoiceIds: string[],
+    changeSelectedInvoiceIds: (id: string) => void,
+    emptySelectedInvoiceIds: () => void,
+    allInvoiceIdSelected: boolean,
+    handleSelectAllInvoices: () => void,
+
+    isPerformingAction: boolean,
+    deleteInvoices: () => Promise<ApiResponse<null>>,
 
     isGettingInvoices: boolean,
     invoicePageLimit: number,
@@ -40,6 +43,46 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
     isGettingInvoices: false,
     invoicePageLimit: 10,
     invoices: null,
+
+    selectedInvoiceIds: [],
+    allInvoiceIdSelected: false,
+
+    isPerformingAction: false,
+
+    changeSelectedInvoiceIds(id) {
+
+        set((state) => {
+            const alreadySelectedId = get().selectedInvoiceIds.includes(id)
+
+            return {
+                selectedInvoiceIds: alreadySelectedId ? state.selectedInvoiceIds.filter((selectedId) => selectedId !== id)
+                    :
+                    [...state.selectedInvoiceIds, id]
+            }
+        })
+
+        if (get().selectedInvoiceIds.length === get().invoices?.invoices.length) {
+            set({ allInvoiceIdSelected: true })
+        } else {
+            set({ allInvoiceIdSelected: false })
+        }
+    },
+
+    emptySelectedInvoiceIds() {
+        set({ selectedInvoiceIds: [], allInvoiceIdSelected: false })
+    },
+
+    handleSelectAllInvoices() {
+        const selectedAll = get().allInvoiceIdSelected
+
+        if (selectedAll) {
+            get().emptySelectedInvoiceIds()
+        } else {
+            const clientIds = get().invoices?.invoices.map((client) => client._id)
+
+            set({ selectedInvoiceIds: clientIds, allInvoiceIdSelected: true })
+        }
+    },
 
     setInvoiceSortAndOrder(sort) {
         set({ invoiceSort: sort })
@@ -94,7 +137,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             if (invoiceFilter !== "all") {
                 params.filter = invoiceFilter
             }
-            console.log("params", params)
+
             const res = await getInvoicesApi(params)
 
             if (res.data.success) {
@@ -110,6 +153,30 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             }
         } finally {
             set({ isGettingInvoices: false })
+        }
+    },
+
+    async deleteInvoices() {
+        set({ isPerformingAction: true })
+        try {
+            const invoiceIds = get().selectedInvoiceIds
+
+            const res = await deleteInvoicesApi(invoiceIds)
+
+            if (res.data.success) {
+                get().emptySelectedInvoiceIds()
+                await get().getInvoices(1)
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to delete invoice:", error);
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingAction: false })
         }
     },
 }))

@@ -9,3 +9,7 @@ export function createInvoiceApi(data: CreateInvoiceInput) {
 export function getInvoicesApi(query: getInvoiceParams) {
     return api.get("/api/invoice/", { params: query })
 }
+
+export function deleteInvoicesApi(invoiceIds: string[]) {
+    return api.patch("/api/invoice/soft_delete", { invoiceIds })
+}

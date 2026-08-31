@@ -272,7 +272,7 @@ async function softDeleteInvoice(req: Request, res: Response) {
             return sendResponse(res, { status: 404, message: "Invoice not found" })
         }
 
-        return sendResponse(res, { status: 200, message: `${invoiceIds.length === 1 ? "Invoice" : "Invoices"} deleted successfully, can be restored within 30 days.` })
+        return sendResponse(res, { status: 200, message: `${invoiceIds.length === 1 ? "Invoice" : "Invoices"} deleted successfully` })
     } catch (error) {
         console.error("Failed to delete invoice");
         return sendResponse(res, { status: 500, message: "Failed to delete invoice" })

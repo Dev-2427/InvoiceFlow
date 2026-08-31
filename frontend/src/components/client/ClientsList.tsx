@@ -4,6 +4,7 @@ import { TbCheck, TbArrowLeft, TbArrowRight } from "react-icons/tb";
 import ClientsCardSkeleton from "../loading/ClientsCardSkeleton";
 import { NavLink } from "react-router-dom";
 import organizationStore from "../../store/organizationStore";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 export default function ClientsList() {
 
@@ -134,11 +135,11 @@ export default function ClientsList() {
                         <div className="flex justify-between items-center">
                             <div className="flex flex-col items-start">
                                 <span className="text-xs text-text-xs font-semibold">RECEIVABLE</span>
-                                <span className="text-unpaid">{organization?.currency.symbol}{client.totalReceivable}</span>
+                                <span className="text-unpaid">{organization?.currency.symbol}{formatCurrency(client.totalReceivable)}</span>
                             </div>
                             <div className="flex flex-col items-start">
                                 <span className="text-xs text-text-xs font-semibold">TOTAL BILLED</span>
-                                <span className="text-paid">{organization?.currency.symbol}{client.totalBilled}</span>
+                                <span className="text-paid">{organization?.currency.symbol}{formatCurrency(client.totalBilled)}</span>
                             </div>
 
                         </div>

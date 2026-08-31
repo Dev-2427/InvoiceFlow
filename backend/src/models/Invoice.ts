@@ -24,7 +24,6 @@ export interface IInvoice {
     taxAmount: number,
     totalAmount: number,
     notes: string,
-    termsAndConditions: string,
     payment: {
         mode: "cash" | "bank_transfer" | "credit_card" | "debit_card" | "upi" | "cheque" | "paypal" | "other" | null,
         receivedDate: Date | null,

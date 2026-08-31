@@ -112,6 +112,9 @@ export default function CreateInvoice() {
             if (!paymentReceivedDate) {
                 setValue("payment.receivedDate", new Date(), { shouldValidate: true })
             }
+
+            setValue("payment.amount", total, {shouldValidate: true})
+
         } else {
             setValue("status", "unpaid", { shouldValidate: true })
             setValue("payment", {
@@ -166,7 +169,7 @@ export default function CreateInvoice() {
     }
 
     function onInvalid() {
-        setLoadingType(null)
+        setLoadingType(null)   
     }
 
     return (
