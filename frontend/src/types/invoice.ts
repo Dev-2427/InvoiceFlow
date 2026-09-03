@@ -49,3 +49,34 @@ export interface getInvoiceParams {
     page: number,
     limit: number
 }
+
+export interface getSoftDeletedInvoiceParams {
+    page: number,
+    limit: number
+}
+
+export interface getSoftDeletedInvoicesResponseData {
+    invoices: {
+        _id: string
+        client: {
+            displayName: string,
+            companyName: string | null
+        },
+        currency: {
+            code: string,
+            symbol: string
+        },
+        deletedAt: string,
+        issueDate: string,
+        dueDate: string,
+        invoiceNumber: string,
+        status: "paid" | "unpaid" | "overdue" | "draft",
+        totalAmount: number
+    }[],
+    pagination: {
+        page: number,
+        limit: number,
+        totalPages: number,
+        totalItems: number,
+    }
+}

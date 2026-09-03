@@ -20,6 +20,7 @@ import EditClient from "../pages/client/EditClient";
 import Invoice from "../pages/invoice/Invoice";
 import CreateInvoice from "../pages/invoice/CreateInvoice";
 import InvoiceDetails from "../pages/invoice/InvoiceDetails";
+import RestoreInvoices from "../pages/invoice/RestoreInvoices";
 
 export const router = createBrowserRouter([
     {
@@ -102,6 +103,10 @@ export const router = createBrowserRouter([
                     {
                         path: "/invoices/:invoiceId",
                         element: <InvoiceDetails />
+                    },
+                    {
+                        path: "/invoices/restore",
+                        element: <RestoreInvoices />
                     }
 
                 ]

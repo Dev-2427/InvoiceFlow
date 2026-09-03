@@ -529,7 +529,7 @@ async function getSoftDeletedInvoices(req: Request, res: Response) {
                     isDeleted: true
                 }
             )
-                .select("invoiceNumber totalAmount deletedAt status issueDate dueDate")
+                .select("invoiceNumber totalAmount deletedAt status issueDate dueDate currency")
                 .populate("client", "displayName companyName -_id")
                 .sort({ deletedAt: -1 })
                 .skip(skip)

@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
-import { createInvoiceApi, deleteInvoicesApi, getInvoicesApi } from "../api/invoice.api";
+import { createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi } from "../api/invoice.api";
 import type { CreateInvoiceInput } from "../validation/invoice.validation";
-import type { getInvoiceParams, GetInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice";
+import type { getInvoiceParams, GetInvoicesResponseData, getSoftDeletedInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice";
 
 interface IInvoiceStore {
     creatingInvoice: boolean,
@@ -28,6 +28,20 @@ interface IInvoiceStore {
     invoicePageLimit: number,
     invoices: GetInvoicesResponseData | null,
     getInvoices: (page: number) => Promise<ApiResponse<{ data: GetInvoicesResponseData }>>
+
+    isGettingSoftDeletedInvoices: boolean,
+    getSoftDeletedInvoices: (page: number) => Promise<ApiResponse<{ data: getSoftDeletedInvoicesResponseData }>>,
+    softDeletedInvoices: getSoftDeletedInvoicesResponseData | null,
+    deletedInvoicesLimit: number,
+
+    emptySelectedInvoiceIdsForDeletion: () => void,
+    allInvoiceIdSelectedForDeletion: boolean,
+    selectedInvoiceIdsForDeletion: string[],
+    isPerformingActionForDeletionPage: boolean,
+    changeSelectedInvoiceIdsForDeletion: (id: string) => void,
+    handleAllSelectedInvoicesForDeletion: () => void,
+    restoreInvoices: (id: string | null) => Promise<ApiResponse<{ data: null }>>
+    deleteInvoicesPermanently: (id: string | null) => Promise<ApiResponse<{ data: null }>>
 }
 
 const invoiceStore = create<IInvoiceStore>((set, get) => ({
@@ -48,6 +62,37 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
     allInvoiceIdSelected: false,
 
     isPerformingAction: false,
+
+    isGettingSoftDeletedInvoices: false,
+    softDeletedInvoices: null,
+    deletedInvoicesLimit: 10,
+
+    allInvoiceIdSelectedForDeletion: false,
+    selectedInvoiceIdsForDeletion: [],
+    isPerformingActionForDeletionPage: false,
+
+    changeSelectedInvoiceIdsForDeletion(id) {
+
+        set((state) => {
+            const alreadySelectedId = get().selectedInvoiceIdsForDeletion.includes(id)
+
+            return {
+                selectedInvoiceIdsForDeletion: alreadySelectedId ? state.selectedInvoiceIdsForDeletion.filter((selectedId) => selectedId !== id)
+                    :
+                    [...state.selectedInvoiceIdsForDeletion, id]
+            }
+        })
+
+        if (get().selectedInvoiceIdsForDeletion.length === get().softDeletedInvoices?.invoices.length) {
+            set({ allInvoiceIdSelectedForDeletion: true })
+        } else {
+            set({ allInvoiceIdSelectedForDeletion: false })
+        }
+    },
+
+    emptySelectedInvoiceIdsForDeletion() {
+        set({ selectedInvoiceIdsForDeletion: [], allInvoiceIdSelectedForDeletion: false })
+    },
 
     changeSelectedInvoiceIds(id) {
 
@@ -72,15 +117,27 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
         set({ selectedInvoiceIds: [], allInvoiceIdSelected: false })
     },
 
+    handleAllSelectedInvoicesForDeletion() {
+        const selectedAll = get().allInvoiceIdSelectedForDeletion
+
+        if (selectedAll) {
+            get().emptySelectedInvoiceIdsForDeletion()
+        } else {
+            const invoiceIds = get().softDeletedInvoices?.invoices.map((invoice) => invoice._id)
+
+            set({ selectedInvoiceIdsForDeletion: invoiceIds, allInvoiceIdSelectedForDeletion: true })
+        }
+    },
+
     handleSelectAllInvoices() {
         const selectedAll = get().allInvoiceIdSelected
 
         if (selectedAll) {
             get().emptySelectedInvoiceIds()
         } else {
-            const clientIds = get().invoices?.invoices.map((client) => client._id)
+            const invoiceIds = get().invoices?.invoices.map((invoice) => invoice._id)
 
-            set({ selectedInvoiceIds: clientIds, allInvoiceIdSelected: true })
+            set({ selectedInvoiceIds: invoiceIds, allInvoiceIdSelected: true })
         }
     },
 
@@ -177,6 +234,86 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             }
         } finally {
             set({ isPerformingAction: false })
+        }
+    },
+
+    async getSoftDeletedInvoices(page) {
+        set({ isGettingSoftDeletedInvoices: true })
+        try {
+
+            const limit = get().deletedInvoicesLimit
+
+            const params = {
+                limit,
+                page
+            }
+
+            const res = await getSoftDeletedInvoicesApi(params)
+
+            if (res.data.success) {
+                set({ softDeletedInvoices: res.data.data })
+            }
+
+            return res.data
+
+        } catch (error: any) {
+            console.error("Failed to get soft deleted invoices:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isGettingSoftDeletedInvoices: false })
+        }
+    },
+
+    async restoreInvoices(id) {
+        set({ isPerformingActionForDeletionPage: true })
+        try {
+
+            const selectedIds = id ? [id] : get().selectedInvoiceIdsForDeletion
+
+            const res = await restoreDeletedInvoicesApi(selectedIds)
+
+            if (res.data.success) {
+                get().emptySelectedInvoiceIdsForDeletion()
+                await get().getSoftDeletedInvoices(1)
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to restore invoice:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingActionForDeletionPage: false })
+        }
+    },
+
+    async deleteInvoicesPermanently(id) {
+        set({ isPerformingActionForDeletionPage: true })
+        try {
+
+            const selectedIds = id ? [id] : get().selectedInvoiceIdsForDeletion
+
+            const res = await deleteInvoicesPermanentlyApi(selectedIds)
+
+            if (res.data.success) {
+                get().emptySelectedInvoiceIdsForDeletion()
+                await get().getSoftDeletedInvoices(1)
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to delete permanently invoice:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingActionForDeletionPage: false })
         }
     },
 }))
