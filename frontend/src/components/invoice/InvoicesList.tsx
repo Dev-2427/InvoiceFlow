@@ -114,7 +114,7 @@ export default function InvoicesList() {
 
                             {/* amount */}
                             <div className="flex justify-between items-center px-4 py-3 bg-page rounded-lg">
-                                <p className="text-text-sm font-bold text-xs">AMOUNT</p>
+                                <p className="text-text-xs font-bold text-xs">AMOUNT</p>
                                 <p className="text-text text-md font-bold">{invoice.currency.symbol}{formatCurrency(invoice.totalAmount)}</p>
                             </div>
 
@@ -122,8 +122,8 @@ export default function InvoicesList() {
                             <div className="flex justify-between items-center">
 
                                 <div>
-                                    <p className="text-text-sm text-xs font-semibold">ISSUED</p>
-                                    <p className="text-[13px] text-text font-semibold">{formatLocalDate(invoice.issueDate)}</p>
+                                    <p className="text-text-xs text-xs font-semibold">ISSUED</p>
+                                    <p className="text-[13px] text-text-md font-semibold">{formatLocalDate(invoice.issueDate)}</p>
                                 </div>
 
                                 <div>

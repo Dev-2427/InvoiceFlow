@@ -158,12 +158,12 @@ export default function SoftDeletedInvoicesList() {
                             <div className="flex justify-between items-start px-4 py-3 bg-page rounded-lg">
 
                                 <div>
-                                    <p className="text-text-sm font-bold text-xs">AMOUNT</p>
-                                    <p className="text-text text-md font-bold">{invoice.currency.symbol}{formatCurrency(invoice.totalAmount)}</p>
+                                    <p className="text-text-xs font-bold text-xs">AMOUNT</p>
+                                    <p className="text-text-md text-md font-bold">{invoice.currency.symbol}{formatCurrency(invoice.totalAmount)}</p>
                                 </div>
 
                                 <div>
-                                    <p className="text-text-sm font-bold text-xs">DELETED ON</p>
+                                    <p className="text-text-xs font-bold text-xs">DELETED ON</p>
                                     <p className="text-overdue text-[12px] font-bold">{formatLocalDate(invoice.deletedAt)}</p>
                                 </div>
 
