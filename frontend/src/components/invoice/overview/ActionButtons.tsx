@@ -16,6 +16,7 @@ export default function ActionButtons() {
     const showLogo = invoiceStore((state) => state.invoiceOverviewData?.showLogo)
     const invoiceStatus = invoiceStore((state) => state.invoiceOverviewData?.status)
     const deleteOverviewInvoice = invoiceStore((state) => state.deleteOverviewInvoice)
+    const changeLogoVisibility = invoiceStore((state) => state.changeLogoVisibility)
 
     const [showDeleteContextMenu, setShowDeleteContextMenu] = useState(false)
     const [showChangePaymentStatusContextMenu, setShowChangePaymentStatusContextMenu] = useState(false)
@@ -32,6 +33,15 @@ export default function ActionButtons() {
 
         navigate("/invoices")
         toast.success(res.message)
+    }
+
+    async function handleShowLogoToggle(showLogo: boolean) {
+        const res = await changeLogoVisibility(showLogo)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
     }
 
     return (
@@ -152,7 +162,7 @@ export default function ActionButtons() {
 
                             <button
                                 type="button"
-                                // onClick={() => setIsPaid(prev => !prev)}
+                                onClick={() => handleShowLogoToggle(!showLogo)}
                                 className={`relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer ${showLogo ? "bg-gold" : "bg-border"
                                     }`}
                             >

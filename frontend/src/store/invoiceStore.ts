@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
-import { changeInvoiceStatusApi, createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoiceOverviewApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi } from "../api/invoice.api";
+import { changeInvoiceStatusApi, changeLogoVisibilityApi, createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoiceOverviewApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi } from "../api/invoice.api";
 import type { ChangeInvoiceStatusInput, CreateInvoiceInput } from "../validation/invoice.validation";
 import type { GetInvoiceOverviewData, getInvoiceParams, GetInvoicesResponseData, getSoftDeletedInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice.types";
 
@@ -50,6 +50,7 @@ interface IInvoiceStore {
     deleteOverviewInvoice: () => Promise<ApiResponse<null>>
     isChangingInvoiceStatus: boolean,
     changeInvoiceStatus: (data: ChangeInvoiceStatusInput) => Promise<ApiResponse<null>>
+    changeLogoVisibility: (showLogo: boolean) => Promise<ApiResponse<null>>
 }
 
 const invoiceStore = create<IInvoiceStore>((set, get) => ({
@@ -418,7 +419,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
 
                     return {
                         invoiceOverviewData: {
-                            ...state.invoiceOverviewData, status, payment: { ...data.payment, receivedDate: data.payment.receivedDate?.toISOString() ?? null}
+                            ...state.invoiceOverviewData, status, payment: { ...data.payment, receivedDate: data.payment.receivedDate?.toISOString() ?? null }
                         }
                     }
                 })
@@ -433,6 +434,43 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             }
         } finally {
             set({ isChangingInvoiceStatus: false })
+        }
+    },
+
+    async changeLogoVisibility(showLogo) {
+        try {
+            const invoiceId = get().invoiceOverviewData?._id
+
+            if (!invoiceId) {
+                return {
+                    success: false,
+                    message: "No invoice found"
+                }
+            }
+
+            set((state) => ({
+                invoiceOverviewData: state.invoiceOverviewData ? { ...state.invoiceOverviewData, showLogo } : state.invoiceOverviewData
+            }))
+
+            const res = await changeLogoVisibilityApi(invoiceId, showLogo)
+
+            if (!res.data.success) {
+                set((state) => ({
+                    invoiceOverviewData: state.invoiceOverviewData ? { ...state.invoiceOverviewData, showLogo: !showLogo } : state.invoiceOverviewData
+                }))
+            }
+
+            return res.data
+        } catch (error: any) {
+                set((state) => ({
+                    invoiceOverviewData: state.invoiceOverviewData ? { ...state.invoiceOverviewData, showLogo: !showLogo } : state.invoiceOverviewData
+                }))
+
+            console.error("Failed to change show logo status:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
         }
     },
 }))

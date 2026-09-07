@@ -33,3 +33,7 @@ export function getInvoiceOverviewApi(id: string) {
 export function changeInvoiceStatusApi(data: ChangeInvoiceStatusInput, invoiceId: string) {
     return api.patch(`/api/invoice/status/${invoiceId}`, data)
 }
+
+export function changeLogoVisibilityApi(invoiceId: string, showLogo: boolean) {
+    return api.patch(`/api/invoice/show_logo/${invoiceId}`, { showLogo  })
+}
