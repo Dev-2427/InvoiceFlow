@@ -4,7 +4,7 @@ import toast from "react-hot-toast"
 import { TbArrowLeft, TbArrowRight, TbCheck, TbCornerDownLeft, TbHourglassLow, TbTrash } from "react-icons/tb"
 import { formatCurrency } from "../../../utils/formatCurrency"
 import formatLocalDate from "../../../utils/dateUtils"
-import SoftDeletedInvoicesCardSkeleton from "../../loading/SoftDeletedInvoicesCardSkeleton"
+import SoftDeletedInvoicesCardSkeleton from "../../loading/invoice/SoftDeletedInvoicesCardSkeleton"
 import getRemainingDays from "../../../utils/getRemainingDays"
 import { NavLink } from "react-router-dom"
 

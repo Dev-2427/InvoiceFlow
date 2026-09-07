@@ -1,7 +1,7 @@
 import clientStore from "../../store/clientStore"
 import { HiEnvelope, HiPhone } from "react-icons/hi2";
 import { TbCheck, TbArrowLeft, TbArrowRight } from "react-icons/tb";
-import ClientsCardSkeleton from "../loading/ClientsCardSkeleton";
+import ClientsCardSkeleton from "../loading/client/ClientsCardSkeleton";
 import { NavLink } from "react-router-dom";
 import organizationStore from "../../store/organizationStore";
 import { formatCurrency } from "../../utils/formatCurrency";

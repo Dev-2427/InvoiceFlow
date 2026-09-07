@@ -5,7 +5,7 @@ import toast from "react-hot-toast"
 import Header from "../../components/ui/Header"
 import ActionButtons from "../../components/client/overview/ActionButtons"
 import OverviewDetails from "../../components/client/overview/OverviewDetails"
-import ClientOverviewSkeleton from "../../components/loading/ClientOverviewSkeleton"
+import ClientOverviewSkeleton from "../../components/loading/client/ClientOverviewSkeleton"
 
 export default function ClientDetails() {
 

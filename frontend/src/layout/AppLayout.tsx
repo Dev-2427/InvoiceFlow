@@ -7,7 +7,7 @@ import uiStore from "../store/uiStore";
 import Tooltip from "../components/ui/Tooltip";
 import organizationStore from "../store/organizationStore";
 import { useEffect, useRef, useState } from "react";
-import OrganizationSkeleton from "../components/loading/OrganizationSkeleton";
+import OrganizationSkeleton from "../components/loading/organization/OrganizationSkeleton";
 import useAuthUser from "../hooks/useAuthUser";
 
 export default function AppLayout() {

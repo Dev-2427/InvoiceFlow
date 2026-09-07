@@ -4,7 +4,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import formatLocalDate from "../../utils/dateUtils";
 import { Link } from "react-router-dom";
 import { HiTrash } from "react-icons/hi2";
-import InvoicesCardSkeletons from "../loading/InvoicesCardSkeletons";
+import InvoicesCardSkeletons from "../loading/invoice/InvoicesCardSkeletons";
 
 export default function InvoicesList() {
 
