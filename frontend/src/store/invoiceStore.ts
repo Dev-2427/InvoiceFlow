@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
-import { createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi } from "../api/invoice.api";
-import type { CreateInvoiceInput } from "../validation/invoice.validation";
-import type { getInvoiceParams, GetInvoicesResponseData, getSoftDeletedInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice";
+import { changeInvoiceStatusApi, createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoiceOverviewApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi } from "../api/invoice.api";
+import type { ChangeInvoiceStatusInput, CreateInvoiceInput } from "../validation/invoice.validation";
+import type { GetInvoiceOverviewData, getInvoiceParams, GetInvoicesResponseData, getSoftDeletedInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice.types";
 
 interface IInvoiceStore {
     creatingInvoice: boolean,
@@ -40,8 +40,16 @@ interface IInvoiceStore {
     isPerformingActionForDeletionPage: boolean,
     changeSelectedInvoiceIdsForDeletion: (id: string) => void,
     handleAllSelectedInvoicesForDeletion: () => void,
-    restoreInvoices: (id: string | null) => Promise<ApiResponse<{ data: null }>>
-    deleteInvoicesPermanently: (id: string | null) => Promise<ApiResponse<{ data: null }>>
+    restoreInvoices: (id: string | null) => Promise<ApiResponse<{ data: null }>>,
+    deleteInvoicesPermanently: (id: string | null) => Promise<ApiResponse<{ data: null }>>,
+
+    invoiceOverviewData: GetInvoiceOverviewData | null,
+    isGettingInvoiceOverviewData: boolean,
+    getInvoiceOverviewData: (id: string) => Promise<ApiResponse<{ invoiceData: GetInvoiceOverviewData }>>,
+    clearInvoiceOverviewData: () => void,
+    deleteOverviewInvoice: () => Promise<ApiResponse<null>>
+    isChangingInvoiceStatus: boolean,
+    changeInvoiceStatus: (data: ChangeInvoiceStatusInput) => Promise<ApiResponse<null>>
 }
 
 const invoiceStore = create<IInvoiceStore>((set, get) => ({
@@ -70,6 +78,11 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
     allInvoiceIdSelectedForDeletion: false,
     selectedInvoiceIdsForDeletion: [],
     isPerformingActionForDeletionPage: false,
+
+    isGettingInvoiceOverviewData: false,
+    invoiceOverviewData: null,
+
+    isChangingInvoiceStatus: false,
 
     changeSelectedInvoiceIdsForDeletion(id) {
 
@@ -314,6 +327,112 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             }
         } finally {
             set({ isPerformingActionForDeletionPage: false })
+        }
+    },
+
+    async getInvoiceOverviewData(id) {
+        set({ isGettingInvoiceOverviewData: true, invoiceOverviewData: null })
+
+        try {
+            const res = await getInvoiceOverviewApi(id)
+
+            if (res.data.success) {
+                set({ invoiceOverviewData: res.data.data.invoiceData })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to get invoice overview data:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isGettingInvoiceOverviewData: false })
+        }
+    },
+
+    clearInvoiceOverviewData() {
+        set({ invoiceOverviewData: null })
+    },
+
+    async deleteOverviewInvoice() {
+        set({ isPerformingAction: true })
+        try {
+            const invoiceId = get().invoiceOverviewData?._id
+
+            if (!invoiceId) {
+                return {
+                    success: false,
+                    message: "Invoice not found"
+                }
+            }
+
+            const res = await deleteInvoicesApi([invoiceId])
+
+            if (res.data.success) {
+                set({ invoiceOverviewData: null })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to delete overview invoice:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingAction: false })
+        }
+    },
+
+    async changeInvoiceStatus(data) {
+        set({ isChangingInvoiceStatus: true })
+        try {
+            const invoiceId = get().invoiceOverviewData?._id
+
+            if (!invoiceId) {
+                return {
+                    success: false,
+                    message: "No invoice found"
+                }
+            }
+            const res = await changeInvoiceStatusApi(data, invoiceId)
+
+            if (res.data.success) {
+                set((state) => {
+                    if (!state.invoiceOverviewData) return state
+
+                    let status: "paid" | "unpaid" | "overdue" = data.status
+
+                    const due = new Date(state.invoiceOverviewData.dueDate).setHours(0, 0, 0, 0)
+                    const today = new Date().setHours(0, 0, 0, 0)
+
+                    if (data.status === "unpaid") {
+                        if (due <= today) {
+                            status = "overdue"
+                        } else {
+                            status = "unpaid"
+                        }
+                    }
+
+                    return {
+                        invoiceOverviewData: {
+                            ...state.invoiceOverviewData, status, payment: { ...data.payment, receivedDate: data.payment.receivedDate?.toISOString() ?? null}
+                        }
+                    }
+                })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to change invoice status:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isChangingInvoiceStatus: false })
         }
     },
 }))

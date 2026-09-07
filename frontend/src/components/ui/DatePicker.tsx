@@ -10,10 +10,11 @@ interface DatePickerProps {
     isOpen: boolean,
     onOpen: () => void,
     onClose: () => void,
-    directionUpLeft?: boolean
+    directionUpLeft?: boolean,
+    directionCenterLeft?: boolean
 }
 
-export default function DatePicker({ label, onChange, value, error, isOpen, onClose, onOpen, directionUpLeft }: DatePickerProps) {
+export default function DatePicker({ label, onChange, value, error, isOpen, onClose, onOpen, directionUpLeft,directionCenterLeft }: DatePickerProps) {
 
     const today = new Date()
 
@@ -49,7 +50,7 @@ export default function DatePicker({ label, onChange, value, error, isOpen, onCl
 
 
             {isOpen && (
-                <div className={`absolute z-50 ${directionUpLeft ? "bottom-full right-0 mb-2" : " top-full left-0 mt-2"} bg-card border border-border rounded-[14px] shadow-xl px-5 py-3`}>
+                <div className={`absolute z-50 ${directionUpLeft ? "bottom-full right-0 mb-2" : directionCenterLeft ? "lg:bottom-0 bottom-full lg:-right-12 right-0 lg:mb-6 mb-2" : " top-full left-0 mt-2"} bg-card border border-border rounded-[14px] shadow-xl px-5 py-3`}>
                     <DayPicker
                         mode="single"
                         selected={value}

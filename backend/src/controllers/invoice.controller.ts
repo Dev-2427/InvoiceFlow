@@ -218,12 +218,15 @@ async function changeInvoiceStatus(req: Request<InvoiceParams>, res: Response) {
             return sendResponse(res, { status: 404, message: "Invoice not found" })
         }
 
+        const today = new Date().setHours(0, 0, 0, 0)
+        const due = new Date(invoice.dueDate).setHours(0, 0, 0, 0)
+
         if (status === "paid") {
             payment.amount = invoice.totalAmount
             invoice.status = "paid"
             invoice.payment = payment
         } else if (status === "unpaid") {
-            if (invoice.dueDate < new Date()) {
+            if (due <= today) {
                 invoice.status = "overdue"
             } else {
                 invoice.status = "unpaid"
@@ -363,7 +366,9 @@ async function getInvoiceData(req: Request<InvoiceParams>, res: Response) {
         const invoice = await Invoice.findOne({
             _id: invoiceId,
             organization: organizationId,
-        }).lean()
+        })
+            .populate("client", "displayName companyName")
+            .lean()
 
         if (!invoice) {
             return sendResponse(res, { status: 404, message: "Invoice not found" })

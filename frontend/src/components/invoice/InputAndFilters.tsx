@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { HiChevronDown, HiMagnifyingGlass } from "react-icons/hi2";
-import type { IInvoiceSort, InvoiceFilterType } from "../../types/invoice";
+import type { IInvoiceSort, InvoiceFilterType } from "../../types/invoice.types";
 import invoiceStore from "../../store/invoiceStore";
 
 const sortProperties: IInvoiceSort[] = [

@@ -138,7 +138,7 @@ const invoiceSchema = new Schema<IInvoice>({
     },
     showLogo: {
         type: Boolean,
-        default: false
+        default: true
     },
     email: {
         sent: {

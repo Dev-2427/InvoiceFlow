@@ -35,4 +35,23 @@ export const createInvoiceSchema = invoiceSchema.superRefine((data, ctx) => {
     }
 })
 
+export const changeInvoiceStatusSchema = z.object({
+    status: z.enum(["paid", "unpaid"]),
+    payment: z.object({
+        mode: z.enum(["cash", "bank_transfer", "credit_card", "debit_card", "upi", "cheque", "paypal", "other"]).nullable(),
+        receivedDate: z.coerce.date().nullable(),
+        amount: z.number().nullable(),
+        note: z.string()
+    })
+}).superRefine((data, ctx) => {
+    if (data.status === "paid" && (!data.payment.mode || !data.payment.receivedDate || data.payment.amount === null)) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["payment"],
+            message: "Payment details are required for paid invoices"
+        })
+    }
+})
+
 export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>
+export type ChangeInvoiceStatusInput = z.infer<typeof changeInvoiceStatusSchema>

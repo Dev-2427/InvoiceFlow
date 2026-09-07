@@ -80,3 +80,47 @@ export interface getSoftDeletedInvoicesResponseData {
         totalItems: number,
     }
 }
+
+export interface GetInvoiceOverviewData {
+    client: {
+        _id: string,
+        displayName: string,
+        companyName: string
+    },
+    createdAt: string,
+    currency: {
+        code: string,
+        symbol: string
+    },
+    deletedAt: string,
+    discountAmount: number,
+    discountValue: number,
+    dueDate: string,
+    email: { sent: boolean, sentAt: string | null, sentTo: string | null },
+    invoiceNumber: string,
+    isDeleted: boolean,
+    issueDate: string,
+    lineItems: {
+        description: string,
+        quantity: number,
+        rate: number,
+        amount: number,
+        _id: string
+    }[],
+    notes: string,
+    organization: string,
+    payment: {
+        mode: PaymentModeType | null,
+        amount: number | null,
+        note: string,
+        receivedDate: string | null
+    },
+    showLogo: boolean,
+    status: "paid" | "unpaid" | "overdue" | "draft",
+    subtotal: number,
+    taxValue: number,
+    taxAmount: number,
+    totalAmount: number,
+    updatedAt: string,
+    _id: string
+}

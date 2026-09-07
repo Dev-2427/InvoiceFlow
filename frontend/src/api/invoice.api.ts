@@ -1,5 +1,5 @@
-import type { getInvoiceParams, getSoftDeletedInvoiceParams } from "../types/invoice";
-import type { CreateInvoiceInput } from "../validation/invoice.validation";
+import type { getInvoiceParams, getSoftDeletedInvoiceParams } from "../types/invoice.types";
+import type { ChangeInvoiceStatusInput, CreateInvoiceInput } from "../validation/invoice.validation";
 import api from "./axios";
 
 export function createInvoiceApi(data: CreateInvoiceInput) {
@@ -24,4 +24,12 @@ export function restoreDeletedInvoicesApi(invoiceIds: string[]) {
 
 export function deleteInvoicesPermanentlyApi(invoiceIds: string[]) {
     return api.delete("/api/invoice/", { data: { invoiceIds } })
+}
+
+export function getInvoiceOverviewApi(id: string) {
+    return api.get(`/api/invoice/${id}`)
+}
+
+export function changeInvoiceStatusApi(data: ChangeInvoiceStatusInput, invoiceId: string) {
+    return api.patch(`/api/invoice/status/${invoiceId}`, data)
 }
