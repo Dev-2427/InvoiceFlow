@@ -12,11 +12,9 @@ export default function ActionButtons() {
     const navigate = useNavigate()
 
     const isPerformingAction = invoiceStore((state) => state.isPerformingAction)
-    const isDeleted = invoiceStore((state) => state.invoiceOverviewData?.isDeleted)
-    const showLogo = invoiceStore((state) => state.invoiceOverviewData?.showLogo)
-    const invoiceStatus = invoiceStore((state) => state.invoiceOverviewData?.status)
     const deleteOverviewInvoice = invoiceStore((state) => state.deleteOverviewInvoice)
     const changeLogoVisibility = invoiceStore((state) => state.changeLogoVisibility)
+    const invoiceOverviewData = invoiceStore((state) => state.invoiceOverviewData)
 
     const [showDeleteContextMenu, setShowDeleteContextMenu] = useState(false)
     const [showChangePaymentStatusContextMenu, setShowChangePaymentStatusContextMenu] = useState(false)
@@ -43,6 +41,10 @@ export default function ActionButtons() {
             return
         }
     }
+
+    const isDeleted = invoiceOverviewData?.isDeleted
+    const showLogo = invoiceOverviewData?.showLogo
+    const invoiceStatus = invoiceOverviewData?.status
 
     return (
         <div className="flex flex-col gap-2 px-5 mt-5">
@@ -118,11 +120,11 @@ export default function ActionButtons() {
                             {/* clone */}
                             < button
                                 type="button"
-                                //    onClick={() => {
-                                //        navigate("/clients/new", {
-                                //            state: { cloneClient: clientOverviewData }
-                                //        })
-                                //    }}
+                                onClick={() => {
+                                    navigate("/invoices/new", {
+                                        state: { cloneInvoice: invoiceOverviewData }
+                                    })
+                                }}
                                 disabled={isPerformingAction}
                                 className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-xs font-semibold bg-card text-text cursor-pointer disabled:opacity-50 disabled:cursor-default hover:bg-navy-50`
                                 }

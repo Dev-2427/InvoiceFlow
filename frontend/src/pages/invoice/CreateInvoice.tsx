@@ -1,6 +1,6 @@
 import { TbPlus, TbXFilled } from "react-icons/tb";
 import Header from "../../components/ui/Header";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import clientStore from "../../store/clientStore";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -16,10 +16,14 @@ import DatePicker from "../../components/ui/DatePicker";
 import { formatCurrency } from "../../utils/formatCurrency";
 import PaymentModeMenu from "../../components/invoice/PaymentModeMenu";
 import invoiceStore from "../../store/invoiceStore";
+import type { GetInvoiceOverviewData } from "../../types/invoice.types";
 
 export default function CreateInvoice() {
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const cloneInvoice = location.state?.cloneInvoice as GetInvoiceOverviewData | undefined
 
     const setClientSearchString = clientStore((state) => state.setClientSearchString)
     const clientSearchString = clientStore((state) => state.clientSearchString)
@@ -42,7 +46,7 @@ export default function CreateInvoice() {
     const menuRef = useRef<HTMLDivElement>(null)
 
 
-    const { handleSubmit, control, register, setValue, watch, formState: { errors } } = useForm({
+    const { handleSubmit, control, register, setValue, watch, reset, formState: { errors } } = useForm({
         resolver: zodResolver(createInvoiceSchema),
         defaultValues: {
             issueDate: new Date(),
@@ -113,7 +117,7 @@ export default function CreateInvoice() {
                 setValue("payment.receivedDate", new Date(), { shouldValidate: true })
             }
 
-            setValue("payment.amount", total, {shouldValidate: true})
+            setValue("payment.amount", total, { shouldValidate: true })
 
         } else {
             setValue("status", "unpaid", { shouldValidate: true })
@@ -141,6 +145,23 @@ export default function CreateInvoice() {
     }, [])
 
 
+    useEffect(() => {
+        if (!cloneInvoice) return
+
+        reset({
+            issueDate: new Date(cloneInvoice.issueDate),
+            dueDate: new Date(cloneInvoice.dueDate),
+            discountValue: cloneInvoice.discountValue,
+            taxValue: cloneInvoice.taxValue,
+            lineItems: cloneInvoice.lineItems,
+            notes: cloneInvoice.notes
+        })
+
+        setClientSearchString(cloneInvoice.client.displayName)
+
+    }, [cloneInvoice])
+
+
     async function onSubmit(data: CreateInvoiceInput) {
 
         let payload = data
@@ -164,12 +185,12 @@ export default function CreateInvoice() {
 
         setLoadingType(null)
         toast.success(res.message)
-        navigate(`/invoices/${res.data.invoiceId}`)
+        navigate(`/invoices/${res.data.invoiceId}`, { replace: true })
 
     }
 
     function onInvalid() {
-        setLoadingType(null)   
+        setLoadingType(null)
     }
 
     return (
