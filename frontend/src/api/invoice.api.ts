@@ -1,5 +1,5 @@
 import type { getInvoiceParams, getSoftDeletedInvoiceParams } from "../types/invoice.types";
-import type { ChangeInvoiceStatusInput, CreateInvoiceInput } from "../validation/invoice.validation";
+import type { ChangeInvoiceStatusInput, CreateInvoiceInput, UpdateInvoiceInput } from "../validation/invoice.validation";
 import api from "./axios";
 
 export function createInvoiceApi(data: CreateInvoiceInput) {
@@ -35,5 +35,9 @@ export function changeInvoiceStatusApi(data: ChangeInvoiceStatusInput, invoiceId
 }
 
 export function changeLogoVisibilityApi(invoiceId: string, showLogo: boolean) {
-    return api.patch(`/api/invoice/show_logo/${invoiceId}`, { showLogo  })
+    return api.patch(`/api/invoice/show_logo/${invoiceId}`, { showLogo })
+}
+
+export function updateInvoiceApi(data: UpdateInvoiceInput, invoiceId: string) {
+    return api.patch(`/api/invoice/update/${invoiceId}`, data)
 }

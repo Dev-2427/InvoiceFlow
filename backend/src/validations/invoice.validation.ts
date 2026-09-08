@@ -36,18 +36,17 @@ export const createInvoiceSchema = invoiceSchema.superRefine((data, ctx) => {
     }
 })
 
-export const updateInvoiceSchema = invoiceSchema.omit({
-    clientId: true
-}).superRefine((data, ctx) => {
-    if (data.status === "paid" &&
-        (!data.payment.mode || !data.payment.receivedDate || data.payment.amount === null)) {
-        ctx.addIssue({
-            code: "custom",
-            path: ["payment"],
-            message: "Payment details are required"
-        })
-    }
-})
+export const updateInvoiceSchema = invoiceSchema
+    .superRefine((data, ctx) => {
+        if (data.status === "paid" &&
+            (!data.payment.mode || !data.payment.receivedDate || data.payment.amount === null)) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["payment"],
+                message: "Payment details are required"
+            })
+        }
+    })
 
 export const changeInvoiceStatusSchema = z.object({
     status: z.enum(["paid", "unpaid"]),

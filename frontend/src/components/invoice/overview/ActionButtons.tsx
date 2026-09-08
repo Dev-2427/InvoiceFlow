@@ -103,11 +103,9 @@ export default function ActionButtons() {
                     {/* edit */}
                     <button
                         type="button"
-                        //    onClick={() => {
-                        //        navigate("/clients/new", {
-                        //            state: { cloneClient: clientOverviewData }
-                        //        })
-                        //    }}
+                        onClick={() => {
+                            navigate(`/invoices/${invoiceOverviewData?._id}/edit`, {replace: true})
+                        }}
                         disabled={isPerformingAction}
                         className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-xs font-semibold bg-card text-text cursor-pointer disabled:opacity-50 disabled:cursor-default hover:bg-navy-50`}
                     >

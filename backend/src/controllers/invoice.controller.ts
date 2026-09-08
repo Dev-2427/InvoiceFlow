@@ -113,7 +113,7 @@ async function createInvoice(req: Request, res: Response) {
 }
 
 async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
-    const { status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, payment }: UpdateInvoiceData = req.body
+    const { clientId, status, issueDate, dueDate, lineItems, discountValue, taxValue, notes, payment, }: UpdateInvoiceData = req.body
 
     const organizationId = req.organization?.organizationId
     const invoiceId = req.params.invoiceId
@@ -157,12 +157,19 @@ async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
             payment.amount = totalAmount
         }
 
+        const client = await Client.findById(clientId).lean()
+
+        if (!client) {
+            return sendResponse(res, { status: 404, message: "Client not found" })
+        }
+
         const invoice = await Invoice.findOneAndUpdate({
             _id: invoiceId,
             organization: organizationId,
             isDeleted: false
         },
             {
+                client: clientId,
                 status: finalStatus,
                 issueDate,
                 dueDate,
