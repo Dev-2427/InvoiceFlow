@@ -7,7 +7,11 @@ import toast from "react-hot-toast"
 import DeleteInvoicesContext from "../DeleteInvoicesContext"
 import ChangePaymentStatusMenu from "./ChangePaymentStatusMenu"
 
-export default function ActionButtons() {
+interface ActionButtonsProps {
+    onDownloadPdf: () => void
+}
+
+export default function ActionButtons({ onDownloadPdf }: ActionButtonsProps) {
 
     const navigate = useNavigate()
 
@@ -77,7 +81,7 @@ export default function ActionButtons() {
                             {/* pdf */}
                             <button
                                 type="button"
-                                //    onClick={() => handleChangeClientStatus(clientStatus === "active" ? "inactive" : "active")}
+                                onClick={onDownloadPdf}
                                 disabled={isPerformingAction}
                                 className={`flex items-center gap-1 border-[1.5px] border-gold rounded-[10px] px-3 py-2 font-bold bg-gold text-gold-dark hover:bg-gold/90 text-xs cursor-pointer disabled:opacity-50 disabled:cursor-default`}>
                                 <TbArrowDown />
@@ -104,7 +108,7 @@ export default function ActionButtons() {
                     <button
                         type="button"
                         onClick={() => {
-                            navigate(`/invoices/${invoiceOverviewData?._id}/edit`, {replace: true})
+                            navigate(`/invoices/${invoiceOverviewData?._id}/edit`, { replace: true })
                         }}
                         disabled={isPerformingAction}
                         className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-xs font-semibold bg-card text-text cursor-pointer disabled:opacity-50 disabled:cursor-default hover:bg-navy-50`}
