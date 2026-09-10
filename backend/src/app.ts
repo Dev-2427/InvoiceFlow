@@ -12,6 +12,7 @@ import invoiceRouter from "./routes/invoice.route.js"
 import authCheck from "./middleware/authCheck.js"
 import loadCurrentOrganization from "./middleware/loadCurrentOrganization.js"
 import "./services/cron/invoiceCleanup.js"
+import "./services/cron/invoiceOverdueStatus.js"
 
 const app = express()
 
