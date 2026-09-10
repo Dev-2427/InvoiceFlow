@@ -5,9 +5,18 @@ import Client from "../models/Client.js";
 import Invoice, { type IInvoice } from "../models/Invoice.js";
 import mongoose, { type PipelineStage, type QueryFilter } from "mongoose";
 import { getInvoicesSchema, getSoftDeletedInvoicesSchema, type ChangeInvoiceStatusData, type CreateInvoiceData, type UpdateInvoiceData } from "../validations/invoice.validation.js";
+import sendEmail from "../services/email/sendEmail.js";
+import invoiceEmailTemplate from "../services/email/templates/invoiceEmailTemplate.js";
+import formatLocalDate from "../utils/formateLocalDate.js";
 
 type InvoiceParams = {
     invoiceId: string
+}
+
+interface PopulatedClient {
+    salutation: string | null,
+    displayName: string,
+    email: string | null
 }
 
 async function createInvoice(req: Request, res: Response) {
@@ -591,4 +600,76 @@ async function deleteInvoicesPermanently(req: Request, res: Response) {
 
 }
 
-export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData, getInvoices, deleteInvoicesPermanently, getSoftDeletedInvoices }
+async function sendInvoiceEmail(req: Request<InvoiceParams>, res: Response) {
+
+    const invoiceId = req.params.invoiceId
+    const organizationId = req.organization?.organizationId
+    const pdf = req.file
+
+    if (!mongoose.Types.ObjectId.isValid(invoiceId)) {
+        return sendResponse(res, { status: 400, message: "Invalid invoice ID" })
+    }
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!pdf) {
+        return sendResponse(res, { status: 400, message: "Invoice PDF is required" })
+    }
+
+    try {
+        const invoice = await Invoice.findOne({
+            _id: invoiceId,
+            organization: organizationId,
+            isDeleted: false
+        }).populate<{ client: PopulatedClient }>("client", "salutation displayName email -_id")
+
+        if (!invoice) {
+            return sendResponse(res, { status: 404, message: "Invoice not found" })
+        }
+
+        if (!invoice.client.email) {
+            return sendResponse(res, {
+                status: 404, message: "Client does not have an email address. Please update the client before sending the invoice."
+            })
+        }
+
+        const { html, text } = invoiceEmailTemplate({
+            clientName: `${invoice.client.salutation ?? ""} ${invoice.client.displayName}`.trim(),
+            invoiceNumber: invoice.invoiceNumber,
+            currencySymbol: invoice.currency.symbol,
+            dueDate: formatLocalDate(invoice.dueDate),
+            issueDate: formatLocalDate(invoice.issueDate),
+            status: invoice.status,
+            totalAmount: invoice.totalAmount.toFixed(2)
+        })
+
+        await sendEmail({
+            html,
+            to: invoice.client.email,
+            subject: `Invoice ${invoice.invoiceNumber} from InvoiceFlow`,
+            text,
+            attachments: [{
+                filename: `${invoice.invoiceNumber}.pdf`,
+                content: pdf.buffer,
+                contentType: "application/pdf"
+            }]
+        })
+
+        invoice.email = {
+            sent: true,
+            sentAt: new Date(),
+            sentTo: invoice.client.email
+        }
+        await invoice.save()
+
+        return sendResponse(res, { status: 200, message: "Invoice email sent successfully" })
+
+    } catch (error) {
+        console.error("Failed to send invoice email:", error)
+        return sendResponse(res, { status: 500, message: "Failed to send invoice email" })
+    }
+}
+
+export { createInvoice, updateInvoice, changeInvoiceStatus, softDeleteInvoice, restoreDeletedInvoices, updateInvoiceLogoVisibility, getInvoiceData, getInvoices, deleteInvoicesPermanently, getSoftDeletedInvoices, sendInvoiceEmail }
