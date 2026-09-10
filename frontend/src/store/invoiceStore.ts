@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
-import { changeInvoiceStatusApi, changeLogoVisibilityApi, createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoiceOverviewApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi, updateInvoiceApi } from "../api/invoice.api";
+import { changeInvoiceStatusApi, changeLogoVisibilityApi, createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoiceOverviewApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi, sendInvoiceEmailApi, updateInvoiceApi } from "../api/invoice.api";
 import type { ChangeInvoiceStatusInput, CreateInvoiceInput, UpdateInvoiceInput } from "../validation/invoice.validation";
 import type { GetInvoiceOverviewData, getInvoiceParams, GetInvoicesResponseData, getSoftDeletedInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice.types";
 
@@ -53,7 +53,9 @@ interface IInvoiceStore {
     changeLogoVisibility: (showLogo: boolean) => Promise<ApiResponse<null>>,
 
     isUpdatingInvoice: boolean,
-    updateInvoice: (data: UpdateInvoiceInput) => Promise<ApiResponse<{invoiceId: string}>>
+    updateInvoice: (data: UpdateInvoiceInput) => Promise<ApiResponse<{ invoiceId: string }>>,
+
+    sendInvoiceEmail: (pdfBlob: Blob) => Promise<ApiResponse<null>>
 }
 
 const invoiceStore = create<IInvoiceStore>((set, get) => ({
@@ -506,6 +508,40 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             set({ isUpdatingInvoice: false })
         }
     },
+
+    async sendInvoiceEmail(pdfBlob) {
+        set({ isPerformingAction: true })
+
+        try {
+            const invoiceId = get().invoiceOverviewData?._id
+
+            if (!invoiceId) {
+                return {
+                    success: false,
+                    message: "Invoice not found"
+                }
+            }
+
+            const formData = new FormData()
+
+            formData.append("pdf",
+                pdfBlob
+            )
+
+            const res = await sendInvoiceEmailApi(invoiceId, formData)
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to send invoice email:", error)
+
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isPerformingAction: false })
+        }
+    }
 }))
 
 export default invoiceStore

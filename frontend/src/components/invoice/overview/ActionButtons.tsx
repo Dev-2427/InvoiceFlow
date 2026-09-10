@@ -8,10 +8,11 @@ import DeleteInvoicesContext from "../DeleteInvoicesContext"
 import ChangePaymentStatusMenu from "./ChangePaymentStatusMenu"
 
 interface ActionButtonsProps {
-    onDownloadPdf: () => void
+    onDownloadPdf: () => void,
+    onSendEmail: () => void
 }
 
-export default function ActionButtons({ onDownloadPdf }: ActionButtonsProps) {
+export default function ActionButtons({ onDownloadPdf, onSendEmail }: ActionButtonsProps) {
 
     const navigate = useNavigate()
 
@@ -91,11 +92,7 @@ export default function ActionButtons({ onDownloadPdf }: ActionButtonsProps) {
                             {/* email */}
                             <button
                                 type="button"
-                                //    onClick={() => {
-                                //        navigate("/clients/new", {
-                                //            state: { cloneClient: clientOverviewData }
-                                //        })
-                                //    }}
+                                onClick={onSendEmail}
                                 disabled={isPerformingAction}
                                 className={`flex items-center gap-1 border-[1.5px] border-border rounded-[10px] px-3 py-2 text-xs font-semibold bg-card text-text cursor-pointer disabled:opacity-50 disabled:cursor-default hover:bg-navy-50`}
                             >

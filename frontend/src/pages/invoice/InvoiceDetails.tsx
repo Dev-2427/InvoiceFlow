@@ -20,6 +20,7 @@ export default function InvoiceDetails() {
   const clearInvoiceOverviewData = invoiceStore((state) => state.clearInvoiceOverviewData)
   const isGettingInvoiceOverviewData = invoiceStore((state) => state.isGettingInvoiceOverviewData)
   const invoiceOverviewData = invoiceStore((state) => state.invoiceOverviewData)
+  const sendInvoiceEmail = invoiceStore((state) => state.sendInvoiceEmail)
 
   useEffect(() => {
 
@@ -50,32 +51,82 @@ export default function InvoiceDetails() {
   async function handleDownloadPdf() {
     if (!invoiceRef.current || !invoiceOverviewData) return
 
-  const options = {
-    margin: 10,
-    filename: `${invoiceOverviewData.invoiceNumber}.pdf`,
-    image: {
+    const options = {
+      margin: 10,
+      filename: `${invoiceOverviewData.invoiceNumber}.pdf`,
+      image: {
         type: "jpeg" as const,
         quality: 0.98
-    },
-    html2canvas: {
+      },
+      html2canvas: {
         scale: 2,
         useCORS: true
-    },
-    jsPDF: {
+      },
+      jsPDF: {
         unit: "mm" as const,
         format: "a4" as const,
         orientation: "portrait" as const
-    },
-    pagebreak: {
+      },
+      pagebreak: {
         mode: ["css", "legacy"] as const
+      }
     }
-}
 
     await html2pdf()
-        .set(options)
-        .from(invoiceRef.current)
-        .save()
-}
+      .set(options)
+      .from(invoiceRef.current)
+      .save()
+  }
+
+  async function generateInvoicePdf() {
+    if (!invoiceRef.current || !invoiceOverviewData) {
+      return null
+    }
+
+    const options = {
+      margin: 10,
+      filename: `${invoiceOverviewData.invoiceNumber}.pdf`,
+      image: {
+        type: "jpeg" as const,
+        quality: 0.98
+      },
+      html2canvas: {
+        scale: 2,
+        useCORS: true
+      },
+      jsPDF: {
+        unit: "mm" as const,
+        format: "a4" as const,
+        orientation: "portrait" as const
+      },
+      pagebreak: {
+        mode: ["css", "legacy"] as const
+      }
+    }
+
+    return await html2pdf()
+      .set(options)
+      .from(invoiceRef.current)
+      .outputPdf("blob")
+  }
+
+  async function handleSendInvoiceEmail() {
+    const pdfBlob = await generateInvoicePdf()
+
+    if (!pdfBlob) {
+      toast.error("Failed to generate invoice pdf")
+      return
+    }
+
+    const res = await sendInvoiceEmail(pdfBlob)
+
+    if (!res.success) {
+      toast.error(res.message)
+      return
+    }
+
+    toast.success(res.message)
+  }
 
   return (
     <main className="space-y-5">
@@ -85,7 +136,10 @@ export default function InvoiceDetails() {
         <InvoiceOverviewSkeleton />
         :
         <>
-          <ActionButtons onDownloadPdf={handleDownloadPdf} />
+          <ActionButtons
+           onDownloadPdf={handleDownloadPdf}
+           onSendEmail={handleSendInvoiceEmail}
+           />
 
           <div className="px-5 pb-5">
             <OverviewDetails />

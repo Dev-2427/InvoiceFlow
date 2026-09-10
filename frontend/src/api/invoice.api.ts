@@ -41,3 +41,7 @@ export function changeLogoVisibilityApi(invoiceId: string, showLogo: boolean) {
 export function updateInvoiceApi(data: UpdateInvoiceInput, invoiceId: string) {
     return api.patch(`/api/invoice/update/${invoiceId}`, data)
 }
+
+export function sendInvoiceEmailApi(invoiceId: string, formData: FormData) {
+    return api.post(`/api/invoice/send/${invoiceId}`, formData)
+}
