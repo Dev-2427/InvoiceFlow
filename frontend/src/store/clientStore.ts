@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData, searchClients } from "../types/clientTypes";
+import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData, searchClients, RevenueData, RevenueCHartFilter } from "../types/clientTypes";
 import type { ApiResponse } from "../types/api.types";
-import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi, searchClientApi, updateClientApi } from "../api/client.api";
+import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi, getRevenueApi, searchClientApi, updateClientApi } from "../api/client.api";
 import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
 
 interface IClientStore {
@@ -34,7 +34,7 @@ interface IClientStore {
     isGettingClientOverview: boolean,
     getClientOverview: (id: string) => Promise<ApiResponse<{ clientData: ClientData }>>
     clientOverviewData: ClientData | null,
-    clearClientOverviewData: () => void,
+    clearClientData: () => void,
     changeClientOverviewStatus: (status: "active" | "inactive") => Promise<ApiResponse<null>>,
     deleteOverviewClient: () => Promise<ApiResponse<null>>,
 
@@ -49,6 +49,11 @@ interface IClientStore {
     handleSearchedClientClick: (client: searchClients) => void,
     selectedClient: searchClients | null,
     clearSearchedAndSelectedClient: () => void
+
+    revenueChartFilter: RevenueCHartFilter,
+    setRevenueChartFilter: (filter: RevenueCHartFilter) => void,
+    revenueData: RevenueData[] | null,
+    getRevenue: () => Promise<ApiResponse<{ revenueData: RevenueData[] }>>
 }
 
 
@@ -78,6 +83,17 @@ const clientStore = create<IClientStore>((set, get) => ({
     clientSearchString: "",
     isSearchingClient: false,
     selectedClient: null,
+
+    revenueChartFilter: {
+        label: "current year",
+        filter: "current_year"
+    },
+
+    revenueData: null,
+
+    setRevenueChartFilter(filter) {
+        set({ revenueChartFilter: filter })
+    },
 
     clearSearchedAndSelectedClient() {
         set({ searchedClients: null, selectedClient: null })
@@ -266,8 +282,8 @@ const clientStore = create<IClientStore>((set, get) => ({
         }
     },
 
-    clearClientOverviewData() {
-        set({ clientOverviewData: null })
+    clearClientData() {
+        set({ clientOverviewData: null, revenueData: null })
     },
 
     async changeClientOverviewStatus(status) {
@@ -411,6 +427,34 @@ const clientStore = create<IClientStore>((set, get) => ({
             selectedClient: client
         })
     },
+
+    async getRevenue() {
+        try {
+            const clientId = get().clientOverviewData?._id
+            const filter = get().revenueChartFilter.filter
+
+            if (!clientId) {
+                return {
+                    success: false,
+                    message: "No client found"
+                }
+
+            }
+            const res = await getRevenueApi(clientId, filter)
+
+            if (res.data.success) {
+                set({ revenueData: res.data.data.revenueData })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to fetch revenue:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        }
+    }
 
 }))
 

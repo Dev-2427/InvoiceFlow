@@ -1,4 +1,4 @@
-import type { getClientsParams } from "../types/clientTypes";
+import type { getClientsParams, GetRevenueParams } from "../types/clientTypes";
 import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
 import api from "./axios";
 
@@ -28,4 +28,8 @@ export function updateClientApi(data: BaseClientInput, id: string) {
 
 export function searchClientApi(search: string) {
     return api.get("/api/client/search", { params: { search } })
+}
+
+export function getRevenueApi(clientId: string, query: GetRevenueParams) {
+    return api.get(`/api/client/revenue/${clientId}`, { params: {revenueFilter : query} })
 }

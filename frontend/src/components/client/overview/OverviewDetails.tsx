@@ -1,15 +1,47 @@
+import { TbChevronDown } from "react-icons/tb"
 import useClientOverviewData from "../../../hooks/useClientOverviewData"
+import clientStore from "../../../store/clientStore"
 import organizationStore from "../../../store/organizationStore"
 import formatLocalDate from "../../../utils/dateUtils"
+import { useEffect, useRef, useState } from "react"
+import RevenueChartFilterMenu from "./RevenueChartFilterMenu"
+import RevenueChart from "./RevenueChart"
+import { formatCurrency } from "../../../utils/formatCurrency"
 
 export default function OverviewDetails() {
 
     const clientOverviewData = useClientOverviewData()
+    const revenueChartFilter = clientStore((state) => state.revenueChartFilter)
+    const setRevenueChartFilter = clientStore((state) => state.setRevenueChartFilter)
+    const revenueData = clientStore((state) => state.revenueData)
 
     const organization = organizationStore((state) => state.organization)
 
+    const [showRevenueChartFilterMenu, setShowRevenueChartFilterMenu] = useState(false)
+
+    const revenueChartFilterMenuRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        function handleOutsideClick(e: MouseEvent) {
+            if (revenueChartFilterMenuRef.current && !revenueChartFilterMenuRef.current.contains(e.target as Node)) {
+                setShowRevenueChartFilterMenu(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleOutsideClick)
+
+        return (() => {
+            document.removeEventListener("mousedown", handleOutsideClick)
+        })
+
+    }, [])
+
+    const totalRevenue = revenueData?.reduce((total, next) => {
+        return total + next.revenue
+    }, 0) ?? 0
+
     return (
-        <div className="px-5 space-y-5">
+        <div className="px-5 space-y-5 mb-5">
 
             <div className="flex items-center gap-3">
 
@@ -116,7 +148,48 @@ export default function OverviewDetails() {
                 </div>
 
 
+
             </div>
+            {/* revenue chart */}
+            {revenueData &&
+                <div className="bg-card border border-border rounded-[14px] space-y-1.5 py-3 px-5 h-full w-full">
+
+                    <div className="flex justify-between">
+                        <p className="font-bold text-sm text-text mb-3">Revenue Chart</p>
+
+
+                        <div
+                            ref={revenueChartFilterMenuRef}
+                            className="relative">
+                            <button
+                                onClick={() => setShowRevenueChartFilterMenu(prev => !prev)}
+                                className="flex justify-center items-center gap-2 border border-border rounded-[10px] text-[12px] font-semibold text-text px-3 py-1.5 cursor-pointer capitalize">
+                                {revenueChartFilter.label}
+                                <TbChevronDown className={`${showRevenueChartFilterMenu && "rotate-180"}`} />
+                            </button>
+
+                            {showRevenueChartFilterMenu && <RevenueChartFilterMenu
+                                onClick={(filter) => {
+                                    setRevenueChartFilter(filter)
+                                    setShowRevenueChartFilterMenu(false)
+                                }}
+                            />}
+                        </div>
+
+
+                    </div>
+
+                    <RevenueChart
+                        revenueData={revenueData}
+                        currencySymbol={organization?.currency.symbol ?? ""}
+                    />
+
+                    <span className="text-navy-700 text-sm font-bold">
+                        Total: {organization?.currency.symbol}{formatCurrency(totalRevenue)}
+                    </span>
+
+                </div>
+            }
 
         </div>
     )
