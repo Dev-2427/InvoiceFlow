@@ -3,7 +3,7 @@ import sendResponse from "../utils/sendResponse.js";
 import User from "../models/User.js";
 import Client, { type IClient } from "../models/Client.js";
 import mongoose, { Types } from "mongoose";
-import { completeClientSchema, getClientsSchema, searchClientSchema } from "../validations/client.validation.js";
+import { completeClientSchema, getClientsSchema, getRevenueSchema, searchClientSchema } from "../validations/client.validation.js";
 import Invoice from "../models/Invoice.js";
 import type { QueryFilter } from "mongoose"
 
@@ -435,4 +435,107 @@ async function searchClient(req: Request, res: Response) {
     }
 }
 
-export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus, getClients, searchClient }
+async function getRevenue(req: Request<clientParams>, res: Response) {
+    const organizationId = req.organization?.organizationId
+    const clientId = req.params.clientId
+
+    const passedQuery = getRevenueSchema.safeParse(req.query)
+
+    if (!mongoose.Types.ObjectId.isValid(clientId)) {
+        return sendResponse(res, { status: 400, message: "Invalid client ID" })
+    }
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!passedQuery.success) {
+        return sendResponse(res, { status: 400, message: "Invalid query" })
+    }
+
+    try {
+        const now = new Date()
+
+        let startDate: Date;
+        let endDate: Date;
+
+        const { revenueFilter } = passedQuery.data
+
+        if (revenueFilter === "current_year") {
+            startDate = new Date(now.getFullYear(), 0, 1)
+            endDate = new Date(now.getFullYear() + 1, 0, 1)
+        } else if (revenueFilter === "previous_year") {
+            startDate = new Date(now.getFullYear() - 1, 0, 1)
+            endDate = new Date(now.getFullYear(), 0, 1)
+        } else {
+            startDate = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+            endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+        }
+
+        const revenueData = await Invoice.aggregate([
+            {
+                $match: {
+                    organization: new mongoose.Types.ObjectId(organizationId),
+                    client: new mongoose.Types.ObjectId(clientId),
+                    status: { $ne: "draft" },
+                    isDeleted: false,
+                    issueDate: {
+                        $gte: startDate,
+                        $lt: endDate
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$issueDate" },
+                        month: { $month: "$issueDate" }
+                    },
+                    revenue: {
+                        $sum: "$totalAmount"
+                    }
+                }
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1
+                }
+            }
+        ])
+
+        const months = []
+
+        for (let i = 0; i < 12; i++) {
+            const date = new Date(
+                startDate.getFullYear(),
+                startDate.getMonth() + i, 1
+            )
+
+            const year = date.getFullYear()
+            const month = date.getMonth() + 1
+
+            const foundRevenue = revenueData.find(
+                item =>
+                    item._id.year === year && item._id.month === month
+            )
+
+            months.push({
+                month: date.toLocaleDateString(undefined, {
+                    month: "short"
+                }),
+                year,
+                revenue: foundRevenue?.revenue ?? 0
+            })
+        }
+
+        return sendResponse(res, { status: 200, message: "Revenue data fetched successfully", data: { revenueData: months } })
+
+    } catch (error) {
+        console.error("Failed to fetch revenue by client:", error)
+        return sendResponse(res, { status: 500, message: "Failed to fetch revenue" })
+    }
+
+}
+
+export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus, getClients, searchClient, getRevenue }

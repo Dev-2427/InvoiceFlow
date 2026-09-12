@@ -90,3 +90,7 @@ export const getClientsSchema = z.object({
 export const searchClientSchema = z.object({
     search: z.string().trim().min(1, "At least one character is required")
 })
+
+export const getRevenueSchema = z.object({
+    revenueFilter: z.enum(["current_year", "previous_year", "past_12_months"])
+}) 
