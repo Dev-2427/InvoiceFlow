@@ -109,6 +109,13 @@ export default function OverviewDetails() {
                         <span className="text-text font-semibold capitalize">{formatLocalDate(clientOverviewData.updatedAt)}</span>
                     </div>
 
+                    <hr className="border border-border/40" />
+
+                    <div className="flex justify-between items-center text-[13px]">
+                        <span className="text-text-sm">receivable</span>
+                        <span className="text-unpaid font-semibold">{organization?.currency.symbol}{formatCurrency(clientOverviewData.receivable)}</span>
+                    </div>
+
                 </div>
 
 

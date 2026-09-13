@@ -36,7 +36,7 @@ export interface GetClientsResponseData {
         email: string | null,
         phone: string | null,
         totalBilled: number,
-        totalReceivable: number,
+        totalReceivable: number
     }[]
     pagination: {
         page: number,
@@ -71,6 +71,7 @@ export interface ClientData {
     shippingAddress: Address | null,
     createdAt: string,
     updatedAt: string,
+    receivable: number
 }
 
 export interface searchClients {
