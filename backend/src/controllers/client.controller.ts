@@ -80,7 +80,29 @@ async function getClientDetails(req: Request<clientParams>, res: Response) {
             return sendResponse(res, { status: 404, message: "Client not found" })
         }
 
-        return sendResponse(res, { status: 200, message: "Client details fetched successfully", data: { clientData: client } })
+        const reveivableData = await Invoice.aggregate([
+            {
+                $match: {
+                    organization: new mongoose.Types.ObjectId(organizationId),
+                    client: new mongoose.Types.ObjectId(clientId),
+                    isDeleted: false,
+                    status: { $in: ["unpaid", "overdue"] }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    receivable: {
+                        $sum: "$totalAmount"
+                    }
+                }
+            }
+        ])
+
+        const receivable = reveivableData[0]?.receivable ?? 0
+        const clientData = { ...client, receivable: receivable }
+
+        return sendResponse(res, { status: 200, message: "Client details fetched successfully", data: { clientData: clientData } })
     } catch (error) {
         console.error("Failed to get client details:", error);
         return sendResponse(res, { status: 500, message: "Failed to get client details" })
@@ -269,7 +291,9 @@ async function getClients(req: Request, res: Response) {
                                     $expr: {
                                         $and: [
                                             { $eq: ["$client", "$$clientId"] },
-                                            { $eq: ["$organization", "$$organizationId"] }
+                                            { $eq: ["$organization", "$$organizationId"] },
+                                            { $eq: ["$isDeleted", false] },
+                                            { $ne: ["$status", "draft"] }
                                         ]
                                     }
                                 }
