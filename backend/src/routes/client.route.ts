@@ -1,7 +1,7 @@
 import { Router } from "express";
 import validate from "../middleware/validate.js";
 import { changeClientStatusSchema, createClientSchema, deleteClientsSchema, getClientsSchema, updateClientSchema } from "../validations/client.validation.js";
-import { changeClientStatus, createClient, deleteClients, getClientDetails, getClients, getRevenue, searchClient, updateClient } from "../controllers/client.controller.js";
+import { changeClientStatus, createClient, deleteClients, getClientDetails, getclientInvoices, getClients, getRevenue, searchClient, updateClient } from "../controllers/client.controller.js";
 import loadCurrentOrganization from "../middleware/loadCurrentOrganization.js";
 
 const route = Router()
@@ -10,6 +10,7 @@ route.post("/", validate(createClientSchema), createClient)
 route.get("/get_clients", loadCurrentOrganization, getClients)
 route.get("/search", loadCurrentOrganization, searchClient)
 route.get("/revenue/:clientId", loadCurrentOrganization, getRevenue)
+route.get("/invoices/:clientId", loadCurrentOrganization, getclientInvoices)
 route.get("/:clientId", loadCurrentOrganization, getClientDetails)
 route.patch("/status", loadCurrentOrganization, validate(changeClientStatusSchema), changeClientStatus)
 route.patch("/:clientId", loadCurrentOrganization, validate(updateClientSchema), updateClient)

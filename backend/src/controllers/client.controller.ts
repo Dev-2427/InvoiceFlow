@@ -3,7 +3,7 @@ import sendResponse from "../utils/sendResponse.js";
 import User from "../models/User.js";
 import Client, { type IClient } from "../models/Client.js";
 import mongoose, { Types } from "mongoose";
-import { completeClientSchema, getClientsSchema, getRevenueSchema, searchClientSchema } from "../validations/client.validation.js";
+import { completeClientSchema, getclientInvoicesSchema, getClientsSchema, getRevenueSchema, searchClientSchema } from "../validations/client.validation.js";
 import Invoice from "../models/Invoice.js";
 import type { QueryFilter } from "mongoose"
 
@@ -562,4 +562,62 @@ async function getRevenue(req: Request<clientParams>, res: Response) {
 
 }
 
-export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus, getClients, searchClient, getRevenue }
+async function getclientInvoices(req: Request<clientParams>, res: Response) {
+
+    const organizationId = req.organization?.organizationId
+    const clientId = req.params.clientId
+    const passedQuery = getclientInvoicesSchema.safeParse(req.query)
+
+    if (!mongoose.Types.ObjectId.isValid(clientId)) {
+        return sendResponse(res, { status: 400, message: "Invalid client ID" })
+    }
+
+    if (!passedQuery.success) {
+        return sendResponse(res, { status: 401, message: "Invalid query" })
+    }
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+    try {
+        const { limit, page } = passedQuery.data
+
+        const skip = (page - 1) * limit
+
+        const [invoices, totalItems] = await Promise.all([
+
+            Invoice.find({
+                organization: organizationId,
+                client: clientId,
+                isDeleted: false
+            })
+                .select("invoiceNumber issueDate totalAmount status")
+                .skip(skip)
+                .limit(limit)
+                .sort({ issueDate: -1 })
+                .lean()
+            ,
+            Invoice.countDocuments({
+                organization: organizationId,
+                client: clientId,
+                isDeleted: false
+            })
+        ])
+
+        return sendResponse(res, {
+            status: 200, message: "Client invoices fetched successfully", data: {
+                invoices,
+                pagination: {
+                    page,
+                    limit,
+                    totalItems,
+                    totalPages: Math.ceil(totalItems / limit)
+                }
+            }
+        })
+    } catch (error) {
+        console.error("Failed to fetch client invoices:", error)
+        return sendResponse(res, { status: 500, message: "Failed to fetch client invoices" })
+    }
+}
+export { createClient, getClientDetails, updateClient, deleteClients, changeClientStatus, getClients, searchClient, getRevenue, getclientInvoices }

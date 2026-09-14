@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { coerce, z } from "zod";
 import { optionalEmail, optionalString } from "../utils/validationHelper.js";
 import mongoose from "mongoose";
 
@@ -93,4 +93,9 @@ export const searchClientSchema = z.object({
 
 export const getRevenueSchema = z.object({
     revenueFilter: z.enum(["current_year", "previous_year", "past_12_months"])
-}) 
+})
+
+export const getclientInvoicesSchema = z.object({
+    page: coerce.number().default(1),
+    limit: coerce.number().default(10)
+})
