@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react"
 import RevenueChartFilterMenu from "./RevenueChartFilterMenu"
 import RevenueChart from "./RevenueChart"
 import { formatCurrency } from "../../../utils/formatCurrency"
+import ClientInvoices from "./ClientInvoices"
 
 export default function OverviewDetails() {
 
@@ -14,6 +15,8 @@ export default function OverviewDetails() {
     const revenueChartFilter = clientStore((state) => state.revenueChartFilter)
     const setRevenueChartFilter = clientStore((state) => state.setRevenueChartFilter)
     const revenueData = clientStore((state) => state.revenueData)
+    const clientInvoices = clientStore((state) => state.clientInvoices)
+    const getClientInvoices = clientStore((state) => state.getClientInvoices)
 
     const organization = organizationStore((state) => state.organization)
 
@@ -196,6 +199,16 @@ export default function OverviewDetails() {
                     </span>
 
                 </div>
+            }
+
+            {clientInvoices &&
+                <ClientInvoices
+                    data={clientInvoices}
+                    currencySymbol={organization?.currency.symbol ?? ""}
+                    changePage={(newPage) => {
+                        getClientInvoices(newPage)
+                    }}
+                />
             }
 
         </div>

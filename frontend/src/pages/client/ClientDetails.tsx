@@ -19,6 +19,7 @@ export default function ClientDetails() {
     const clientOverviewData = clientStore((state) => state.clientOverviewData)
     const getRevenue = clientStore((state) => state.getRevenue)
     const revenueChartFilter = clientStore((state) => state.revenueChartFilter)
+    const getClientInvoices = clientStore((state) => state.getClientInvoices)
 
     useEffect(() => {
         async function fetchClientOverview() {
@@ -45,9 +46,7 @@ export default function ClientDetails() {
 
     useEffect(() => {
         async function fetchRevenueData() {
-            if (!clientOverviewData) {
-                return
-            }
+            if (!clientOverviewData) return
 
             const res = await getRevenue()
 
@@ -60,6 +59,21 @@ export default function ClientDetails() {
         fetchRevenueData()
 
     }, [clientOverviewData, revenueChartFilter.filter])
+
+    useEffect(() => {
+        async function fetchClientInvoices() {
+            if (!clientOverviewData) return
+
+            const res = await getClientInvoices(1)
+
+            if (!res.success) {
+                toast.error(res.message)
+                return
+            }
+        }
+
+        fetchClientInvoices()
+    }, [clientOverviewData])
 
     return (
         <main className="space-y-5">

@@ -1,5 +1,5 @@
 import clientStore from "../../../store/clientStore"
-import type { RevenueCHartFilter } from "../../../types/clientTypes"
+import type { RevenueCHartFilter } from "../../../types/client.types"
 
 const revenueChartFilterOptions: RevenueCHartFilter[] = [
     {

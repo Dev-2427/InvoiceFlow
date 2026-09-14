@@ -1,5 +1,5 @@
 import { TbXFilled } from "react-icons/tb"
-import type { searchClients } from "../../types/clientTypes"
+import type { searchClients } from "../../types/client.types"
 import organizationStore from "../../store/organizationStore"
 import { formatCurrency } from "../../utils/formatCurrency"
 

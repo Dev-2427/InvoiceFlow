@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createClientSchema, type CreateClientInput } from "../../validation/clientValidation";
 import clientStore from "../../store/clientStore";
 import toast from "react-hot-toast";
-import type { ClientData } from "../../types/clientTypes";
+import type { ClientData } from "../../types/client.types";
 
 const SALUTATIONS = ["Mr.", "Mrs.", "Ms.", "Dr.", "Prof."] as const
 

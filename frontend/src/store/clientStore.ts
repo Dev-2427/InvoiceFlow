@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData, searchClients, RevenueData, RevenueCHartFilter } from "../types/clientTypes";
+import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsParams, ClientData, searchClients, RevenueData, RevenueCHartFilter, GetClientInvoicesData } from "../types/client.types";
 import type { ApiResponse } from "../types/api.types";
-import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientOverviewApi, getClientsApi, getRevenueApi, searchClientApi, updateClientApi } from "../api/client.api";
+import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientInvoicesApi, getClientOverviewApi, getClientsApi, getRevenueApi, searchClientApi, updateClientApi } from "../api/client.api";
 import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
 
 interface IClientStore {
@@ -54,6 +54,10 @@ interface IClientStore {
     setRevenueChartFilter: (filter: RevenueCHartFilter) => void,
     revenueData: RevenueData[] | null,
     getRevenue: () => Promise<ApiResponse<{ revenueData: RevenueData[] }>>
+
+    getClientInvoices: (page: number) => Promise<ApiResponse<{ data: GetClientInvoicesData }>>
+    clientInvoices: GetClientInvoicesData | null,
+    clientInvoicesLimit: number
 }
 
 
@@ -90,6 +94,9 @@ const clientStore = create<IClientStore>((set, get) => ({
     },
 
     revenueData: null,
+
+    clientInvoices: null,
+    clientInvoicesLimit: 10,
 
     setRevenueChartFilter(filter) {
         set({ revenueChartFilter: filter })
@@ -283,7 +290,7 @@ const clientStore = create<IClientStore>((set, get) => ({
     },
 
     clearClientData() {
-        set({ clientOverviewData: null, revenueData: null })
+        set({ clientOverviewData: null, revenueData: null, clientInvoices: null })
     },
 
     async changeClientOverviewStatus(status) {
@@ -454,7 +461,40 @@ const clientStore = create<IClientStore>((set, get) => ({
                 message: "Something went wrong, please try again."
             }
         }
-    }
+    },
+
+    async getClientInvoices(page) {
+        try {
+            const limit = get().clientInvoicesLimit
+            const clientId = get().clientOverviewData?._id
+
+            if (!clientId) {
+                return {
+                    success: false,
+                    message: "No client found"
+                }
+            }
+
+            const query = {
+                page,
+                limit
+            }
+
+            const res = await getClientInvoicesApi(clientId, query)
+
+            if (res.data.success) {
+                set({ clientInvoices: res.data.data })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to fetch client invoices:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        }
+    },
 
 }))
 

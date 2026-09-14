@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { HiChevronDown, HiMagnifyingGlass } from "react-icons/hi2";
 import clientStore from "../../store/clientStore";
-import type { IClientFilter, IClientSort } from "../../types/clientTypes";
+import type { IClientFilter, IClientSort } from "../../types/client.types";
 
 const sortProperties: IClientSort[] = [
     {

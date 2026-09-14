@@ -1,4 +1,4 @@
-import type { RevenueData } from "../../../types/clientTypes"
+import type { RevenueData } from "../../../types/client.types"
 import {
     LineChart,
     Line,

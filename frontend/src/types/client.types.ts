@@ -99,3 +99,24 @@ export interface RevenueData {
     year: number,
     revenue: number
 }
+
+export interface GetClientInvoicesParams {
+    page: number,
+    limit: number
+}
+
+export interface GetClientInvoicesData {
+    invoices: {
+        _id: string,
+        invoiceNumber: string,
+        issueDate: string,
+        totalAmount: number,
+        status: string,
+    }[]
+    pagination: {
+        page: number,
+        limit: number,
+        totalItems: number,
+        totalPages: number
+    }
+}
