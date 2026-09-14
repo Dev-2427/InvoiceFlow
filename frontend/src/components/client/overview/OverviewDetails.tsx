@@ -8,6 +8,8 @@ import RevenueChartFilterMenu from "./RevenueChartFilterMenu"
 import RevenueChart from "./RevenueChart"
 import { formatCurrency } from "../../../utils/formatCurrency"
 import ClientInvoices from "./ClientInvoices"
+import ClientInvoicesSkeleton from "../../loading/client/ClientInvoicesSkeleton"
+import RevenueChartSkeleton from "../../loading/client/RevenueChartSkeleton"
 
 export default function OverviewDetails() {
 
@@ -17,6 +19,9 @@ export default function OverviewDetails() {
     const revenueData = clientStore((state) => state.revenueData)
     const clientInvoices = clientStore((state) => state.clientInvoices)
     const getClientInvoices = clientStore((state) => state.getClientInvoices)
+    const isGettingClientInvoices = clientStore((state) => state.isGettingClientInvoices)
+    const isGettingRevenue = clientStore((state) => state.isGettingRevenue)
+
 
     const organization = organizationStore((state) => state.organization)
 
@@ -157,59 +162,74 @@ export default function OverviewDetails() {
 
                 </div>
 
-
-
             </div>
+
+
             {/* revenue chart */}
-            {revenueData &&
-                <div className="bg-card border border-border rounded-[14px] space-y-1.5 py-3 px-5 h-full w-full">
+            {
+                isGettingRevenue ?
+                    <RevenueChartSkeleton />
+                    :
+                    <>
+                        {revenueData &&
+                            <div className="bg-card border border-border rounded-[14px] space-y-1.5 py-3 px-5 h-full w-full">
 
-                    <div className="flex justify-between">
-                        <p className="font-bold text-sm text-text mb-3">Revenue Chart</p>
-
-
-                        <div
-                            ref={revenueChartFilterMenuRef}
-                            className="relative">
-                            <button
-                                onClick={() => setShowRevenueChartFilterMenu(prev => !prev)}
-                                className="flex justify-center items-center gap-2 border border-border rounded-[10px] text-[12px] font-semibold text-text px-3 py-1.5 cursor-pointer capitalize">
-                                {revenueChartFilter.label}
-                                <TbChevronDown className={`${showRevenueChartFilterMenu && "rotate-180"}`} />
-                            </button>
-
-                            {showRevenueChartFilterMenu && <RevenueChartFilterMenu
-                                onClick={(filter) => {
-                                    setRevenueChartFilter(filter)
-                                    setShowRevenueChartFilterMenu(false)
-                                }}
-                            />}
-                        </div>
+                                <div className="flex justify-between">
+                                    <p className="font-bold text-sm text-text mb-3">Revenue Chart</p>
 
 
-                    </div>
+                                    <div
+                                        ref={revenueChartFilterMenuRef}
+                                        className="relative">
+                                        <button
+                                            onClick={() => setShowRevenueChartFilterMenu(prev => !prev)}
+                                            className="flex justify-center items-center gap-2 border border-border rounded-[10px] text-[12px] font-semibold text-text px-3 py-1.5 cursor-pointer capitalize">
+                                            {revenueChartFilter.label}
+                                            <TbChevronDown className={`${showRevenueChartFilterMenu && "rotate-180"}`} />
+                                        </button>
 
-                    <RevenueChart
-                        revenueData={revenueData}
-                        currencySymbol={organization?.currency.symbol ?? ""}
-                    />
+                                        {showRevenueChartFilterMenu && <RevenueChartFilterMenu
+                                            onClick={(filter) => {
+                                                setRevenueChartFilter(filter)
+                                                setShowRevenueChartFilterMenu(false)
+                                            }}
+                                        />}
+                                    </div>
 
-                    <span className="text-navy-700 text-sm font-bold">
-                        Total: {organization?.currency.symbol}{formatCurrency(totalRevenue)}
-                    </span>
 
-                </div>
+                                </div>
+
+                                <RevenueChart
+                                    revenueData={revenueData}
+                                    currencySymbol={organization?.currency.symbol ?? ""}
+                                />
+
+                                <span className="text-navy-700 text-sm font-bold">
+                                    Total: {organization?.currency.symbol}{formatCurrency(totalRevenue)}
+                                </span>
+
+                            </div>
+                        }
+                    </>
             }
 
-            {clientInvoices &&
-                <ClientInvoices
-                    data={clientInvoices}
-                    currencySymbol={organization?.currency.symbol ?? ""}
-                    changePage={(newPage) => {
-                        getClientInvoices(newPage)
-                    }}
-                />
+
+            {isGettingClientInvoices ?
+                <ClientInvoicesSkeleton />
+                :
+                <>
+                    {clientInvoices &&
+                        <ClientInvoices
+                            data={clientInvoices}
+                            currencySymbol={organization?.currency.symbol ?? ""}
+                            changePage={(newPage) => {
+                                getClientInvoices(newPage)
+                            }}
+                        />
+                    }
+                </>
             }
+
 
         </div>
     )

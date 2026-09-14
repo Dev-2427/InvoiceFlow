@@ -53,8 +53,10 @@ interface IClientStore {
     revenueChartFilter: RevenueCHartFilter,
     setRevenueChartFilter: (filter: RevenueCHartFilter) => void,
     revenueData: RevenueData[] | null,
+    isGettingRevenue: boolean,
     getRevenue: () => Promise<ApiResponse<{ revenueData: RevenueData[] }>>
 
+    isGettingClientInvoices: boolean,
     getClientInvoices: (page: number) => Promise<ApiResponse<{ data: GetClientInvoicesData }>>
     clientInvoices: GetClientInvoicesData | null,
     clientInvoicesLimit: number
@@ -93,8 +95,10 @@ const clientStore = create<IClientStore>((set, get) => ({
         filter: "current_year"
     },
 
+    isGettingRevenue: false,
     revenueData: null,
 
+    isGettingClientInvoices: false,
     clientInvoices: null,
     clientInvoicesLimit: 10,
 
@@ -436,6 +440,7 @@ const clientStore = create<IClientStore>((set, get) => ({
     },
 
     async getRevenue() {
+        set({ isGettingRevenue: true })
         try {
             const clientId = get().clientOverviewData?._id
             const filter = get().revenueChartFilter.filter
@@ -460,10 +465,13 @@ const clientStore = create<IClientStore>((set, get) => ({
                 success: false,
                 message: "Something went wrong, please try again."
             }
+        } finally {
+            set({ isGettingRevenue: false })
         }
     },
 
     async getClientInvoices(page) {
+        set({ isGettingClientInvoices: true })
         try {
             const limit = get().clientInvoicesLimit
             const clientId = get().clientOverviewData?._id
@@ -493,6 +501,8 @@ const clientStore = create<IClientStore>((set, get) => ({
                 success: false,
                 message: "Something went wrong, please try again."
             }
+        } finally {
+            set({ isGettingClientInvoices: false })
         }
     },
 

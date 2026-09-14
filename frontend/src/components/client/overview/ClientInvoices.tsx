@@ -26,7 +26,7 @@ export default function ClientInvoices({ data, currencySymbol, changePage }: Cli
       </div>
 
 
-      <div className="bg-page border border-border rounded-t-[14px] overflow-hidden">
+      <div className={`bg-page border border-border rounded-t-[14px] overflow-hidden ${data.invoices.length === 0 && "rounded-b-[14px]"}`}>
 
         <div className="overflow-x-auto">
 
@@ -44,33 +44,47 @@ export default function ClientInvoices({ data, currencySymbol, changePage }: Cli
 
             {/* table data */}
             <tbody>
-              {data.invoices.map((invoice) => {
-                const status = invoice.status
-                return (
-                  <tr
-                    key={invoice._id}
-                    onClick={() => navigate(`/invoices/${invoice._id}`)}
-                    className="bg-card border-b border-border last:border-b-0 text-sm cursor-pointer hover:bg-page" >
-                    <td className="px-5 py-3 font-bold text-navy-700"> {invoice.invoiceNumber} </td>
-                    <td className="px-5 py-3 text-text-sm"> {formatLocalDate(invoice.issueDate)} </td>
-                    <td className="px-5 py-3 font-semibold text-text"> {currencySymbol}{formatCurrency(invoice.totalAmount)} </td>
+              {data.invoices.length > 0 ? (
 
-                    <td className="px-5 py-3 capitalize">
+                data.invoices.map((invoice) => {
+                  const status = invoice.status
+                  return (
+                    <tr
+                      key={invoice._id}
+                      onClick={() => navigate(`/invoices/${invoice._id}`)}
+                      className="bg-card border-b border-border last:border-b-0 text-sm cursor-pointer hover:bg-page" >
+                      <td className="px-5 py-3 font-bold text-navy-700"> {invoice.invoiceNumber} </td>
+                      <td className="px-5 py-3 text-text-sm"> {formatLocalDate(invoice.issueDate)} </td>
+                      <td className="px-5 py-3 font-semibold text-text"> {currencySymbol}{formatCurrency(invoice.totalAmount)} </td>
 
-                      <div
-                        className={`flex items-center  gap-1 border ${status === "overdue" ? "border-overdue-border bg-overdue-bg" : status === "paid" ? "border-paid-border bg-paid-bg" : status === "unpaid" ? "border-unpaid-border bg-unpaid-bg" : "border-draft-border bg-draft-bg"} rounded-[14px] px-2 py-1 w-fit`}>
+                      <td className="px-5 py-3 capitalize">
 
-                        <div className={`${status === "overdue" ? "bg-overdue" : status === "paid" ? "bg-paid" : status === "unpaid" ? "bg-unpaid" : "bg-draft"} w-1.5 h-1.5 rounded-full`} />
+                        <div
+                          className={`flex items-center  gap-1 border ${status === "overdue" ? "border-overdue-border bg-overdue-bg" : status === "paid" ? "border-paid-border bg-paid-bg" : status === "unpaid" ? "border-unpaid-border bg-unpaid-bg" : "border-draft-border bg-draft-bg"} rounded-[14px] px-2 py-1 w-fit`}>
 
-                        <span
-                          className={`${status === "overdue" ? "text-overdue" : status === "paid" ? "text-paid" : status === "unpaid" ? "text-unpaid" : "text-draft"} text-[11px] font-bold capitalize`}
-                        >{status}</span>
-                      </div>
+                          <div className={`${status === "overdue" ? "bg-overdue" : status === "paid" ? "bg-paid" : status === "unpaid" ? "bg-unpaid" : "bg-draft"} w-1.5 h-1.5 rounded-full`} />
 
-                    </td>
-                  </tr>
-                )
-              })}
+                          <span
+                            className={`${status === "overdue" ? "text-overdue" : status === "paid" ? "text-paid" : status === "unpaid" ? "text-unpaid" : "text-draft"} text-[11px] font-bold capitalize`}
+                          >{status}</span>
+                        </div>
+
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="px-5 py-12 text-center text-sm text-text-sm"
+                  >
+                    No invoices yet
+                  </td>
+                </tr>
+              )
+              }
+
             </tbody>
 
           </table>
@@ -79,55 +93,56 @@ export default function ClientInvoices({ data, currencySymbol, changePage }: Cli
 
       </div>
 
-          {/* pagination  */}
-          <div className="flex justify-end items-center gap-5 bg-card w-full border border-t-0 border-border rounded-b-[14px] p-4">
+      {/* pagination  */}
+      {data.invoices.length > 0 &&
+        <div className="flex justify-end items-center gap-5 bg-card w-full border border-t-0 border-border rounded-b-[14px] p-4">
 
-            <p className="text-sm text-text-sm">Page {page} of {totalPages}</p>
+          <p className="text-sm text-text-sm">Page {page} of {totalPages}</p>
 
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
 
+            <button
+              onClick={() => changePage(page - 1)}
+              type="button"
+              disabled={page === 1}
+              className="flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 cursor-pointer text-sm text-text disabled:opacity-50 disabled:cursor-auto">
+              <TbArrowLeft />
+            </button>
+
+            {page > 1 &&
               <button
                 onClick={() => changePage(page - 1)}
                 type="button"
-                disabled={page === 1}
-                className="flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 cursor-pointer text-sm text-text disabled:opacity-50 disabled:cursor-auto">
-                <TbArrowLeft />
+                className="flex justify-center items-center border-[1.5px] border-border rounded-xl h-8 w-8 text-text-text cursor-pointer bg-card text-text">
+                {page - 1}
               </button>
+            }
 
-              {page > 1 &&
-                <button
-                  onClick={() => changePage(page - 1)}
-                  type="button"
-                  className="flex justify-center items-center border-[1.5px] border-border rounded-xl h-8 w-8 text-text-text cursor-pointer bg-card text-text">
-                  {page - 1}
-                </button>
-              }
+            <div
+              className={`flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 text-text-text cursor-pointer bg-navy-700 text-sm text-card `}>
+              {page}
+            </div>
 
-              <div
-                className={`flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 text-text-text cursor-pointer bg-navy-700 text-sm text-card `}>
-                {page}
-              </div>
-
-              {page < totalPages &&
-                <button
-                  onClick={() => changePage(page + 1)}
-                  type="button"
-                  className="flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 cursor-pointer text-sm text-text">
-                  {page + 1}
-                </button>
-              }
-
+            {page < totalPages &&
               <button
                 onClick={() => changePage(page + 1)}
                 type="button"
-                disabled={page === totalPages}
-                className="flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 cursor-pointer text-sm text-text disabled:opacity-50 disabled:cursor-auto">
-                <TbArrowRight />
+                className="flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 cursor-pointer text-sm text-text">
+                {page + 1}
               </button>
+            }
 
-            </div>
+            <button
+              onClick={() => changePage(page + 1)}
+              type="button"
+              disabled={page === totalPages}
+              className="flex justify-center items-center border-[1.8px] border-border rounded-xl h-8 w-8 cursor-pointer text-sm text-text disabled:opacity-50 disabled:cursor-auto">
+              <TbArrowRight />
+            </button>
+
           </div>
-
+        </div>
+      }
     </div>
   )
 }
