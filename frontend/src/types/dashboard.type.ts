@@ -9,10 +9,10 @@ export interface DashboardParams {
 export interface DashboardResponseData {
     clientOverviewData: {
         totalClients: number,
-        totalClientCreatedInCurrentMonth: number,
+        totalClientsCreatedINCurrentMonth: number,
         totalOverdue: number,
-        totalOverviewCount: number,
-        totalRecievable: number,
+        totalOverdueCount: number,
+        totalReceivable: number,
         unpaidInvoicesCount: number,
         upcomingOverdue: {
             _id: string,

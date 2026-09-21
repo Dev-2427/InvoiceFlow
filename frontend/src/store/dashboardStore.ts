@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
 import { getDashboardDataApi } from "../api/dashboard.api";
-import type { revenueAndReceiptsFilter } from "../types/dashboard.type";
+import type { DashboardResponseData, revenueAndReceiptsFilter } from "../types/dashboard.type";
 import { getTimeZone } from "../utils/getTimeZone";
 
 interface IDashboardStore {
     recentInvoiceLimit: number,
     revenueAndReceiptsFilter: revenueAndReceiptsFilter,
     isGettingDashboardData: boolean,
-    dashboardData: [] | null,
+    dashboardData: DashboardResponseData | null,
     getDashboardData: () => Promise<ApiResponse<null>>
 }
 

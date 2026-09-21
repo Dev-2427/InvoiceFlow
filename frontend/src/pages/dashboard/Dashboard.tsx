@@ -4,11 +4,13 @@ import dashboardStore from "../../store/dashboardStore";
 import toast from "react-hot-toast";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import organizationStore from "../../store/organizationStore";
+import Overview from "../../components/dashboard/Overview";
 
 export default function Dashboard() {
 
     const getDashboardData = dashboardStore((store) => store.getDashboardData)
     const isGettingDashboardData = dashboardStore((store) => store.isGettingDashboardData)
+    const dashboardData = dashboardStore((store) => store.dashboardData)
 
     const organization = organizationStore((store) => store.organization)
 
@@ -35,9 +37,21 @@ export default function Dashboard() {
                     Loading
                 </div>
                 :
-                <DashboardHeader
-                organizationName={organization?.organizationName!}
-                />
+                !dashboardData ?
+                    <div>
+                        Show Error Code
+                    </div>
+                    :
+                    <div className="space-y-5 mb-4">
+                        <DashboardHeader
+                            organizationName={organization?.organizationName!}
+                        />
+
+                        <Overview
+                            clientOverviewData={dashboardData.clientOverviewData}
+                            currencySymbol={organization?.currency.symbol!}
+                        />
+                    </div>
             }
         </>
     )
