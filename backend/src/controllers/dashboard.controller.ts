@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getDashboardDataSchema } from "../validations/dashboard.validation.js";
+import { getDashboardDataSchema, getRevenueAndReceiptsDataSchema } from "../validations/dashboard.validation.js";
 import sendResponse from "../utils/sendResponse.js";
 import Invoice from "../models/Invoice.js";
 import mongoose from "mongoose";
@@ -452,4 +452,127 @@ async function getDashboardData(req: Request, res: Response) {
     }
 }
 
-export { getDashboardData }
+async function getRevenueAndReceiptsData(req: Request, res: Response) {
+
+    const organizationId = req.organization?.organizationId
+    const passedQuery = getRevenueAndReceiptsDataSchema.safeParse(req.query)
+
+    if (!organizationId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    if (!passedQuery.success) {
+        return sendResponse(res, { status: 400, message: "Invalid query" })
+    }
+
+    try {
+        const validOrganizationId = new mongoose.Types.ObjectId(organizationId)
+        const { revenueFilter, timeZone } = passedQuery.data
+
+        const now = new Date()
+        const localNow = toZonedTime(now, timeZone)
+
+        let startDate: Date;
+        let endDate: Date;
+
+        if (revenueFilter === "current_year") {
+            startDate = startOfYear(localNow)
+            endDate = addYears(startDate, 1)
+        } else if (revenueFilter === "previous_year") {
+            endDate = startOfYear(localNow)
+            startDate = addYears(endDate, -1)
+        } else {
+            startDate = startOfMonth(addMonths(localNow, -11))
+            endDate = startOfMonth(addMonths(localNow, 1))
+        }
+
+        const startDateUtc = fromZonedTime(startDate, timeZone)
+        const endDateUtc = fromZonedTime(endDate, timeZone)
+
+        const [revenue, receipts] = await Promise.all([
+            Invoice.aggregate([
+                {
+                    $match: {
+                        organization: validOrganizationId,
+                        isDeleted: false,
+                        status: { $ne: "draft" },
+                        issueDate: {
+                            $gte: startDateUtc,
+                            $lt: endDateUtc
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$issueDate" },
+                            month: { $month: "$issueDate" }
+                        },
+                        revenue: {
+                            $sum: "$totalAmount"
+                        }
+                    }
+                }
+            ]),
+
+            Invoice.aggregate([
+                {
+                    $match: {
+                        organization: validOrganizationId,
+                        isDeleted: false,
+                        status: "paid",
+                        "payment.receivedDate":
+                            { $gte: startDateUtc, $lt: endDateUtc }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$payment.receivedDate" },
+                            month: { $month: "$payment.receivedDate" }
+                        },
+                        receipts: {
+                            $sum: "$payment.amount"
+                        }
+                    }
+                }
+            ])
+
+        ])
+
+        const monthlyRevenueReceipts = Array.from({ length: 12 }, (_, index) => {
+            const monthDate = addMonths(startOfMonth(startDate), index)
+
+            const year = monthDate.getFullYear()
+            const month = monthDate.getMonth() + 1
+
+            const revenueData = revenue.find((item) =>
+                item._id.year === year &&
+                item._id.month === month
+            )
+
+            const receiptsData = receipts.find((item) =>
+                item._id.year === year &&
+                item._id.month === month
+            )
+
+            return {
+                year,
+                month: monthDate.toLocaleString("en-US", { month: "short" }),
+                revenue: revenueData?.revenue ?? 0,
+                receipts: receiptsData?.receipts ?? 0
+            }
+        })
+
+        return sendResponse(res, {
+            status: 200, message: "Revenue and receipts fetched successfully", data: {
+                revenueAndReceiptsData: monthlyRevenueReceipts
+            }
+        })
+    } catch (error) {
+        console.error("Failed to fetch revenue and receipts data:", error)
+        return sendResponse(res, { status: 400, message: "Invalid query" })
+    }
+}
+
+export { getDashboardData, getRevenueAndReceiptsData }

@@ -5,3 +5,7 @@ export const getDashboardDataSchema = z.object({
     timeZone: z.string(),
     recentInvoicesLimit: coerce.number().default(5)
 })
+
+export const getRevenueAndReceiptsDataSchema = getDashboardDataSchema.omit({
+    recentInvoicesLimit: true
+})
