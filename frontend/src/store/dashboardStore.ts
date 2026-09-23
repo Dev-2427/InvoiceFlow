@@ -1,29 +1,36 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
 import { getDashboardDataApi } from "../api/dashboard.api";
-import type { DashboardResponseData, revenueAndReceiptsFilter } from "../types/dashboard.type";
+import type { DashboardResponseData, RevenueAndReceiptsCHartFilter } from "../types/dashboard.type";
 import { getTimeZone } from "../utils/getTimeZone";
 
 interface IDashboardStore {
     recentInvoiceLimit: number,
-    revenueAndReceiptsFilter: revenueAndReceiptsFilter,
     isGettingDashboardData: boolean,
     dashboardData: DashboardResponseData | null,
-    getDashboardData: () => Promise<ApiResponse<null>>
+    getDashboardData: () => Promise<ApiResponse<null>>,
+    revenueChartAndReceiptsFilter: RevenueAndReceiptsCHartFilter,
+    setRevenueAndReceiptsChartFilter: (filter: RevenueAndReceiptsCHartFilter) => void
 }
 
 const dashboardStore = create<IDashboardStore>((set, get) => ({
     recentInvoiceLimit: 5,
-    revenueAndReceiptsFilter: "current_year",
     isGettingDashboardData: false,
     dashboardData: null,
+    revenueChartAndReceiptsFilter: {
+        filter: "current_year",
+        label: "current year"
+    },
+    setRevenueAndReceiptsChartFilter(filter) {
+        set({ revenueChartAndReceiptsFilter: filter })
+    },
 
     async getDashboardData() {
         set({ isGettingDashboardData: true })
         try {
             const query = {
                 recentInvoiceLimit: get().recentInvoiceLimit,
-                revenueFilter: get().revenueAndReceiptsFilter,
+                revenueFilter: get().revenueChartAndReceiptsFilter.filter,
                 timeZone: getTimeZone()
             }
 

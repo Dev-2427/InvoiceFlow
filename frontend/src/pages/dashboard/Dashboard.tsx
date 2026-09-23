@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import organizationStore from "../../store/organizationStore";
 import Overview from "../../components/dashboard/Overview";
+import RevenueAndReceipts from "../../components/dashboard/RevenueAndReceipts";
 
 export default function Dashboard() {
 
@@ -51,6 +52,12 @@ export default function Dashboard() {
                             clientOverviewData={dashboardData.clientOverviewData}
                             currencySymbol={organization?.currency.symbol!}
                         />
+
+                        <RevenueAndReceipts
+                            revenueAndReceiptsData={dashboardData.revenueAndReceiptsData}
+                            currencySymbol={organization?.currency.symbol!}
+                        />
+
                     </div>
             }
         </>

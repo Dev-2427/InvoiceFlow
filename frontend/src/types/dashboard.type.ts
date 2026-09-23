@@ -6,6 +6,13 @@ export interface DashboardParams {
     recentInvoiceLimit: number
 }
 
+export type GetRevenueAndReceiptsParams = "current_year" | "previous_year" | "past_12_months"
+
+export type RevenueAndReceiptsCHartFilter = {
+    label: "current year" | "previous year" | "past 12 months",
+    filter: GetRevenueAndReceiptsParams
+}
+
 export interface DashboardResponseData {
     clientOverviewData: {
         totalClients: number,
