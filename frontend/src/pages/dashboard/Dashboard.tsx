@@ -6,6 +6,8 @@ import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import organizationStore from "../../store/organizationStore";
 import Overview from "../../components/dashboard/Overview";
 import RevenueAndReceipts from "../../components/dashboard/RevenueAndReceipts";
+import DashboardSkeleton from "../../components/loading/dashboard/DashboardSkeleton";
+import RevenueAndReceiptsSkeleton from "../../components/loading/dashboard/RevenueAndReceiptsSekeleton";
 
 export default function Dashboard() {
 
@@ -36,9 +38,9 @@ export default function Dashboard() {
 
 
             {isGettingDashboardData ?
-                <div>
-                    Loading
-                </div>
+                (
+                    <DashboardSkeleton />
+                )
                 :
                 !dashboardData ?
                     <div>
@@ -56,9 +58,9 @@ export default function Dashboard() {
                         />
 
                         {isGettingRevenueAndReceiptsData ?
-                            <div>
-                                Loading
-                            </div>
+                            (
+                                <RevenueAndReceiptsSkeleton />
+                            )
                             :
                             <>
                                 {revenueAndReceiptsData &&

@@ -39,7 +39,7 @@ export default function DashboardHeader({ organizationName }: PageHeaderProps) {
         <div className="px-5 pt-4">
             <div className="flex justify-between items-center">
 
-                <span className="text-text text-[22px] font-bold">Hello 👋</span>
+                <span className="text-text text-[22px] font-bold">Welcome back 👋</span>
 
                 <div
                     ref={createOptionsRef}
