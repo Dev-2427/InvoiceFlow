@@ -1,6 +1,6 @@
-import type { RevenueAndReceiptsCHartFilter } from "../../types/dashboard.type"
+import type { RevenueAndReceiptsChartFilter } from "../../types/dashboard.type"
 
-const revenueChartFilterOptions: RevenueAndReceiptsCHartFilter[] = [
+const revenueChartFilterOptions: RevenueAndReceiptsChartFilter[] = [
     {
         label: "current year",
         filter: "current_year"
@@ -16,8 +16,8 @@ const revenueChartFilterOptions: RevenueAndReceiptsCHartFilter[] = [
 ]
 
 interface RevenueChartAndReceiptsFilterMenuProps {
-    onClick: (filter: RevenueAndReceiptsCHartFilter) => void,
-    revenueAndReceiptsChartFilter: RevenueAndReceiptsCHartFilter
+    onClick: (filter: RevenueAndReceiptsChartFilter) => void,
+    revenueAndReceiptsChartFilter: RevenueAndReceiptsChartFilter
 }
 
 export default function RevenueChartAndReceiptsFilterMenu({ onClick, revenueAndReceiptsChartFilter }: RevenueChartAndReceiptsFilterMenuProps) {

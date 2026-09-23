@@ -8,7 +8,7 @@ export interface DashboardParams {
 
 export type GetRevenueAndReceiptsParams = "current_year" | "previous_year" | "past_12_months"
 
-export type RevenueAndReceiptsCHartFilter = {
+export type RevenueAndReceiptsChartFilter = {
     label: "current year" | "previous year" | "past 12 months",
     filter: GetRevenueAndReceiptsParams
 }
@@ -64,4 +64,16 @@ export interface DashboardResponseData {
         todayReceipts: number,
         todayRevenue: number,
     }
+}
+
+export interface RevenueAndReceiptsParams {
+    revenueFilter: GetRevenueAndReceiptsParams,
+    timeZone: string
+}
+
+export interface RevenueAndReceiptsData {
+    year: number,
+    month: string,
+    revenue: number,
+    receipts: number
 }

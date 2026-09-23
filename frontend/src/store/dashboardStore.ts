@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
-import { getDashboardDataApi } from "../api/dashboard.api";
-import type { DashboardResponseData, RevenueAndReceiptsCHartFilter } from "../types/dashboard.type";
+import { getDashboardDataApi, getRevenueAndReceiptsApi } from "../api/dashboard.api";
+import type { DashboardResponseData, RevenueAndReceiptsChartFilter, RevenueAndReceiptsData } from "../types/dashboard.type";
 import { getTimeZone } from "../utils/getTimeZone";
 
 interface IDashboardStore {
@@ -9,8 +9,11 @@ interface IDashboardStore {
     isGettingDashboardData: boolean,
     dashboardData: DashboardResponseData | null,
     getDashboardData: () => Promise<ApiResponse<null>>,
-    revenueChartAndReceiptsFilter: RevenueAndReceiptsCHartFilter,
-    setRevenueAndReceiptsChartFilter: (filter: RevenueAndReceiptsCHartFilter) => void
+    revenueChartAndReceiptsFilter: RevenueAndReceiptsChartFilter,
+
+    isGettingRevenueAndReceiptsData: boolean,
+    revenueAndReceiptsData: RevenueAndReceiptsData[] | null,
+    getRevenueAndReceiptsData: (filter: RevenueAndReceiptsChartFilter) => Promise<ApiResponse<{ revenueAndReceiptsData: RevenueAndReceiptsData[] }>>
 }
 
 const dashboardStore = create<IDashboardStore>((set, get) => ({
@@ -21,9 +24,10 @@ const dashboardStore = create<IDashboardStore>((set, get) => ({
         filter: "current_year",
         label: "current year"
     },
-    setRevenueAndReceiptsChartFilter(filter) {
-        set({ revenueChartAndReceiptsFilter: filter })
-    },
+
+    isGettingRevenueAndReceiptsData: false,
+    revenueAndReceiptsData: null,
+
 
     async getDashboardData() {
         set({ isGettingDashboardData: true })
@@ -37,7 +41,10 @@ const dashboardStore = create<IDashboardStore>((set, get) => ({
             const res = await getDashboardDataApi(query)
 
             if (res.data.success) {
-                set({ dashboardData: res.data.data })
+                set({
+                    dashboardData: res.data.data,
+                    revenueAndReceiptsData: res.data.data.revenueAndReceiptsData
+                })
             }
             return res.data
         } catch (error: any) {
@@ -50,6 +57,46 @@ const dashboardStore = create<IDashboardStore>((set, get) => ({
             set({ isGettingDashboardData: false })
         }
     },
+
+    async getRevenueAndReceiptsData(filter) {
+
+        if (get().revenueChartAndReceiptsFilter.filter === filter.filter) {
+            return {
+                success: true,
+                message: "Filter already selected"
+            }
+        }
+
+        set({ isGettingRevenueAndReceiptsData: true })
+
+        try {
+
+            const query = {
+                revenueFilter: filter.filter,
+                timeZone: getTimeZone()
+            }
+
+            const res = await getRevenueAndReceiptsApi(query)
+
+            if (res.data.success) {
+                set({
+                    revenueAndReceiptsData: res.data.data.revenueAndReceiptsData,
+                    revenueChartAndReceiptsFilter: filter
+                })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to fetch revenue and receipts data:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isGettingRevenueAndReceiptsData: false })
+        }
+    }
+
 }))
 
 export default dashboardStore

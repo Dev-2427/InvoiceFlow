@@ -12,6 +12,8 @@ export default function Dashboard() {
     const getDashboardData = dashboardStore((store) => store.getDashboardData)
     const isGettingDashboardData = dashboardStore((store) => store.isGettingDashboardData)
     const dashboardData = dashboardStore((store) => store.dashboardData)
+    const revenueAndReceiptsData = dashboardStore((store) => store.revenueAndReceiptsData)
+    const isGettingRevenueAndReceiptsData = dashboardStore((store) => store.isGettingRevenueAndReceiptsData)
 
     const organization = organizationStore((store) => store.organization)
 
@@ -53,10 +55,20 @@ export default function Dashboard() {
                             currencySymbol={organization?.currency.symbol!}
                         />
 
-                        <RevenueAndReceipts
-                            revenueAndReceiptsData={dashboardData.revenueAndReceiptsData}
-                            currencySymbol={organization?.currency.symbol!}
-                        />
+                        {isGettingRevenueAndReceiptsData ?
+                            <div>
+                                Loading
+                            </div>
+                            :
+                            <>
+                                {revenueAndReceiptsData &&
+                                    <RevenueAndReceipts
+                                        revenueAndReceiptsData={revenueAndReceiptsData}
+                                        currencySymbol={organization?.currency.symbol!}
+                                    />
+                                }
+                            </>
+                        }
 
                     </div>
             }

@@ -3,24 +3,34 @@ import dashboardStore from "../../store/dashboardStore"
 import RevenueAndReceiptsChart from "../../components/dashboard/RevenueAndReceiptsChart";
 import { TbChevronDown } from "react-icons/tb";
 import RevenueChartAndReceiptsFilterMenu from "../../components/dashboard/RevenueChartAndReceiptsFilterMenu";
+import type { RevenueAndReceiptsChartFilter, RevenueAndReceiptsData } from "../../types/dashboard.type";
+import toast from "react-hot-toast";
 
 interface RevenueAndReceiptsProps {
-    revenueAndReceiptsData: {
-        year: number,
-        month: string,
-        revenue: number,
-        receipts: number
-    }[],
+    revenueAndReceiptsData: RevenueAndReceiptsData[],
     currencySymbol: string
 }
 
 export default function RevenueAndReceipts({ revenueAndReceiptsData, currencySymbol }: RevenueAndReceiptsProps) {
 
-    const setRevenueAndReceiptsChartFilter = dashboardStore((store) => store.setRevenueAndReceiptsChartFilter)
     const revenueChartAndReceiptsFilter = dashboardStore((store) => store.revenueChartAndReceiptsFilter)
+    const getRevenueAndReceiptsData = dashboardStore((store) => store.getRevenueAndReceiptsData)
+
     const [showRevenueAndReceiptsChartFilterMenu, setShowRevenueAndReceiptsChartFilterMenu] = useState(false)
 
     const revenueChartFilterMenuRef = useRef<HTMLDivElement>(null)
+
+    async function handleFilterChange(filter: RevenueAndReceiptsChartFilter) {
+
+        setShowRevenueAndReceiptsChartFilterMenu(false)
+
+        const res = await getRevenueAndReceiptsData(filter)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+    }
 
     return (
         <div className="px-5 space-y-5">
@@ -50,8 +60,7 @@ export default function RevenueAndReceipts({ revenueAndReceiptsData, currencySym
 
                         {showRevenueAndReceiptsChartFilterMenu && <RevenueChartAndReceiptsFilterMenu
                             onClick={(filter) => {
-                                setRevenueAndReceiptsChartFilter(filter)
-                                setShowRevenueAndReceiptsChartFilterMenu(false)
+                                handleFilterChange(filter)
                             }}
                             revenueAndReceiptsChartFilter={revenueChartAndReceiptsFilter}
                         />}
