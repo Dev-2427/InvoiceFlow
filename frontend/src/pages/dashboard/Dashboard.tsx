@@ -9,6 +9,7 @@ import RevenueAndReceipts from "../../components/dashboard/RevenueAndReceipts";
 import DashboardSkeleton from "../../components/loading/dashboard/DashboardSkeleton";
 import RevenueAndReceiptsSkeleton from "../../components/loading/dashboard/RevenueAndReceiptsSekeleton";
 import SalesSummary from "../../components/dashboard/SalesSummary";
+import RecentInvoices from "../../components/dashboard/RecentInvoices";
 
 export default function Dashboard() {
 
@@ -77,6 +78,12 @@ export default function Dashboard() {
                             salesSummary={dashboardData.salesSummary}
                             currencySymbol={organization?.currency.symbol!}
                         />
+
+                        {dashboardData.recentInvoices.length > 0 &&
+                            <RecentInvoices
+                                recentInvoices={dashboardData.recentInvoices}
+                            />
+                        }
 
                     </div>
             }
