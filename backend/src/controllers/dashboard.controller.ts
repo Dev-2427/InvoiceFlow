@@ -438,11 +438,13 @@ async function getDashboardData(req: Request, res: Response) {
             }
         })
 
+        const salesSummaryData = salesSummary[0]
+
         return sendResponse(res, {
             status: 200, message: "Dashboard data fetched successfully", data: {
                 clientOverviewData: CompleteOverviewData,
                 revenueAndReceiptsData: monthlyRevenueReceipts,
-                salesSummary,
+                salesSummary: salesSummaryData,
                 recentInvoices
             }
         })
