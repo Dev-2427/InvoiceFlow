@@ -1,7 +1,7 @@
 import type { RevenueData } from "../../../types/client.types"
 import {
-    LineChart,
-    Line,
+    BarChart,
+    Bar,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -12,15 +12,18 @@ import { formatCompactCurrency } from "../../../utils/formatCompactCurrency"
 import { formatCurrency } from "../../../utils/formatCurrency"
 
 interface ChartRevenueProps {
-    revenueData: RevenueData[],
+    revenueData: RevenueData[]
     currencySymbol: string
 }
 
-export default function RevenueChart({ revenueData, currencySymbol }: ChartRevenueProps) {
+export default function RevenueChart({
+    revenueData,
+    currencySymbol,
+}: ChartRevenueProps) {
     return (
-        <div className="w-full h-52 ">
+        <div className="w-full h-52">
             <ResponsiveContainer width="100%" height="100%">
-                <LineChart
+                <BarChart
                     data={revenueData}
                     margin={{
                         top: 10,
@@ -56,32 +59,32 @@ export default function RevenueChart({ revenueData, currencySymbol }: ChartReven
                             fontSize: 11,
                         }}
                         tickFormatter={(value) =>
-                            formatCompactCurrency(Number(value), currencySymbol)
+                            formatCompactCurrency(
+                                Number(value),
+                                currencySymbol
+                            )
                         }
                     />
 
                     <Tooltip
                         cursor={{
-                            strokeDasharray: "4 4",
+                            fill: "transparent",
                         }}
                         formatter={(value) => [
-                            `${currencySymbol}${formatCurrency(Number(value))}`, "Revenue"
+                            `${currencySymbol}${formatCurrency(Number(value))}`,
+                            "Revenue",
                         ]}
                         labelFormatter={(label) => `${label}`}
                     />
 
-                    <Line
-                        type="monotone"
+                    <Bar
                         dataKey="revenue"
-                        strokeWidth={2.5}
-                        dot={{
-                            r: 3
-                        }}
-                        activeDot={{
-                            r: 5,
-                        }}
+                        name="Revenue"
+                        fill="var(--color-gold)"
+                        maxBarSize={30}
+                        radius={[4, 4, 0, 0]}
                     />
-                </LineChart>
+                </BarChart>
             </ResponsiveContainer>
         </div>
     )
