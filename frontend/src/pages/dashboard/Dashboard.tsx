@@ -8,6 +8,7 @@ import Overview from "../../components/dashboard/Overview";
 import RevenueAndReceipts from "../../components/dashboard/RevenueAndReceipts";
 import DashboardSkeleton from "../../components/loading/dashboard/DashboardSkeleton";
 import RevenueAndReceiptsSkeleton from "../../components/loading/dashboard/RevenueAndReceiptsSekeleton";
+import SalesSummary from "../../components/dashboard/SalesSummary";
 
 export default function Dashboard() {
 
@@ -62,15 +63,20 @@ export default function Dashboard() {
                                 <RevenueAndReceiptsSkeleton />
                             )
                             :
-                            <>
-                                {revenueAndReceiptsData &&
-                                    <RevenueAndReceipts
-                                        revenueAndReceiptsData={revenueAndReceiptsData}
-                                        currencySymbol={organization?.currency.symbol!}
-                                    />
-                                }
-                            </>
+                            (
+                                revenueAndReceiptsData &&
+                                <RevenueAndReceipts
+                                    revenueAndReceiptsData={revenueAndReceiptsData}
+                                    currencySymbol={organization?.currency.symbol!}
+                                />
+
+                            )
                         }
+
+                        <SalesSummary
+                            salesSummary={dashboardData.salesSummary}
+                            currencySymbol={organization?.currency.symbol!}
+                        />
 
                     </div>
             }
