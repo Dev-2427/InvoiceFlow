@@ -14,6 +14,7 @@ import loadCurrentOrganization from "./middleware/loadCurrentOrganization.js"
 import "./services/cron/invoiceCleanup.js"
 import "./services/cron/invoiceOverdueStatus.js"
 import dashboardRouter from "./routes/dashboard.route.js"
+import reportsRouter from "./routes/reports.route.js"
 
 const app = express()
 
@@ -40,5 +41,6 @@ app.use("/api/organization", authCheck, organizationRouter)
 app.use("/api/client", authCheck, clientRouter)
 app.use("/api/invoice", authCheck, loadCurrentOrganization, invoiceRouter)
 app.use("/api/dashboard", authCheck, loadCurrentOrganization, dashboardRouter)
+app.use("/api/reports", authCheck, loadCurrentOrganization, reportsRouter)
 
 export default app
