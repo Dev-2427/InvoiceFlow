@@ -3,11 +3,11 @@ import z, { coerce } from "zod";
 
 export const getReportsSchema = z.object({
     dateRange: z.enum(["today", "this_month", "this_week", "this_year", "custom"]),
-    from: coerce.date().nullable(),
-    to: coerce.date().nullable(),
+    from: coerce.date().nullable().optional().default(null),
+    to: coerce.date().nullable().optional().default(null),
     timeZone: z.string(),
 
-    clientId: z.string().refine(mongoose.Types.ObjectId.isValid, "Invalid client ID").nullable(),
+    clientId: z.string().refine(mongoose.Types.ObjectId.isValid, "Invalid client ID").nullable().optional().default(null),
 
     status: z.enum(["paid", "unpaid", "overdue", "draft", "all"]),
 

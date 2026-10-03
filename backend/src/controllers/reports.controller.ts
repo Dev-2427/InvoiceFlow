@@ -154,6 +154,21 @@ async function getReports(req: Request, res: Response) {
                                 }
                             }
                         }
+                    ],
+                    totalRevenue: [
+                        {
+                            $match: {
+                                status: { $ne: "draft" }
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                totalRevenue: {
+                                    $sum: "$totalAmount"
+                                }
+                            }
+                        }
                     ]
                 }
             }
@@ -164,6 +179,7 @@ async function getReports(req: Request, res: Response) {
             count: [],
             totalCollected: [],
             totalOverdue: [],
+            totalRevenue: [],
             invoicesCountsByStatus: []
         }
 
@@ -185,6 +201,7 @@ async function getReports(req: Request, res: Response) {
             totalInvoices: report.count[0]?.totalInvoices ?? 0,
             totalCollected: report.totalCollected[0]?.totalCollected ?? 0,
             totalOverdue: report.totalOverdue[0]?.totalOverdue ?? 0,
+            totalRevenue: report.totalRevenue[0]?.totalRevenue ?? 0,
             invoicesCountsByStatus: invoicesCountsByStatus
         }
 
