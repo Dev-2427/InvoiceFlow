@@ -47,6 +47,11 @@ export default function Invoice() {
         fetchInvoices()
     }, [debounceSearch, invoiceSort, invoiceFilter])
 
+    function changePage(newPage: number) {
+        emptySelectedInvoiceIds()
+        getInvoices(newPage)
+    }
+
     return (
         <main className="space-y-5">
             <Header header="Invoices" />
@@ -59,7 +64,12 @@ export default function Invoice() {
                 <SelectedInvoicesAction />
             }
 
-            <InvoicesList />
+            <InvoicesList
+                invoices={invoices}
+                showTrashPageLink={true}
+                changePage={(page) => changePage(page)}
+                allowSelection={true}
+            />
 
         </main>
     )

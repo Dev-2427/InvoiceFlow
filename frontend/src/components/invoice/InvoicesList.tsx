@@ -5,16 +5,21 @@ import formatLocalDate from "../../utils/dateUtils";
 import { Link } from "react-router-dom";
 import { HiTrash } from "react-icons/hi2";
 import InvoicesCardSkeletons from "../loading/invoice/InvoicesCardSkeletons";
+import type { InvoiceListData } from "../../types/invoice.types";
 
-export default function InvoicesList() {
+interface InvoicesListProps {
+    invoices: InvoiceListData | null,
+    showTrashPageLink: boolean,
+    changePage: (page: number) => void,
+    allowSelection: boolean
+}
+
+export default function InvoicesList({ invoices, showTrashPageLink, changePage, allowSelection }: InvoicesListProps) {
 
     const isGettingInvoices = invoiceStore((state) => state.isGettingInvoices)
-    const getInvoices = invoiceStore((state) => state.getInvoices)
-    const invoices = invoiceStore((state) => state.invoices)
     const changeSelectedInvoiceIds = invoiceStore((state) => state.changeSelectedInvoiceIds)
     const isPerformingAction = invoiceStore((state) => state.isPerformingAction)
     const selectedInvoiceIds = invoiceStore((state) => state.selectedInvoiceIds)
-    const emptySelectedInvoiceIds = invoiceStore((state) => state.emptySelectedInvoiceIds)
 
     if (isGettingInvoices) {
         return <InvoicesCardSkeletons />
@@ -34,11 +39,6 @@ export default function InvoicesList() {
 
     const page = invoices?.pagination.page || 1
     const totalPages = invoices?.pagination.totalPages || 1
-
-    function changePage(newPage: number) {
-        emptySelectedInvoiceIds()
-        getInvoices(newPage)
-    }
 
     return (
         <div className="px-5 pb-3">
@@ -60,21 +60,23 @@ export default function InvoicesList() {
                                 {/* checkbox and invoice number */}
                                 <div className="flex items-center gap-2">
 
-                                    <button
-                                        onClick={() => {
+                                    {allowSelection &&
+                                        <button
+                                            onClick={() => {
 
-                                            if (isPerformingAction) return
+                                                if (isPerformingAction) return
 
-                                            changeSelectedInvoiceIds(invoice._id)
-                                        }
-                                        }
-                                        type="button"
-                                        className={`shrink-0 flex justify-center items-center w-3.5 h-3.5 border-[1.5px] border-text-sm rounded-sm ${isPerformingAction ? "opacity-50 cursor-default" : "cursor-pointer"}  ${selectedInvoiceIds.includes(invoice._id) && "bg-navy-700 text-card border-none"}`}>
+                                                changeSelectedInvoiceIds(invoice._id)
+                                            }
+                                            }
+                                            type="button"
+                                            className={`shrink-0 flex justify-center items-center w-3.5 h-3.5 border-[1.5px] border-text-sm rounded-sm ${isPerformingAction ? "opacity-50 cursor-default" : "cursor-pointer"}  ${selectedInvoiceIds.includes(invoice._id) && "bg-navy-700 text-card border-none"}`}>
 
-                                        {selectedInvoiceIds.includes(invoice._id) &&
-                                            <TbCheck />
-                                        }
-                                    </button>
+                                            {selectedInvoiceIds.includes(invoice._id) &&
+                                                <TbCheck />
+                                            }
+                                        </button>
+                                    }
 
                                     <span className="text-navy-700 font-bold text-[13px]">{invoice.invoiceNumber}</span>
                                 </div>
@@ -201,12 +203,15 @@ export default function InvoicesList() {
             </div>
 
             {/* restore invoice page link */}
-            <Link
-                to={"/invoices/restore"}
-                className="flex items-center justify-center gap-1 text-text-sm text-sm mt-5 mb-2">
-                <HiTrash />
-                <span>View Trash ({invoices?.deletedCount ?? 0})</span>
-            </Link>
+            {
+                showTrashPageLink &&
+                <Link
+                    to={"/invoices/restore"}
+                    className="flex items-center justify-center gap-1 text-text-sm text-sm mt-5 mb-2">
+                    <HiTrash />
+                    <span>View Trash ({invoices?.deletedCount ?? 0})</span>
+                </Link>
+            }
 
         </div >
     )
