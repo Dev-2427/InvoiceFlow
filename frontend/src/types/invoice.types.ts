@@ -124,3 +124,30 @@ export interface GetInvoiceOverviewData {
     updatedAt: string,
     _id: string
 }
+
+export interface InvoiceListData {
+      invoices: {
+        _id: string,
+        status: "paid" | "unpaid" | "overdue" | "draft",
+        issueDate: string,
+        dueDate: string,
+        invoiceNumber: string,
+        totalAmount: number,
+        currency: {
+            symbol: string,
+            code: string
+        },
+        client: {
+            displayName: string,
+            companyName: string | null
+        }
+    }[]
+    pagination: {
+        page: number,
+        limit: number,
+        totalItems: number,
+        totalPages: number
+    },
+    deletedCount?: number
+
+}
