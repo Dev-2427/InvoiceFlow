@@ -15,6 +15,7 @@ import "./services/cron/invoiceCleanup.js"
 import "./services/cron/invoiceOverdueStatus.js"
 import dashboardRouter from "./routes/dashboard.route.js"
 import reportsRouter from "./routes/reports.route.js"
+import userRouter from "./routes/user.route.js"
 
 const app = express()
 
@@ -42,5 +43,6 @@ app.use("/api/client", authCheck, clientRouter)
 app.use("/api/invoice", authCheck, loadCurrentOrganization, invoiceRouter)
 app.use("/api/dashboard", authCheck, loadCurrentOrganization, dashboardRouter)
 app.use("/api/reports", authCheck, loadCurrentOrganization, reportsRouter)
+app.use("/api/profile", authCheck, userRouter)
 
 export default app
