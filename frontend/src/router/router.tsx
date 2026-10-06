@@ -23,108 +23,120 @@ import InvoiceDetails from "../pages/invoice/InvoiceDetails";
 import RestoreInvoices from "../pages/invoice/RestoreInvoices";
 import EditInvoice from "../pages/invoice/EditInvoice";
 import Reports from "../pages/reports/Reports";
+import Settings from "../pages/settings/Settings";
+import RootLayout from "../layout/RootLayout";
 
 export const router = createBrowserRouter([
     {
-        path: "/",
-        element: <HomeRedirect />
-    },
-    {
-        element: <PublicLayout />,
+        element: <RootLayout />,
         children: [
+
+
             {
-                element: <AuthLayout />,
-                children: [
-                    {
-                        path: "/signup",
-                        element: <Signup />
-                    },
-                    {
-                        path: "/verify-code/:userId",
-                        element: <VerifyCode />
-                    },
-                    {
-                        path: "/signin",
-                        element: <Signin />
-                    },
-                    {
-                        path: "/forgot-password",
-                        element: <ForgotPassword />
-                    },
-                    {
-                        path: "/verify-reset-code/:userId",
-                        element: <VerifyResetCode />
-                    },
-                    {
-                        path: "/reset-password",
-                        element: <ResetPassword />
-                    },
-                ]
-            }
-        ]
-    },
-    {
-        element: <ProtectedLayout />,
-        children: [
-            {
-                path: "/create-organization",
-                element: <CreateOrganization />
+                path: "/",
+                element: <HomeRedirect />
             },
 
             {
-                element: <AppLayout />,
+                element: <PublicLayout />,
                 children: [
                     {
-                        path: "/dashboard",
-                        element: <Dashboard />
-                    },
-                    {
-                        path: "/clients",
-                        element: <Clients />
-                    },
-                    {
-                        path: "/clients/new",
-                        element: <CreateClient />
-                    },
-                    {
-                        path: "/clients/:id",
-                        element: <ClientDetails />
-                    },
-                    {
-                        path: "/clients/:id/edit",
-                        element: <EditClient />
-                    },
-                    {
-                        path: "/invoices",
-                        element: <Invoice />
-                    },
-                    {
-                        path: "/invoices/new",
-                        element: <CreateInvoice />
-                    },
-                    {
-                        path: "/invoices/:invoiceId",
-                        element: <InvoiceDetails />
-                    },
-                    {
-                        path: "/invoices/restore",
-                        element: <RestoreInvoices />
-                    },
-                    {
-                        path: "/invoices/:id/edit",
-                        element: <EditInvoice />
-                    },
-                    {
-                        path: "/reports",
-                        element: <Reports />
+                        element: <AuthLayout />,
+                        children: [
+                            {
+                                path: "/signup",
+                                element: <Signup />
+                            },
+                            {
+                                path: "/verify-code/:userId",
+                                element: <VerifyCode />
+                            },
+                            {
+                                path: "/signin",
+                                element: <Signin />
+                            },
+                            {
+                                path: "/forgot-password",
+                                element: <ForgotPassword />
+                            },
+                            {
+                                path: "/verify-reset-code/:userId",
+                                element: <VerifyResetCode />
+                            },
+                            {
+                                path: "/reset-password",
+                                element: <ResetPassword />
+                            },
+                        ]
                     }
-
                 ]
+            },
+
+            {
+                element: <ProtectedLayout />,
+                children: [
+                    {
+                        path: "/create-organization",
+                        element: <CreateOrganization />
+                    },
+
+                    {
+                        element: <AppLayout />,
+                        children: [
+                            {
+                                path: "/dashboard",
+                                element: <Dashboard />
+                            },
+                            {
+                                path: "/clients",
+                                element: <Clients />
+                            },
+                            {
+                                path: "/clients/new",
+                                element: <CreateClient />
+                            },
+                            {
+                                path: "/clients/:id",
+                                element: <ClientDetails />
+                            },
+                            {
+                                path: "/clients/:id/edit",
+                                element: <EditClient />
+                            },
+                            {
+                                path: "/invoices",
+                                element: <Invoice />
+                            },
+                            {
+                                path: "/invoices/new",
+                                element: <CreateInvoice />
+                            },
+                            {
+                                path: "/invoices/:invoiceId",
+                                element: <InvoiceDetails />
+                            },
+                            {
+                                path: "/invoices/restore",
+                                element: <RestoreInvoices />
+                            },
+                            {
+                                path: "/invoices/:id/edit",
+                                element: <EditInvoice />
+                            },
+                            {
+                                path: "/reports",
+                                element: <Reports />
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            {
+                path: "/*",
+                element: <NotFound />
             }
+
         ]
-    },
-    {
-        path: "/*",
-        element: <NotFound />
     }
 ])
