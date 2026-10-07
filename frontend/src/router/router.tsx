@@ -126,7 +126,12 @@ export const router = createBrowserRouter([
                             {
                                 path: "/reports",
                                 element: <Reports />
+                            },
+                            {
+                                path: "settings",
+                                element: <Settings />
                             }
+
                         ]
                     }
                 ]

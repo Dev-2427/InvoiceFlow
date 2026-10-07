@@ -15,6 +15,8 @@ interface IAuthStore {
     isCheckingAuth: boolean,
     isAuthenticated: boolean,
 
+    changeUserAvatar: (avatar: string) => void,
+
     signup: (data: SignupInput) => Promise<ApiResponse<{ userId: string }>>,
     verifyCode: (data: VerifyCodeInput) => Promise<ApiResponse<{ userData: User }>>
     signin: (data: SigninInput) => Promise<ApiResponse<{ userData: User }>>
@@ -41,6 +43,16 @@ const authStore = create<IAuthStore>((set) => ({
     isCheckingAuth: true,
 
     user: null,
+
+    changeUserAvatar(avatar) {
+        set((state) => {
+            if (!state.user) return state
+
+            return {
+                user: { ...state.user, avatar }
+            }
+        })
+    },
 
     async signup(data) {
         set({ isSigningUp: true })
