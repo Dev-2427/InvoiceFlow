@@ -11,17 +11,16 @@ const screens: IScreen[] = ["profile", "password", "organizations"]
 export default function Settings() {
 
     const location = useLocation()
-    const changeScreentTo: IScreen = location.state?.changeScreen
 
     const [currentScreen, setCurrentScreen] = useState<IScreen>("profile")
 
     const user = useAuthUser()
 
     useEffect(() => {
-        if (changeScreentTo === "organizations") {
+        if (location.state?.changeScreen === "organizations") {
             setCurrentScreen("organizations")
         }
-    }, [changeScreentTo])
+    }, [location.state])
 
     return (
         <main className="space-y-5 mb-5">

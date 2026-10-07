@@ -157,6 +157,7 @@ export default function AppLayout() {
 
                                 <Link
                                     to={"/settings"}
+                                    state={{ changeScreen: "organizations" }}
                                     onClick={() => {
                                         closeSidebar()
                                         setShowOrgContextMenu(false)
