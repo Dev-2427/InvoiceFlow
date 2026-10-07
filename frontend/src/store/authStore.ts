@@ -16,6 +16,7 @@ interface IAuthStore {
     isAuthenticated: boolean,
 
     changeUserAvatar: (avatar: string) => void,
+    changeUserProfile: (firstName: string, lastName: string, country: string,) => void,
 
     signup: (data: SignupInput) => Promise<ApiResponse<{ userId: string }>>,
     verifyCode: (data: VerifyCodeInput) => Promise<ApiResponse<{ userData: User }>>
@@ -50,6 +51,16 @@ const authStore = create<IAuthStore>((set) => ({
 
             return {
                 user: { ...state.user, avatar }
+            }
+        })
+    },
+
+    changeUserProfile(firstName, lastName, country) {
+        set((state) => {
+            if (!state.user) return state
+
+            return {
+                user: { ...state.user, firstName, lastName, country }
             }
         })
     },

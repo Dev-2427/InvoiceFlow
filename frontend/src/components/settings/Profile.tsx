@@ -2,6 +2,9 @@ import React from "react";
 import type { User } from "../../types/auth.types"
 import toast from "react-hot-toast";
 import userStore from "../../store/userStore";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updateProfileSchema, type UpdateProfileSchemaInput } from "../../validation/user.validation";
 
 interface ProfileProps {
     user: User
@@ -11,6 +14,8 @@ export default function Profile({ user }: ProfileProps) {
 
     const updateAvatar = userStore((state) => state.updateAvatar)
     const isUpdatingAvatar = userStore((state) => state.isUpdatingAvatar)
+    const isUpdatingProfile = userStore((state) => state.isUpdatingProfile)
+    const updateProfile = userStore((state) => state.updateProfile)
 
     async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
@@ -28,6 +33,27 @@ export default function Profile({ user }: ProfileProps) {
         }
 
         const res = await updateAvatar(file)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+
+        toast.success(res.message)
+    }
+
+    const { register, handleSubmit, formState: { errors, isDirty } } = useForm({
+        resolver: zodResolver(updateProfileSchema),
+        defaultValues: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            country: user.country
+        }
+    })
+
+    async function onSubmit(data: UpdateProfileSchemaInput) {
+
+        const res = await updateProfile(data)
 
         if (!res.success) {
             toast.error(res.message)
@@ -106,7 +132,7 @@ export default function Profile({ user }: ProfileProps) {
                 <hr className="border border-border/70" />
 
                 {/* details form*/}
-                <form>
+                <form onSubmit={handleSubmit(onSubmit)}>
 
                     <div className="flex flex-col sm:flex-row items-center sm:gap-3">
 
@@ -115,13 +141,13 @@ export default function Profile({ user }: ProfileProps) {
                             <label htmlFor="firstName" className='text-text-sm font-bold text-[11px]'>FIRST NAME *</label>
 
                             <input
-                                // {...register("companyName")}
+                                {...register("firstName")}
                                 spellCheck={false}
                                 className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] transition-all duration-200'
                                 placeholder={"First name"} id="firstName" />
 
                             <p className="min-h-5 text-xs text-overdue">
-                                {/* {errors.companyName?.message} */}
+                                {errors.firstName?.message}
                             </p>
                         </div>
 
@@ -130,13 +156,13 @@ export default function Profile({ user }: ProfileProps) {
                             <label htmlFor="lastName" className='text-text-sm font-bold text-[11px]'>LAST NAME</label>
 
                             <input
-                                // {...register("displayName")}
+                                {...register("lastName")}
                                 spellCheck={false}
                                 className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] transition-all duration-200'
                                 placeholder={"Last name"} id="lastName" />
 
                             <p className="min-h-5 text-xs text-overdue">
-                                {/* {errors.displayName?.message} */}
+                                {errors.lastName?.message}
                             </p>
                         </div>
 
@@ -168,20 +194,21 @@ export default function Profile({ user }: ProfileProps) {
                         <label htmlFor="country" className='text-text-sm font-bold text-[11px]'>COUNTRY</label>
 
                         <input
-                            // {...register("country")}
+                            {...register("country")}
                             spellCheck={false}
                             className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] transition-all duration-200'
                             placeholder={"Country"} id="country" />
 
                         <p className="min-h-5 text-xs text-overdue">
-                            {/* {errors.country?.message} */}
+                            {errors.country?.message}
                         </p>
                     </div>
 
                     <button
+                        disabled={isUpdatingProfile || !isDirty}
                         type="submit"
-                        className="bg-gold text-gold-dark hover:bg-gold/90 rounded-lg py-2.5 w-full text-[15px] font-bold cursor-pointer">
-                        Save Changes
+                        className="bg-gold text-gold-dark hover:bg-gold/90 rounded-lg py-2.5 w-full text-[15px] font-bold cursor-pointer disabled:opacity-50 disabled:pointer-events-none">
+                        {isUpdatingProfile ? "Saving..." : "Save Changes"}
                     </button>
                 </form>
 
