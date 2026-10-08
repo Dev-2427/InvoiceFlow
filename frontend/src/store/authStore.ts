@@ -1,6 +1,6 @@
 import { create } from "zustand"
-import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput } from "../validation/authValidation"
-import { checkAuthApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput, ChangePasswordInput } from "../validation/authValidation"
+import { changePasswordApi, checkAuthApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { User } from "../types/auth.types"
 
@@ -29,10 +29,13 @@ interface IAuthStore {
     signout: () => Promise<ApiResponse<null>>
     forceLogout: () => void,
 
-    user: User | null
+    user: User | null,
+
+    isChangingPassword: boolean,
+    changePassword: (data: ChangePasswordInput) => Promise<ApiResponse<null>>
 }
 
-const authStore = create<IAuthStore>((set) => ({
+const authStore = create<IAuthStore>((set, get) => ({
     isSigningUp: false,
     isVerifyingCode: false,
     isSigningIn: false,
@@ -42,6 +45,7 @@ const authStore = create<IAuthStore>((set) => ({
     isSigningout: false,
     isAuthenticated: false,
     isCheckingAuth: true,
+    isChangingPassword: false,
 
     user: null,
 
@@ -249,6 +253,28 @@ const authStore = create<IAuthStore>((set) => ({
 
     forceLogout() {
         set({ user: null, isAuthenticated: false })
+    },
+
+    async changePassword(data) {
+        set({ isChangingPassword: true })
+
+        try {
+            const res = await changePasswordApi(data)
+
+            if (res.data.success) {
+                get().forceLogout()
+            }
+
+            return res.data
+        } catch (error) {
+            console.error("Failed to change password:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isChangingPassword: false })
+        }
     }
 
 }))

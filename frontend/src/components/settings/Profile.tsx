@@ -64,7 +64,7 @@ export default function Profile({ user }: ProfileProps) {
     }
 
     return (
-        <div className="px-5 space-y-5">
+        <div className="px-5 space-y-5 max-w-2xl">
 
             {/* profile avatar */}
             <div className="bg-card border-[1.5px] border-border rounded-[14px] px-5 py-3 space-y-4">

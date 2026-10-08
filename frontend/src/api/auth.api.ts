@@ -1,5 +1,5 @@
 import api from "./axios";
-import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput } from "../validation/authValidation";
+import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput, ChangePasswordInput } from "../validation/authValidation";
 
 export function signupApi(data: SignupInput) {
     return api.post("/api/auth/signup", data)
@@ -35,4 +35,14 @@ export function checkAuthApi() {
 
 export function signoutApi() {
     return api.post("/api/auth/signout")
+}
+
+export function changePasswordApi(data: ChangePasswordInput) {
+
+    const finalData = {
+        oldPassword: data.oldPassword,
+        newPassword: data.newPassword,
+    }
+
+    return api.patch("/api/auth/change-password", finalData)
 }
