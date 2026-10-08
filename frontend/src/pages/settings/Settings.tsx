@@ -4,6 +4,8 @@ import Profile from "../../components/settings/Profile";
 import useAuthUser from "../../hooks/useAuthUser";
 import { useLocation } from "react-router-dom";
 import Password from "../../components/settings/Password";
+import Organization from "../../components/settings/Organization";
+import organizationStore from "../../store/organizationStore";
 
 type IScreen = "profile" | "password" | "organizations"
 
@@ -16,6 +18,7 @@ export default function Settings() {
     const [currentScreen, setCurrentScreen] = useState<IScreen>("profile")
 
     const user = useAuthUser()
+    const organization = organizationStore((state) => state.organization)
 
     useEffect(() => {
         if (location.state?.changeScreen === "organizations") {
@@ -61,8 +64,14 @@ export default function Settings() {
                 />
 
                 :
-                currentScreen === "password" &&
-                <Password />
+                currentScreen === "password" ?
+                    <Password />
+
+                    :
+                    currentScreen === "organizations" &&
+                    <Organization
+                        organization={organization!}
+                    />
             }
 
         </main>

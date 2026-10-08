@@ -8,7 +8,7 @@ interface Address {
 }
 
 export interface organizationData {
-    id: string,
+    _id: string,
     organizationName: string,
     logo: { url: string } | null,
     email: string,

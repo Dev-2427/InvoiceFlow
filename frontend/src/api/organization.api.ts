@@ -8,3 +8,11 @@ export function createOrganizationApi(data: CreateOrganizationInput) {
 export function getOrganizationDataApi(organizationId: string) {
     return api.get(`/api/organization/${organizationId}`)
 }
+
+export function updateOrganizationLogoApi(organizationId: string, formData: FormData) {
+    return api.patch(`/api/organization/${organizationId}/logo`, formData)
+}
+
+export function removeOrganizationLogoApi(organizationId: string) {
+    return api.delete(`/api/organization/${organizationId}/logo`,)
+}
