@@ -42,7 +42,7 @@ export default function Profile({ user }: ProfileProps) {
         toast.success(res.message)
     }
 
-    const { register, handleSubmit, formState: { errors, isDirty } } = useForm({
+    const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm({
         resolver: zodResolver(updateProfileSchema),
         defaultValues: {
             firstName: user.firstName,
@@ -61,6 +61,7 @@ export default function Profile({ user }: ProfileProps) {
         }
 
         toast.success(res.message)
+        reset(data)
     }
 
     return (
