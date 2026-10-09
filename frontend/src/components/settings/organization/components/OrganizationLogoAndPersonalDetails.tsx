@@ -63,6 +63,7 @@ export default function OrganizationLogoAndPersonalDetails({ organization, handl
   }
 
   const phoneCodeValue = watch("phoneCode")
+  const termsAndConditions = watch("termsAndConditions")
 
   return (
     <div className="px-5 space-y-5 max-w-2xl">
@@ -266,6 +267,22 @@ export default function OrganizationLogoAndPersonalDetails({ organization, handl
                 Currency is set at organisation creation and cannot be changed. Create a new organisation to use a different currency.
               </p>
             </div>
+
+
+            {/* terms and conditions */}
+            <div className="flex flex-col self-start items-start gap-2 w-full">
+              <p className="text-text-sm font-bold text-xs">TERMS & CONDITIONS</p>
+
+              <textarea
+                {...register("termsAndConditions")}
+                className="border-[1.5px] border-text-xs/30 rounded-lg w-full text-[14px] p-2 text-text-xs outline-none focus:ring-[1.5px] placeholder:text-text-xs transition-all duration-200"
+                placeholder="e.g. Payment is due within 15 days of invoice date."
+                maxLength={500}
+              />
+
+              <p className="text-text-xs self-end text-xs">{termsAndConditions?.length}/500 characters</p>
+            </div>
+
 
             {/* createdAt */}
             <div className="flex items-center gap-1 mb-5 self-start">
