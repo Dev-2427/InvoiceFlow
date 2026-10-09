@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import type { CreateOrganizationInput } from "../validation/organizationValidation";
+import type { CreateOrganizationInput, UpdateOrganizationInput } from "../validation/organizationValidation";
 import type { ApiResponse } from "../types/api.types";
 import type { organizationData } from "../types/organization.types";
-import { createOrganizationApi, getOrganizationDataApi, removeOrganizationLogoApi, updateOrganizationLogoApi } from "../api/organization.api";
+import { createOrganizationApi, getOrganizationDataApi, removeOrganizationLogoApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
 
 interface IOrganizationStore {
     isCreatingOrganization: boolean,
@@ -16,12 +16,15 @@ interface IOrganizationStore {
     isUpdatingLogo: boolean,
     updateOrganizationLogo: (organizationId: string, file: File) => Promise<ApiResponse<{ logoUrl: string }>>,
     removeOrganizationLogo: (organizationId: string) => Promise<ApiResponse<null>>,
+    isUpdatingOrganizationData: boolean,
+    updateOrganization: (organizationId: string, data: UpdateOrganizationInput) => Promise<ApiResponse<{ organizationData: organizationData }>>
 }
 
 const organizationStore = create<IOrganizationStore>((set) => ({
     isCreatingOrganization: false,
     isGettingOrganizationData: false,
     isUpdatingLogo: false,
+    isUpdatingOrganizationData: false,
 
     organization: null,
 
@@ -130,6 +133,28 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             }
         } finally {
             set({ isUpdatingLogo: false })
+        }
+    },
+
+    async updateOrganization(organizationId, data) {
+        set({ isUpdatingOrganizationData: true })
+        try {
+
+            const res = await updateOrganizationDataApi(organizationId, data)
+
+            if (res.data.success) {
+                set({ organization: res.data.data.organizationData })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to update organization data:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isUpdatingOrganizationData: false })
         }
     },
 

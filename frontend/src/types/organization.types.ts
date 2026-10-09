@@ -17,5 +17,5 @@ export interface organizationData {
     currency: { code: string, symbol: string },
     address: Address,
     termsAndConditions: string,
-    createdAt: Date
+    createdAt: string
 }

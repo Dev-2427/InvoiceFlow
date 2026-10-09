@@ -23,7 +23,7 @@ export default function AuthInput({ id, optional = false, label, type, placehold
             </div>
             <input {...register}
                 spellCheck={false}
-                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
+                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
                 placeholder={placeholder}
                 type={type} id={id} />
 
