@@ -2,7 +2,8 @@ import toast from "react-hot-toast"
 import organizationStore from "../../../store/organizationStore"
 import type { organizationData } from "../../../types/organization.types"
 import OrganizationLogoAndPersonalDetails from "./components/OrganizationLogoAndPersonalDetails"
-import type { UpdateOrganizationInput } from "../../../validation/organizationValidation"
+import type { OrganizationAddressInput, UpdateOrganizationInput } from "../../../validation/organizationValidation"
+import BusinessAddress from "./components/BusinessAddress"
 
 interface OrganizationProp {
     organization: organizationData
@@ -14,6 +15,7 @@ export default function Organization({ organization }: OrganizationProp) {
     const isUpdatingLogo = organizationStore((state) => state.isUpdatingLogo)
     const removeOrganizationLogo = organizationStore((state) => state.removeOrganizationLogo)
     const isUpdatingOrganizationData = organizationStore((state) => state.isUpdatingOrganizationData)
+    const isUpdatingOrganizationAddress = organizationStore((state) => state.isUpdatingOrganizationAddress)
     const updateOrganization = organizationStore((state) => state.updateOrganization)
 
     async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -55,7 +57,7 @@ export default function Organization({ organization }: OrganizationProp) {
         toast.success(res.message)
     }
 
-    async function onPersonalDetailsSubmit(data: UpdateOrganizationInput) {
+    async function handleOrganizationUpdate(data: UpdateOrganizationInput | OrganizationAddressInput) {
         const res = await updateOrganization(organization._id, data)
 
         if (!res.success) {
@@ -75,7 +77,13 @@ export default function Organization({ organization }: OrganizationProp) {
                 handleLogoChange={(e) => handleLogoChange(e)}
                 handleRemoveLogo={handleRemoveLogo}
                 isUpdatingOrganizationData={isUpdatingOrganizationData}
-                onPersonalDetailsSubmit={(data) => onPersonalDetailsSubmit(data)}
+                onPersonalDetailsSubmit={(data) => handleOrganizationUpdate(data)}
+            />
+
+            <BusinessAddress
+                address={organization.address}
+                handleAddressSubmit={(data) => handleOrganizationUpdate(data)}
+                isSavingAddress={isUpdatingOrganizationAddress}
             />
         </>
     )

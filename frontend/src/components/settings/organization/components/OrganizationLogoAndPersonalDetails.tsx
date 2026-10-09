@@ -255,7 +255,7 @@ export default function OrganizationLogoAndPersonalDetails({ organization, handl
             />
 
             {/* currency */}
-            <div className="mb-5">
+            <div className="mb-5 w-full">
               <div className="flex justify-between items-center bg-page border-[1.5px] border-border border-dashed rounded-lg px-3 py-2.5 w-full ">
                 <span className="text-text text-sm font-semibold">{organization.currency.code} — {organization.currency.symbol}</span>
                 <span className="text-gold-mid text-[12px] font-semibold">🔒 This cannot be changed</span>

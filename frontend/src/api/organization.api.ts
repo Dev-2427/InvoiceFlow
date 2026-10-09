@@ -1,4 +1,4 @@
-import type { CreateOrganizationInput, UpdateOrganizationInput } from "../validation/organizationValidation";
+import type { CreateOrganizationInput, OrganizationAddressInput, UpdateOrganizationInput } from "../validation/organizationValidation";
 import api from "./axios";
 
 export function createOrganizationApi(data: CreateOrganizationInput) {
@@ -17,11 +17,14 @@ export function removeOrganizationLogoApi(organizationId: string) {
     return api.delete(`/api/organization/${organizationId}/logo`,)
 }
 
-export function updateOrganizationDataApi(organizationId: string, data: UpdateOrganizationInput) {
+export function updateOrganizationDataApi(organizationId: string, data: UpdateOrganizationInput | OrganizationAddressInput) {
 
-    const payload = {
-        ...data, phone: data.phone ? `${data.phoneCode} ${data.phone}` : ""
-    }
+    const payload = "address" in data ?
+        data
+        :
+        {
+            ...data, phone: data.phone ? `${data.phoneCode} ${data.phone}` : ""
+        }
 
     return api.patch(`/api/organization/${organizationId}`, payload)
 }

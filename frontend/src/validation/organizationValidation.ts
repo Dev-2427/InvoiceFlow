@@ -35,5 +35,10 @@ export const updateOrganizationSchema = createOrganizationSchema.omit({
     currencyCode: true
 })
 
+export const organizationAddressSchema = z.object({
+    address: address
+})
+
 export type CreateOrganizationInput = z.infer<typeof createOrganizationSchema>
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationSchema>
+export type OrganizationAddressInput = z.infer<typeof organizationAddressSchema>

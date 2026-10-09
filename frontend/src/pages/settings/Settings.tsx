@@ -4,8 +4,8 @@ import Profile from "../../components/settings/Profile";
 import useAuthUser from "../../hooks/useAuthUser";
 import { useLocation } from "react-router-dom";
 import Password from "../../components/settings/Password";
-import Organization from "../../components/settings/organization/Organization";
 import organizationStore from "../../store/organizationStore";
+import Organization from "../../components/settings/organization/Organization";
 
 type IScreen = "profile" | "password" | "organizations"
 

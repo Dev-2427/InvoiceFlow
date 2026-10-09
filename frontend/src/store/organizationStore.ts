@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { CreateOrganizationInput, UpdateOrganizationInput } from "../validation/organizationValidation";
+import type { CreateOrganizationInput, OrganizationAddressInput, UpdateOrganizationInput } from "../validation/organizationValidation";
 import type { ApiResponse } from "../types/api.types";
 import type { organizationData } from "../types/organization.types";
 import { createOrganizationApi, getOrganizationDataApi, removeOrganizationLogoApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
@@ -17,7 +17,8 @@ interface IOrganizationStore {
     updateOrganizationLogo: (organizationId: string, file: File) => Promise<ApiResponse<{ logoUrl: string }>>,
     removeOrganizationLogo: (organizationId: string) => Promise<ApiResponse<null>>,
     isUpdatingOrganizationData: boolean,
-    updateOrganization: (organizationId: string, data: UpdateOrganizationInput) => Promise<ApiResponse<{ organizationData: organizationData }>>
+    isUpdatingOrganizationAddress: boolean,
+    updateOrganization: (organizationId: string, data: UpdateOrganizationInput | OrganizationAddressInput) => Promise<ApiResponse<{ organizationData: organizationData }>>
 }
 
 const organizationStore = create<IOrganizationStore>((set) => ({
@@ -25,6 +26,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
     isGettingOrganizationData: false,
     isUpdatingLogo: false,
     isUpdatingOrganizationData: false,
+    isUpdatingOrganizationAddress: false,
 
     organization: null,
 
@@ -137,7 +139,14 @@ const organizationStore = create<IOrganizationStore>((set) => ({
     },
 
     async updateOrganization(organizationId, data) {
-        set({ isUpdatingOrganizationData: true })
+
+        const isAddressUpdate = "address" in data
+
+        if (isAddressUpdate) {
+            set({ isUpdatingOrganizationAddress: true })
+        } else {
+            set({ isUpdatingOrganizationData: true })
+        }
         try {
 
             const res = await updateOrganizationDataApi(organizationId, data)
@@ -154,7 +163,11 @@ const organizationStore = create<IOrganizationStore>((set) => ({
                 message: "Something went wrong. please try again."
             }
         } finally {
-            set({ isUpdatingOrganizationData: false })
+            if (isAddressUpdate) {
+                set({ isUpdatingOrganizationAddress: false })
+            } else {
+                set({ isUpdatingOrganizationData: false })
+            }
         }
     },
 
