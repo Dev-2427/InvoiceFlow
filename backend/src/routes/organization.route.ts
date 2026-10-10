@@ -4,11 +4,12 @@ import { createOrganization, deleteOrganization, getOrganization, getOrganizatio
 import validate from "../middleware/validate.js";
 import { createOrganizationSchema, updateOrganizationSchema } from "../validations/organization.validation.js";
 import upload from "../middleware/upload.js";
+import loadCurrentOrganization from "../middleware/loadCurrentOrganization.js";
 
 const route = Router()
 
 route.post("/", validate(createOrganizationSchema), createOrganization)
-route.get("/", getOrganizations)
+route.get("/", loadCurrentOrganization, getOrganizations)
 route.get("/:organizationId", getOrganization)
 route.patch("/:organizationId", validate(updateOrganizationSchema), updateOrganization)
 route.patch("/:organizationId/logo", upload.single("logo"), updateLogo)
