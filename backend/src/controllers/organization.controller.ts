@@ -131,20 +131,14 @@ async function getOrganization(req: Request<OrganizationParams>, res: Response) 
 async function getOrganizations(req: Request<OrganizationParams>, res: Response) {
 
     const userId = req.user?.userId
-    const organizationId = req.organization?.organizationId
 
     if (!userId) {
         return sendResponse(res, { status: 401, message: "Unauthorized access" })
     }
 
-    if (!organizationId) {
-        return sendResponse(res, { status: 401, message: "Unauthorized access" })
-    }
-
     try {
         const organizations = await Organization.find({
-            owner: userId,
-            _id: { $ne: organizationId }
+            owner: userId
         })
             .select("organizationName logo.url currency createdAt")
             .sort({ createdAt: -1 })

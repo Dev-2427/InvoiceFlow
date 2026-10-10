@@ -9,7 +9,7 @@ import loadCurrentOrganization from "../middleware/loadCurrentOrganization.js";
 const route = Router()
 
 route.post("/", validate(createOrganizationSchema), createOrganization)
-route.get("/", loadCurrentOrganization, getOrganizations)
+route.get("/", getOrganizations)
 route.get("/:organizationId", getOrganization)
 route.patch("/:organizationId", validate(updateOrganizationSchema), updateOrganization)
 route.patch("/:organizationId/logo", upload.single("logo"), updateLogo)
