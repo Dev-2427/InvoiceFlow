@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type { CreateOrganizationInput, OrganizationAddressInput, UpdateOrganizationInput } from "../validation/organizationValidation";
 import type { ApiResponse } from "../types/api.types";
-import type { organizationData } from "../types/organization.types";
-import { createOrganizationApi, getOrganizationDataApi, removeOrganizationLogoApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
+import type { getAllOrganizationsResponseData, organizationData } from "../types/organization.types";
+import { createOrganizationApi, getAllOrganizationsApi, getOrganizationDataApi, removeOrganizationLogoApi, switchOrganizationApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
 
 interface IOrganizationStore {
     isCreatingOrganization: boolean,
@@ -19,6 +19,12 @@ interface IOrganizationStore {
     isUpdatingOrganizationData: boolean,
     isUpdatingOrganizationAddress: boolean,
     updateOrganization: (organizationId: string, data: UpdateOrganizationInput | OrganizationAddressInput) => Promise<ApiResponse<{ organizationData: organizationData }>>
+
+    isGettingAllOrganizations: boolean,
+    allOrganizations: getAllOrganizationsResponseData[] | null,
+    getAllOrganizations: () => Promise<ApiResponse<{ organizations: getAllOrganizationsResponseData[] }>>,
+    switchingOrganizationId: string | null,
+    switchOrganization: (organizationId: string) => Promise<ApiResponse<{ organizationData: organizationData }>>
 }
 
 const organizationStore = create<IOrganizationStore>((set) => ({
@@ -27,8 +33,11 @@ const organizationStore = create<IOrganizationStore>((set) => ({
     isUpdatingLogo: false,
     isUpdatingOrganizationData: false,
     isUpdatingOrganizationAddress: false,
+    isGettingAllOrganizations: false,
+    switchingOrganizationId: null,
 
     organization: null,
+    allOrganizations: null,
 
     async createOrganization(data) {
         set({ isCreatingOrganization: true })
@@ -170,6 +179,50 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             }
         }
     },
+
+    async getAllOrganizations() {
+        set({ isGettingAllOrganizations: true })
+
+        try {
+            const res = await getAllOrganizationsApi()
+
+            if (res.data.success) {
+                set({ allOrganizations: res.data.data.organizations })
+            }
+            console.log(res.data.data.organizations);
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to get all organization:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isGettingAllOrganizations: false })
+        }
+    },
+
+    async switchOrganization(organizationId) {
+        set({ switchingOrganizationId: organizationId })
+        try {
+            const res = await switchOrganizationApi(organizationId)
+
+            if (res.data.success) {
+                set({ organization: res.data.data.organizationData, allOrganizations: null })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to switch organization:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ switchingOrganizationId: null })
+        }
+    }
 
 }))
 

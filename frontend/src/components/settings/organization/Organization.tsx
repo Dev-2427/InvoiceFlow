@@ -4,6 +4,8 @@ import type { organizationData } from "../../../types/organization.types"
 import OrganizationLogoAndPersonalDetails from "./components/OrganizationLogoAndPersonalDetails"
 import type { OrganizationAddressInput, UpdateOrganizationInput } from "../../../validation/organizationValidation"
 import BusinessAddress from "./components/BusinessAddress"
+import SwitchOrganization from "./components/SwitchOrganization"
+import { useNavigate } from "react-router-dom"
 
 interface OrganizationProp {
     organization: organizationData
@@ -17,6 +19,13 @@ export default function Organization({ organization }: OrganizationProp) {
     const isUpdatingOrganizationData = organizationStore((state) => state.isUpdatingOrganizationData)
     const isUpdatingOrganizationAddress = organizationStore((state) => state.isUpdatingOrganizationAddress)
     const updateOrganization = organizationStore((state) => state.updateOrganization)
+    const isGettingAllOrganizations = organizationStore((state) => state.isGettingAllOrganizations)
+    const getAllOrganizations = organizationStore((state) => state.getAllOrganizations)
+    const allOrganizations = organizationStore((state) => state.allOrganizations)
+    const switchOrganization = organizationStore((state) => state.switchOrganization)
+    const switchingOrganizationId = organizationStore((state) => state.switchingOrganizationId)
+
+    const navigate = useNavigate()
 
     async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
@@ -69,6 +78,26 @@ export default function Organization({ organization }: OrganizationProp) {
         return true
     }
 
+    async function fetchAllOrganizations() {
+        const res = await getAllOrganizations()
+
+        if (!res.success) {
+            toast.error(res.message)
+        }
+    }
+
+    async function handleSwitchOrganization(organisationId: string) {
+        const res = await switchOrganization(organisationId)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+
+        toast.success(res.message)
+        navigate("/dashboard", { replace: true })
+    }
+
     return (
         <>
             <OrganizationLogoAndPersonalDetails
@@ -84,6 +113,15 @@ export default function Organization({ organization }: OrganizationProp) {
                 address={organization.address}
                 handleAddressSubmit={(data) => handleOrganizationUpdate(data)}
                 isSavingAddress={isUpdatingOrganizationAddress}
+            />
+
+            <SwitchOrganization
+                getAllOrganizations={fetchAllOrganizations}
+                isGettingAllOrganizations={isGettingAllOrganizations}
+                allOrganizations={allOrganizations}
+                currentOrganization={organization}
+                switchOrganization={(organizationId) => handleSwitchOrganization(organizationId)}
+                switchingOrganizationId={switchingOrganizationId}
             />
         </>
     )

@@ -19,3 +19,16 @@ export interface organizationData {
     termsAndConditions: string,
     createdAt: string
 }
+
+export interface getAllOrganizationsResponseData {
+    _id: string,
+    organizationName: string,
+    logo: {
+        url: string | null
+    },
+    currency: {
+        code: string,
+        symbol: string
+    }
+    createdAt: string
+}

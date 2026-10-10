@@ -28,3 +28,11 @@ export function updateOrganizationDataApi(organizationId: string, data: UpdateOr
 
     return api.patch(`/api/organization/${organizationId}`, payload)
 }
+
+export function getAllOrganizationsApi() {
+    return api.get("/api/organization",)
+}
+
+export function switchOrganizationApi(organizationId: string) {
+    return api.patch(`/api/organization/switch/${organizationId}`)
+}
