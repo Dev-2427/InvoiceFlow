@@ -137,6 +137,7 @@ export default function SwitchOrganization({ getAllOrganizations, isGettingAllOr
 
                 <hr className="border border-border/70" />
 
+                {/* create new organisation */}
                 <div className="space-y-2">
                     <button
                         onClick={() => navigate("/create-organization")}

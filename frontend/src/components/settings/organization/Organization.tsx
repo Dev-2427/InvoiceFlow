@@ -6,6 +6,7 @@ import type { OrganizationAddressInput, UpdateOrganizationInput } from "../../..
 import BusinessAddress from "./components/BusinessAddress"
 import SwitchOrganization from "./components/SwitchOrganization"
 import { useNavigate } from "react-router-dom"
+import DeleteOrganization from "./components/DeleteOrganization"
 
 interface OrganizationProp {
     organization: organizationData
@@ -24,6 +25,9 @@ export default function Organization({ organization }: OrganizationProp) {
     const allOrganizations = organizationStore((state) => state.allOrganizations)
     const switchOrganization = organizationStore((state) => state.switchOrganization)
     const switchingOrganizationId = organizationStore((state) => state.switchingOrganizationId)
+    const removeOrganization = organizationStore((state) => state.removeOrganization)
+    const isDeletingOrganization = organizationStore((state) => state.isDeletingOrganization)
+    const deleteOrganization = organizationStore((state) => state.deleteOrganization)
 
     const navigate = useNavigate()
 
@@ -98,6 +102,23 @@ export default function Organization({ organization }: OrganizationProp) {
         navigate("/dashboard", { replace: true })
     }
 
+    async function handleOrganizationDeletion(organisationId: string) {
+        const res = await deleteOrganization(organisationId)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return false
+        }
+
+        if (!res.data.organization) {
+            removeOrganization()
+            navigate("/create-organization", { replace: true })
+        }
+
+        toast.success(res.message)
+        return true
+    }
+
     return (
         <>
             <OrganizationLogoAndPersonalDetails
@@ -122,6 +143,12 @@ export default function Organization({ organization }: OrganizationProp) {
                 currentOrganization={organization}
                 switchOrganization={(organizationId) => handleSwitchOrganization(organizationId)}
                 switchingOrganizationId={switchingOrganizationId}
+            />
+
+            <DeleteOrganization
+                organizationName={organization.organizationName}
+                isDeletingOrganization={isDeletingOrganization}
+                deleteOrganization={() => handleOrganizationDeletion(organization._id)}
             />
         </>
     )

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { CreateOrganizationInput, OrganizationAddressInput, UpdateOrganizationInput } from "../validation/organizationValidation";
 import type { ApiResponse } from "../types/api.types";
 import type { getAllOrganizationsResponseData, organizationData } from "../types/organization.types";
-import { createOrganizationApi, getAllOrganizationsApi, getOrganizationDataApi, removeOrganizationLogoApi, switchOrganizationApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
+import { createOrganizationApi, deleteOrganizationApi, getAllOrganizationsApi, getOrganizationDataApi, removeOrganizationLogoApi, switchOrganizationApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
 
 interface IOrganizationStore {
     isCreatingOrganization: boolean,
@@ -25,6 +25,10 @@ interface IOrganizationStore {
     getAllOrganizations: () => Promise<ApiResponse<{ organizations: getAllOrganizationsResponseData[] }>>,
     switchingOrganizationId: string | null,
     switchOrganization: (organizationId: string) => Promise<ApiResponse<{ organizationData: organizationData }>>
+
+    removeOrganization: () => void,
+    isDeletingOrganization: boolean,
+    deleteOrganization: (organizationId: string) => Promise<ApiResponse<{ organization: organizationData }>>
 }
 
 const organizationStore = create<IOrganizationStore>((set) => ({
@@ -35,6 +39,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
     isUpdatingOrganizationAddress: false,
     isGettingAllOrganizations: false,
     switchingOrganizationId: null,
+    isDeletingOrganization: false,
 
     organization: null,
     allOrganizations: null,
@@ -222,7 +227,32 @@ const organizationStore = create<IOrganizationStore>((set) => ({
         } finally {
             set({ switchingOrganizationId: null })
         }
-    }
+    },
+
+    removeOrganization() {
+        set({ organization: null })
+    },
+
+    async deleteOrganization(organizationId) {
+        set({ isDeletingOrganization: true })
+        try {
+            const res = await deleteOrganizationApi(organizationId)
+
+            if (res.data.success) {
+                set({ organization: res.data.data.organization })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to delete organization:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isDeletingOrganization: false })
+        }
+    },
 
 }))
 

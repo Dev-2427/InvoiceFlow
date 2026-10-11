@@ -118,7 +118,7 @@ export default function AppLayout() {
                         className="flex relative justify-between items-center bg-navy-700 border border-border/10 p-3 rounded-lg cursor-pointer">
 
 
-                        <div className="flex gap-2 items-center">
+                        <div className="flex min-w-0 gap-2 items-center">
                             {organization.logo?.url ?
                                 (
                                     <img className="rounded-lg h-8 w-8 object-cover shrink-0" src={organization.logo?.url} />
