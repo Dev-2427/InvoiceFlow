@@ -4,7 +4,6 @@ import { createOrganization, deleteOrganization, getOrganization, getOrganizatio
 import validate from "../middleware/validate.js";
 import { createOrganizationSchema, updateOrganizationSchema } from "../validations/organization.validation.js";
 import upload from "../middleware/upload.js";
-import loadCurrentOrganization from "../middleware/loadCurrentOrganization.js";
 
 const route = Router()
 

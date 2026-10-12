@@ -1,7 +1,7 @@
 import { Router } from "express";
 import validate from "../middleware/validate.js";
 import { changePasswordSchema, forgotPasswordSchema, googleAuthSchema, passwordSchema, signinSchema, signupSchema, verifyCodeSchema } from "../validations/auth.validation.js";
-import { activeSessions, changePassword, forgotPassword, googleAuth, me, refreshToken, resetPassword, signin, signout, signoutAllDevices, signoutSession, signup, verifyCode, verifyResetCode } from "../controllers/auth.controller.js";
+import { activeSessions, changePassword, deleteUserAccount, forgotPassword, googleAuth, me, refreshToken, resetPassword, signin, signout, signoutAllDevices, signoutSession, signup, verifyCode, verifyResetCode } from "../controllers/auth.controller.js";
 import authCheck from "../middleware/authCheck.js";
 
 const route = Router()
@@ -23,6 +23,7 @@ route.post("/reset-password", validate(passwordSchema), resetPassword)
 
 route.patch("/change-password", validate(changePasswordSchema), authCheck, changePassword)
 
+route.delete("/account", authCheck, deleteUserAccount)
 route.get("/me", authCheck, me)
 
 export default route

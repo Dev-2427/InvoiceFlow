@@ -12,6 +12,11 @@ import forgotPasswordVerificationTemplate from "../services/email/templates/forg
 import { googleClient } from "../config/google.js"
 import { getDeviceDetails } from "../utils/getDeviceDetails.js"
 import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE } from "../config/constants.js"
+import mongoose from "mongoose"
+import Organization from "../models/Organization.js"
+import Client from "../models/Client.js"
+import Invoice from "../models/Invoice.js"
+import imagekit from "../services/imagekit.js"
 
 async function signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, country } = req.body
@@ -699,5 +704,86 @@ async function activeSessions(req: Request, res: Response) {
     }
 }
 
+async function deleteUserAccount(req: Request, res: Response) {
 
-export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth, me, signoutSession, activeSessions }
+    const userId = req.user?.userId
+
+    if (!userId) {
+        return sendResponse(res, { status: 401, message: "Unauthorized access" })
+    }
+
+    const session = await mongoose.startSession()
+
+    try {
+        const user = await User.findById(userId)
+
+        if (!user) {
+            return sendResponse(res, { status: 404, message: "User not found" })
+        }
+
+        const organizations = await Organization.find(
+            { owner: userId }
+        )
+            .select("_id logo.fileId")
+            .lean()
+            .session(session)
+
+        const organizationIds = organizations.map((organization) => organization._id)
+
+        session.startTransaction()
+
+
+        await Client.deleteMany({
+            organization: { $in: organizationIds }
+        }).session(session)
+
+        await Invoice.deleteMany({
+            organization: { $in: organizationIds }
+        }).session(session)
+
+        await Organization.deleteMany({
+            owner: userId
+        }).session(session)
+
+        await RefreshToken.deleteMany({
+            user: userId
+        }).session(session)
+
+        await user.deleteOne().session(session)
+
+        await session.commitTransaction()
+
+        if (user.avatar.fileId) {
+            try {
+                await imagekit.deleteFile(user.avatar.fileId)
+            } catch (error) {
+                console.error("failed to delete user avatar:", error)
+            }
+        }
+        await Promise.all(
+            organizations.map(async (organization) => {
+                try {
+                    organization.logo.fileId && (
+                        await imagekit.deleteFile(organization.logo.fileId)
+                    )
+                } catch (error) {
+                    console.error("Failed to delete organization logo:", error)
+                }
+            })
+        )
+
+        return sendResponse(res, { status: 200, message: "User account deleted successfully" })
+    } catch (error) {
+        if (session.inTransaction()) {
+            await session.abortTransaction()
+        }
+
+        console.error("Failed to delete user account:", error)
+        return sendResponse(res, { status: 500, message: "Failed to delete user account" })
+    } finally {
+        await session.endSession()
+    }
+}
+
+
+export { signup, verifyCode, signin, refreshToken, signout, signoutAllDevices, forgotPassword, verifyResetCode, resetPassword, changePassword, googleAuth, me, signoutSession, activeSessions, deleteUserAccount }
