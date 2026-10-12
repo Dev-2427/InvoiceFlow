@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { ApiResponse } from "../types/api.types";
-import { updateAvatarApi, updateProfileApi } from "../api/user.api";
+import { removeAvatarApi, updateAvatarApi, updateProfileApi } from "../api/user.api";
 import authStore from "./authStore";
 import type { UpdateProfileSchemaInput } from "../validation/user.validation";
 
@@ -9,12 +9,16 @@ interface IUserStore {
     updateAvatar: (file: File) => Promise<ApiResponse<{ avatar: string }>>,
 
     isUpdatingProfile: boolean,
-    updateProfile: (data: UpdateProfileSchemaInput) => Promise<ApiResponse<null>>
+    updateProfile: (data: UpdateProfileSchemaInput) => Promise<ApiResponse<null>>,
+
+    isRemovingAvatar: boolean,
+    removeAvatar: () => Promise<ApiResponse<null>>
 }
 
 const userStore = create<IUserStore>((set) => ({
     isUpdatingAvatar: false,
     isUpdatingProfile: false,
+    isRemovingAvatar: false,
 
     async updateAvatar(file) {
         set({ isUpdatingAvatar: true })
@@ -62,8 +66,30 @@ const userStore = create<IUserStore>((set) => ({
                 success: false,
                 message: "Something went wrong, please try again."
             }
-        }finally{
-            set({isUpdatingProfile: false})
+        } finally {
+            set({ isUpdatingProfile: false })
+        }
+    },
+
+    async removeAvatar() {
+        set({ isRemovingAvatar: true })
+
+        try {
+            const res = await removeAvatarApi()
+
+            if (res.data.success) {
+                authStore.getState().changeUserAvatar(null)
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("failed to update profile:", error)
+            return {
+                success: false,
+                message: "Something went wrong, please try again."
+            }
+        } finally {
+            set({ isRemovingAvatar: false })
         }
     },
 

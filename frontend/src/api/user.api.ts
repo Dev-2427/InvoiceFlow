@@ -8,3 +8,7 @@ export function updateAvatarApi(formData: FormData) {
 export function updateProfileApi(data: UpdateProfileSchemaInput) {
     return api.patch("/api/profile", data)
 }
+
+export function removeAvatarApi() {
+    return api.delete("/api/profile/remove_avatar")
+}

@@ -16,6 +16,8 @@ export default function Profile({ user }: ProfileProps) {
     const isUpdatingAvatar = userStore((state) => state.isUpdatingAvatar)
     const isUpdatingProfile = userStore((state) => state.isUpdatingProfile)
     const updateProfile = userStore((state) => state.updateProfile)
+    const isRemovingAvatar = userStore((state) => state.isRemovingAvatar)
+    const removeAvatar = userStore((state) => state.removeAvatar)
 
     async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
@@ -33,6 +35,17 @@ export default function Profile({ user }: ProfileProps) {
         }
 
         const res = await updateAvatar(file)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+
+        toast.success(res.message)
+    }
+
+    async function handleRemoveAvatar() {
+        const res = await removeAvatar()
 
         if (!res.success) {
             toast.error(res.message)
@@ -97,22 +110,38 @@ export default function Profile({ user }: ProfileProps) {
 
                         <span className="text-[13px] text-text-sm break-all">{user.email}</span>
 
-                        <label
-                            htmlFor={isUpdatingAvatar ? undefined : "avatar"}
-                            className={`border-[1.5px] border-border rounded-lg px-3 w-fit text-[13px] font-semibold text-text-md py-1.5 hover:bg-navy-50 my-1.5 ${isUpdatingAvatar ? "opacity-50 pointer-events-none" : "cursor-pointer"}`}
-                        >
-                            {isUpdatingAvatar ? "Uploading..." : "Upload Avatar"}
-                        </label>
+                        <div className="flex items-start gap-2">
 
-                        <input
-                            id="avatar"
-                            type="file"
-                            accept="image/jpeg,image/png"
-                            onChange={(e) => handleAvatarChange(e)}
-                            className="hidden"
-                        />
+                            <div className="flex flex-col items-start">
+                                <label
+                                    htmlFor={isUpdatingAvatar ? undefined : isRemovingAvatar ? undefined : "avatar"}
+                                    className={`border-[1.5px] border-border rounded-lg px-3 w-fit text-[13px] font-semibold text-text-md py-1.5 hover:bg-navy-50 my-1.5 ${isUpdatingAvatar || isRemovingAvatar ? "opacity-50 pointer-events-none" : "cursor-pointer"}`}
+                                >
+                                    {isUpdatingAvatar ? "Uploading..." : "Upload Avatar"}
+                                </label>
 
-                        <span className="text-text-xs text-[10px] font-semibold">JPG or PNG · MAX 5MB</span>
+                                <input
+                                    id="avatar"
+                                    type="file"
+                                    accept="image/jpeg,image/png"
+                                    onChange={(e) => handleAvatarChange(e)}
+                                    className="hidden"
+                                />
+
+                                <span className="text-text-xs text-[10px] font-semibold">JPG or PNG · MAX 5MB</span>
+                            </div>
+
+                            {user.avatar &&
+                                <button
+                                    onClick={handleRemoveAvatar}
+                                    type="button"
+                                    disabled={isRemovingAvatar || isUpdatingAvatar}
+                                    className="bg-overdue-bg text-overdue hover:bg-overdue-bg/90 rounded-lg py-1.5 px-3 text-[13px] font-semibold cursor-pointer border-[1.5px] disabled:opacity-50 disabled:pointer-events-none my-1.5">
+                                    {isRemovingAvatar ? "Removing..." : "Remove"}
+                                </button>
+                            }
+
+                        </div>
 
                     </div>
 

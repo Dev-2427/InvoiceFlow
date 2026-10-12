@@ -15,7 +15,7 @@ interface IAuthStore {
     isCheckingAuth: boolean,
     isAuthenticated: boolean,
 
-    changeUserAvatar: (avatar: string) => void,
+    changeUserAvatar: (avatar: string | null) => void,
     changeUserProfile: (firstName: string, lastName: string, country: string,) => void,
 
     signup: (data: SignupInput) => Promise<ApiResponse<{ userId: string }>>,
