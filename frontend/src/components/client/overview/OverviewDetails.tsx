@@ -58,7 +58,7 @@ export default function OverviewDetails() {
                 </div>
 
                 <div>
-                    <span className="font-bold text-lg text-text">{clientOverviewData.salutation} {clientOverviewData.firstName} {clientOverviewData.lastName}</span>
+                    <span className="font-bold text-lg text-text capitalize">{clientOverviewData.salutation} {clientOverviewData.firstName} {clientOverviewData.lastName}</span>
 
                     <div className="flex items-center gap-2 text-[13px]">
                         <span className={`text-text-sm ${!clientOverviewData.companyName && "invisible"}}`}>{clientOverviewData.companyName || "Invisible"}</span>

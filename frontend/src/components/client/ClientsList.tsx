@@ -66,7 +66,7 @@ export default function ClientsList() {
                                 </div>
 
                                 <div className="min-w-0">
-                                    <p className="truncate font-bold text-text">{client.displayName}</p>
+                                    <p className="truncate font-bold text-text capitalize">{client.displayName}</p>
                                     <p className={`truncate text-text-sm text-[13px] ${!client.companyName && "invisible"}`}>{client.companyName || "invisible"}</p>
                                 </div>
 

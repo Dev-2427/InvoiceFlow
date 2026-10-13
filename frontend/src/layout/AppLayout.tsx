@@ -51,7 +51,7 @@ export default function AppLayout() {
 
     const [showOrgContextMenu, setShowOrgContextMenu] = useState(false)
 
-    const orgContextRef = useRef<HTMLButtonElement>(null)
+    const orgContextRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
 
@@ -111,34 +111,39 @@ export default function AppLayout() {
                 {!organization ?
                     <OrganizationSkeleton />
                     :
-                    <button
+                    <div
                         ref={orgContextRef}
-                        type="button"
-                        onClick={() => setShowOrgContextMenu(prev => !prev)}
-                        className="flex relative justify-between items-center bg-navy-700 border border-border/10 p-3 rounded-lg cursor-pointer">
+                        className="relative"
+                    >
+                        <button
+                            type="button"
+                            onClick={() => setShowOrgContextMenu(prev => !prev)}
+                            className="flex justify-between items-center bg-navy-700 border border-border/10 p-3 rounded-lg cursor-pointer w-full">
 
 
-                        <div className="flex min-w-0 gap-2 items-center">
-                            {organization.logo?.url ?
-                                (
-                                    <img className="rounded-lg h-8 w-8 object-cover shrink-0" src={organization.logo?.url} />
-                                )
-                                :
-                                (
-                                    <div className="flex justify-center items-center rounded-lg w-8 h-8 bg-gold text-gold-dark font-bold text-lg shrink-0">
-                                        {organization.organizationName.charAt(0).toUpperCase()}
-                                    </div>
-                                )
-                            }
+                            <div className="flex min-w-0 gap-2 items-center">
+                                {organization.logo?.url ?
+                                    (
+                                        <img className="rounded-lg h-8 w-8 object-cover shrink-0" src={organization.logo?.url} />
+                                    )
+                                    :
+                                    (
+                                        <div className="flex justify-center items-center rounded-lg w-8 h-8 bg-gold text-gold-dark font-bold text-lg shrink-0">
+                                            {organization.organizationName.charAt(0).toUpperCase()}
+                                        </div>
+                                    )
+                                }
 
-                            <div className={`min-w-0 text-start ${isSidebarCollapsed && "lg:hidden"}`}>
-                                <p className="truncate text-card text-sm font-bold">{organization.organizationName}</p>
-                                <p className="truncate text-text-xs text-xs">{organization.currency.code}</p>
+                                <div className={`min-w-0 text-start ${isSidebarCollapsed && "lg:hidden"}`}>
+                                    <p className="truncate text-card text-sm font-bold capitalize">{organization.organizationName}</p>
+                                    <p className="truncate text-text-xs text-xs">{organization.currency.code}</p>
+                                </div>
+
                             </div>
 
-                        </div>
+                            <RiArrowDownSFill className={`shrink-0 ${showOrgContextMenu && "rotate-180"} text-text-xs transition-transform duration-200 ${isSidebarCollapsed && "lg:hidden"}`} size={25} />
 
-                        <RiArrowDownSFill className={`shrink-0 ${showOrgContextMenu && "rotate-180"} text-text-xs transition-transform duration-200 ${isSidebarCollapsed && "lg:hidden"}`} size={25} />
+                        </button>
 
                         {/* organization context menu  */}
                         {showOrgContextMenu &&
@@ -168,7 +173,7 @@ export default function AppLayout() {
                                 </Link>
                             </div>
                         }
-                    </button>
+                    </div>
                 }
 
 
@@ -212,7 +217,7 @@ export default function AppLayout() {
                     }
 
                     <div className={`min-w-0 ${isSidebarCollapsed && "lg:hidden"}`}>
-                        <p className="truncate text-card text-sm font-bold">{user.firstName} {user.lastName}</p>
+                        <p className="truncate text-card text-sm font-bold capitalize">{user.firstName} {user.lastName}</p>
                         <p className="truncate text-text-xs text-xs">{user.email}</p>
                     </div>
                 </div>

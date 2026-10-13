@@ -144,7 +144,7 @@ export default function SoftDeletedInvoicesList() {
                                     </div>
 
                                     <div className="min-w-0">
-                                        <p className="truncate font-bold text-text">{invoice.client.displayName}</p>
+                                        <p className="truncate font-bold text-text capitalize">{invoice.client.displayName}</p>
                                         <p className={`truncate text-text-sm text-[13px] ${!invoice.client.companyName && "invisible"}`}>{invoice.client.companyName || "invisible"}</p>
                                     </div>
 

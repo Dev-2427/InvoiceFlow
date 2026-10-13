@@ -123,7 +123,7 @@ export default function InvoicePdf({ invoiceRef }: InvoicePdfProps) {
                                         fill="currentColor"
                                         fontSize="20"
                                         fontWeight="800"
-                                        className="text-text"
+                                        className="text-text capitalize"
                                     >
                                         {organization?.organizationName}
                                     </text>
@@ -226,7 +226,7 @@ export default function InvoicePdf({ invoiceRef }: InvoicePdfProps) {
                         BILL TO
                     </p>
 
-                    <p className="text-text font-bold text-lg mt-1">
+                    <p className="text-text font-bold text-lg mt-1 capitalize">
                         {client.displayName}
                     </p>
 

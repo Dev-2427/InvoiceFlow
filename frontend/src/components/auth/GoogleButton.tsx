@@ -38,7 +38,7 @@ export default function GoogleButton({ text }: { text: string }) {
 
     return (
         <>
-            <div onClick={() => login()} className='flex justify-center items-center gap-3 my-5 border-text-sm border w-full rounded-xl py-2 cursor-pointer select-none'>
+            <div onClick={() => login()} className='flex justify-center items-center gap-3 my-5 border-border border-[1.5px] w-full rounded-xl py-2 cursor-pointer select-none'>
                 <FcGoogle size={20} />
                 <span className='text-text font-semibold text-[14px]'>{text} with Google</span>
             </div>

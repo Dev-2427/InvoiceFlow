@@ -179,7 +179,7 @@ export default function CreateClient() {
                                 <button
                                     type="button"
                                     onClick={() => setIsSalutationMenuVisible(prev => !prev)}
-                                    className="flex justify-center items-center gap-2 border-text-sm border rounded-lg py-2.5 px-3 text-text-sm text-[13px] w-18 cursor-pointer"
+                                    className="flex justify-center items-center gap-2 border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm text-[13px] w-18 cursor-pointer"
                                 >
                                     <span>{currentSalutation}</span>
                                     <TbChevronDown className={`${isSalutationMenuVisible && "rotate-180"}`} />
@@ -217,7 +217,7 @@ export default function CreateClient() {
                                 <input
                                     {...register("firstName")}
                                     spellCheck={false}
-                                    className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                    className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                     placeholder={"First name"} id="firstName" />
 
                                 <p className="min-h-5 text-xs text-overdue">
@@ -234,7 +234,7 @@ export default function CreateClient() {
                             <input
                                 {...register("lastName")}
                                 spellCheck={false}
-                                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
+                                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
                                 placeholder="Last name" id="lastName" />
 
                             <p className="min-h-5 text-xs text-overdue">
@@ -253,7 +253,7 @@ export default function CreateClient() {
                             <input
                                 {...register("companyName")}
                                 spellCheck={false}
-                                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                 placeholder={"Company name"} id="companyName" />
 
                             <p className="min-h-5 text-xs text-overdue">
@@ -268,7 +268,7 @@ export default function CreateClient() {
                             <input
                                 {...register("displayName")}
                                 spellCheck={false}
-                                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                 placeholder={"Display name"} id="displayName" />
 
                             <p className="min-h-5 text-xs text-overdue">
@@ -300,7 +300,7 @@ export default function CreateClient() {
                                     <button
                                         type="button"
                                         onClick={() => setIsDropdownOpen(prev => !prev)}
-                                        className="flex justify-center items-center gap-2 border-text-sm border rounded-lg py-2.5 px-3 text-text-sm text-[13px] w-18 cursor-pointer"
+                                        className="flex justify-center items-center gap-2 border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm text-[13px] w-18 cursor-pointer"
                                     >
                                         <span>{currentPhoneCode}</span>
                                         <TbChevronDown
@@ -347,7 +347,7 @@ export default function CreateClient() {
                                     <input
                                         {...register("phone")}
                                         spellCheck={false}
-                                        className="w-full border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200"
+                                        className="w-full border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200"
                                         placeholder="Phone number"
                                         id="phoneNumber"
                                     />
@@ -373,7 +373,7 @@ export default function CreateClient() {
                             <input
                                 {...register("email")}
                                 spellCheck={false}
-                                className="w-full border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200"
+                                className="w-full border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200"
                                 placeholder="Email"
                                 id="email"
                             />
@@ -417,7 +417,7 @@ export default function CreateClient() {
                             <input
                                 {...register("billingAddress.country")}
                                 spellCheck={false}
-                                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                 placeholder={"Country"} id="country" />
 
                             <p className="min-h-5 text-xs text-overdue">
@@ -431,7 +431,7 @@ export default function CreateClient() {
                             <input
                                 {...register("billingAddress.state")}
                                 spellCheck={false}
-                                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                 placeholder={"State"} id="state" />
 
                             <p className="min-h-5 text-xs text-overdue">
@@ -448,7 +448,7 @@ export default function CreateClient() {
                         <input
                             {...register("billingAddress.street1")}
                             spellCheck={false}
-                            className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                            className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                             placeholder={"Street line 1"} id="streetLine1" />
 
                         <p className="min-h-5 text-xs text-overdue">
@@ -462,7 +462,7 @@ export default function CreateClient() {
                         <input
                             {...register("billingAddress.street2")}
                             spellCheck={false}
-                            className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                            className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                             placeholder={"Street line 2"} id="streetLine2" />
 
                         <p className="min-h-5 text-xs text-overdue">
@@ -478,7 +478,7 @@ export default function CreateClient() {
                             <input
                                 {...register("billingAddress.city")}
                                 spellCheck={false}
-                                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                 placeholder={"City"} id="city" />
 
                             <p className="min-h-5 text-xs text-overdue">
@@ -492,7 +492,7 @@ export default function CreateClient() {
                             <input
                                 {...register("billingAddress.pincode")}
                                 spellCheck={false}
-                                className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                 placeholder={"Pincode"} id="pincode" />
 
                             <p className="min-h-5 text-xs text-overdue">
@@ -534,7 +534,7 @@ export default function CreateClient() {
                                     <input
                                         {...register("shippingAddress.country")}
                                         spellCheck={false}
-                                        className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                        className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                         placeholder={"Country"} id="countryForShip" />
 
                                     <p className="min-h-5 text-xs text-overdue">
@@ -548,7 +548,7 @@ export default function CreateClient() {
                                     <input
                                         {...register("shippingAddress.state")}
                                         spellCheck={false}
-                                        className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                        className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                         placeholder={"State"} id="stateForShip" />
 
                                     <p className="min-h-5 text-xs text-overdue">
@@ -565,7 +565,7 @@ export default function CreateClient() {
                                 <input
                                     {...register("shippingAddress.street1")}
                                     spellCheck={false}
-                                    className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                    className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                     placeholder={"Street line 1"} id="streetLine1ForShip" />
 
                                 <p className="min-h-5 text-xs text-overdue">
@@ -579,7 +579,7 @@ export default function CreateClient() {
                                 <input
                                     {...register("shippingAddress.street2")}
                                     spellCheck={false}
-                                    className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                    className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                     placeholder={"Street line 2"} id="streetLine2ForShip" />
 
                                 <p className="min-h-5 text-xs text-overdue">
@@ -595,7 +595,7 @@ export default function CreateClient() {
                                     <input
                                         {...register("shippingAddress.city")}
                                         spellCheck={false}
-                                        className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                        className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                         placeholder={"City"} id="cityForShip" />
 
                                     <p className="min-h-5 text-xs text-overdue">
@@ -609,7 +609,7 @@ export default function CreateClient() {
                                     <input
                                         {...register("shippingAddress.pincode")}
                                         spellCheck={false}
-                                        className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                        className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                         placeholder={"Pincode"} id="pincodeForShip" />
 
                                     <p className="min-h-5 text-xs text-overdue">

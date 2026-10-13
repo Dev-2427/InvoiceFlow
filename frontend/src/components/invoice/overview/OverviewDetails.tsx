@@ -35,11 +35,11 @@ export default function OverviewDetails() {
                   />
                   :
                   <div className="flex justify-center items-center w-8 h-8 rounded-lg bg-gold text-gold-dark font-bold">
-                    {organization?.organizationName.charAt(0)}
+                    {organization?.organizationName.charAt(0).toUpperCase()}
                   </div>
                 }
 
-                <p className="text-text font-extrabold text-lg">{organization?.organizationName}</p>
+                <p className="text-text font-extrabold text-lg capitalize">{organization?.organizationName}</p>
 
               </div>
             </>
@@ -87,7 +87,7 @@ export default function OverviewDetails() {
       {/* bill to */}
       <div className="space-y-0.5 bg-page rounded-lg px-5 py-3">
         <p className="text-text-sm text-xs  font-semibold">BILL TO</p>
-        <p className="text-text font-bold text-[16px]">{invoiceOverviewData.client.displayName}</p>
+        <p className="text-text font-bold text-[16px] capitalize">{invoiceOverviewData.client.displayName}</p>
         <p className="text-text-sm text-[13px]">{invoiceOverviewData.client.companyName}</p>
       </div>
 

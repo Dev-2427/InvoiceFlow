@@ -60,7 +60,7 @@ export default function Signin() {
                     </div>
 
                     <input {...register("password")}
-                        className='border-text-sm border rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
+                        className='border-border border-[1.5px] rounded-lg py-2 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-sm text-[13px]'
                         placeholder='Password'
                         type="password" id="password" />
 
