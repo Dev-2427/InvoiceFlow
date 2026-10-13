@@ -38,7 +38,7 @@ export default function UserContextMenu({ firstName, lastName, email }: IUserCon
                 </div>
 
                 <div className="flex flex-col items-start text-sm">
-                    <span className="font-bold text-text">{firstName} {lastName}</span>
+                    <span className="font-bold text-text capitalize">{firstName} {lastName}</span>
                     <span className="text-text-sm">{email}</span>
                 </div>
             </div>

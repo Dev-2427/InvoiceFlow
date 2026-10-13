@@ -133,7 +133,7 @@ export default function CreateOrganization() {
                             <span>{user.firstName.charAt(0).toUpperCase()}</span>
                         </div>
 
-                        <div className="flex items-center text-card font-semibold gap-1 text-sm">
+                        <div className="flex items-center text-card font-semibold gap-1 text-sm capitalize">
                             <span>{user.firstName}</span>
                             <span>{user.lastName}</span>
                         </div>
