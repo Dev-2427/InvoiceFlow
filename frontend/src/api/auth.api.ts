@@ -46,3 +46,7 @@ export function changePasswordApi(data: ChangePasswordInput) {
 
     return api.patch("/api/auth/change-password", finalData)
 }
+
+export function deleteUserAccountApi() {
+    return api.delete("/api/auth/account")
+}

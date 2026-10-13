@@ -54,7 +54,9 @@ export default function DeleteOrganization({ organizationName, isDeletingOrganiz
                     deletionAllowedText={organizationName}
                     onCancel={() => setOpenDeleteContextMenu(false)}
                     onDelete={handleDeleteOrganization}
-                    isDeletingOrganization={isDeletingOrganization}
+                    isDeleting={isDeletingOrganization}
+                    inputPlaceholder="Type organization name"
+                    deleteButtonText="Delete Organization"
                 />
             }
         </>

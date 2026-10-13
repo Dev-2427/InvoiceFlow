@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput, ChangePasswordInput } from "../validation/authValidation"
-import { changePasswordApi, checkAuthApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { User } from "../types/auth.types"
 
@@ -32,7 +32,10 @@ interface IAuthStore {
     user: User | null,
 
     isChangingPassword: boolean,
-    changePassword: (data: ChangePasswordInput) => Promise<ApiResponse<null>>
+    changePassword: (data: ChangePasswordInput) => Promise<ApiResponse<null>>,
+
+    isDeletingUserAccount: boolean,
+    deleteUserAccount: () => Promise<ApiResponse<null>>
 }
 
 const authStore = create<IAuthStore>((set, get) => ({
@@ -46,6 +49,7 @@ const authStore = create<IAuthStore>((set, get) => ({
     isAuthenticated: false,
     isCheckingAuth: true,
     isChangingPassword: false,
+    isDeletingUserAccount: false,
 
     user: null,
 
@@ -274,6 +278,28 @@ const authStore = create<IAuthStore>((set, get) => ({
             }
         } finally {
             set({ isChangingPassword: false })
+        }
+    },
+
+    async deleteUserAccount() {
+        set({ isDeletingUserAccount: true })
+
+        try {
+            const res = await deleteUserAccountApi()
+
+            if (res.data.success) {
+                get().forceLogout()
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to delete user account:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isDeletingUserAccount: false })
         }
     }
 

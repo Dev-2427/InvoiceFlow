@@ -7,10 +7,12 @@ interface DeleteContextMenuProps {
   onCancel: () => void,
   onDelete: () => Promise<void>,
   deletionAllowedText: string,
-  isDeletingOrganization: boolean
+  isDeleting: boolean,
+  inputPlaceholder: string,
+  deleteButtonText: string
 }
 
-export default function DeleteContextMenu({ deletionAllowedText, headerText, onCancel, onDelete, subText, isDeletingOrganization }: DeleteContextMenuProps) {
+export default function DeleteContextMenu({ deletionAllowedText, headerText, onCancel, onDelete, subText, isDeleting, deleteButtonText, inputPlaceholder }: DeleteContextMenuProps) {
 
   const [inputText, setInputText] = useState("")
 
@@ -42,7 +44,7 @@ export default function DeleteContextMenu({ deletionAllowedText, headerText, onC
             type="text"
             onChange={(e) => setInputText(e.target.value)}
             className="w-full rounded-lg border-[1.5px] border-border bg-card px-3 py-2.5 text-text-sm text-sm"
-            placeholder="Type organization name"
+            placeholder={inputPlaceholder}
           />
 
         </div>
@@ -52,7 +54,7 @@ export default function DeleteContextMenu({ deletionAllowedText, headerText, onC
 
           <button
             onClick={onCancel}
-            disabled={isDeletingOrganization}
+            disabled={isDeleting}
             type="button"
             className="bg-card text-navy-700 rounded-lg py-2.5 text-sm font-bold cursor-pointer border-[1.5px] border-border disabled:opacity-50 disabled:pointer-events-none w-1/2">
             Cancel
@@ -60,10 +62,10 @@ export default function DeleteContextMenu({ deletionAllowedText, headerText, onC
 
           <button
             onClick={onDelete}
-            disabled={isDeletingOrganization || deletionAllowedText !== inputText}
+            disabled={isDeleting || deletionAllowedText !== inputText}
             type="button"
             className="bg-overdue text-card hover:bg-overdue/90 rounded-lg py-2.5 text-sm font-bold cursor-pointer border-[1.5px] disabled:opacity-50 disabled:pointer-events-none w-1/2">
-            {isDeletingOrganization ? "Deleting..." : " Delete Organization"}
+            {isDeleting ? "Deleting..." : deleteButtonText}
           </button>
 
         </div>

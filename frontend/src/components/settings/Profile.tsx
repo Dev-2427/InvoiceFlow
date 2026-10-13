@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import type { User } from "../../types/auth.types"
 import toast from "react-hot-toast";
 import userStore from "../../store/userStore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateProfileSchema, type UpdateProfileSchemaInput } from "../../validation/user.validation";
+import authStore from "../../store/authStore";
+import DeleteContextMenu from "./organization/components/DeleteContextMenu";
 
 interface ProfileProps {
     user: User
@@ -18,6 +20,20 @@ export default function Profile({ user }: ProfileProps) {
     const updateProfile = userStore((state) => state.updateProfile)
     const isRemovingAvatar = userStore((state) => state.isRemovingAvatar)
     const removeAvatar = userStore((state) => state.removeAvatar)
+
+    const isDeletingUserAccount = authStore((state) => state.isDeletingUserAccount)
+    const deleteUserAccount = authStore((state) => state.deleteUserAccount)
+
+    const [openDeleteContextMenu, setOpenDeleteContextMenu] = useState(false)
+
+    const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm({
+        resolver: zodResolver(updateProfileSchema),
+        defaultValues: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            country: user.country
+        }
+    })
 
     async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
@@ -55,15 +71,6 @@ export default function Profile({ user }: ProfileProps) {
         toast.success(res.message)
     }
 
-    const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm({
-        resolver: zodResolver(updateProfileSchema),
-        defaultValues: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            country: user.country
-        }
-    })
-
     async function onSubmit(data: UpdateProfileSchemaInput) {
 
         const res = await updateProfile(data)
@@ -75,6 +82,18 @@ export default function Profile({ user }: ProfileProps) {
 
         toast.success(res.message)
         reset(data)
+    }
+
+    async function handleUserAccountDeletion() {
+        const res = await deleteUserAccount()
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+
+        toast.success(res.message)
+        setOpenDeleteContextMenu(false)
     }
 
     return (
@@ -259,11 +278,26 @@ export default function Profile({ user }: ProfileProps) {
                 <p className="text-[13px] text-text-sm">Deleting your account will permanently remove all data including organisations, invoices and clients. This cannot be undone.</p>
 
                 <button
+                    onClick={() => setOpenDeleteContextMenu(true)}
+                    disabled={isDeletingUserAccount}
                     type="button"
-                    className="bg-overdue-bg text-overdue hover:bg-overdue-bg/90 rounded-lg py-2.5 w-full text-sm font-semibold cursor-pointer border-[1.5px] ">
+                    className="bg-overdue-bg text-overdue hover:bg-overdue-bg/90 rounded-lg py-2.5 w-full text-sm font-semibold cursor-pointer border-[1.5px] disabled:opacity-50 disabled:pointer-events-none">
                     Delete My Account
                 </button>
             </div>
+
+            {openDeleteContextMenu &&
+                <DeleteContextMenu
+                    headerText="Danger Zone"
+                    subText="Deleting your account will permanently remove all data including organisations, invoices, clients and reports. This cannot be undone."
+                    onCancel={() => setOpenDeleteContextMenu(false)}
+                    deletionAllowedText="DELETE"
+                    onDelete={handleUserAccountDeletion}
+                    isDeleting={isDeletingUserAccount}
+                    inputPlaceholder="Type DELETE here"
+                    deleteButtonText="Delete My Account"
+                />
+            }
 
         </div>
     )
