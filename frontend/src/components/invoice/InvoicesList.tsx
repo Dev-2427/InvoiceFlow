@@ -33,6 +33,15 @@ export default function InvoicesList({ invoices, showTrashPageLink, changePage, 
                         No invoices found.
                     </p>
                 </div>
+                {
+                    showTrashPageLink &&
+                    <Link
+                        to={"/invoices/restore"}
+                        className="flex items-center justify-center gap-1 text-text-sm text-sm mt-5 mb-2">
+                        <HiTrash />
+                        <span>View Trash ({invoices?.deletedCount ?? 0})</span>
+                    </Link>
+                }
             </div>
         )
     }
