@@ -438,7 +438,18 @@ async function getDashboardData(req: Request, res: Response) {
             }
         })
 
-        const salesSummaryData = salesSummary[0]
+        const salesSummaryData = salesSummary[0] ?? {
+            thisMonthReceipts: 0,
+            thisMonthRevenue: 0,
+            thisQuarterReceipts: 0,
+            thisQuarterRevenue: 0,
+            thisWeekReceipts: 0,
+            thisWeekRevenue: 0,
+            thisYearReceipts: 0,
+            thisYearRevenue: 0,
+            todayReceipts: 0,
+            todayRevenue: 0
+        }
 
         return sendResponse(res, {
             status: 200, message: "Dashboard data fetched successfully", data: {
