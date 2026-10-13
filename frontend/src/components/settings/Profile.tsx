@@ -23,6 +23,8 @@ export default function Profile({ user }: ProfileProps) {
 
     const isDeletingUserAccount = authStore((state) => state.isDeletingUserAccount)
     const deleteUserAccount = authStore((state) => state.deleteUserAccount)
+    const isSigningout = authStore((state) => state.isSigningout)
+    const signout = authStore((state) => state.signout)
 
     const [openDeleteContextMenu, setOpenDeleteContextMenu] = useState(false)
 
@@ -94,6 +96,17 @@ export default function Profile({ user }: ProfileProps) {
 
         toast.success(res.message)
         setOpenDeleteContextMenu(false)
+    }
+
+    async function handleSignout() {
+        const res = await signout()
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+
+        toast.success(res.message)
     }
 
     return (
@@ -260,6 +273,38 @@ export default function Profile({ user }: ProfileProps) {
                         {isUpdatingProfile ? "Saving..." : "Save Changes"}
                     </button>
                 </form>
+
+            </div>
+
+
+            {/* signout */}
+            <div className="bg-card border-[1.5px] border-border rounded-[14px] px-5 py-3 space-y-4">
+
+                {/* header */}
+                <div>
+                    <span className="text-text text-[15px] font-bold">Account</span>
+                    <p className="text-[13px] text-text-sm">Sign out or manage your account</p>
+                </div>
+
+                <hr className="border border-border/70" />
+
+                <div className="flex justify-between items-center gap-2">
+
+                    <div className="flex flex-col">
+                        <span className="text-text text-sm font-semibold">Sign out of InvoiceFlow</span>
+                        <span className="text-[13px] text-text-sm">You'll be redirected to the login screen on this device.</span>
+                    </div>
+
+                    <button
+                        onClick={handleSignout}
+                        disabled={isSigningout}
+                        type="button"
+                        className="text-navy-700 text-sm border-[1.5px] font-semibold border-border rounded-lg py-2 px-3 cursor-pointer hover:bg-navy-50 disabled:opacity-50 disabled:pointer-events-none shrink-0"
+                    >
+                        {isSigningout ? "Signing out..." : "Sign Out"}
+                    </button>
+
+                </div>
 
             </div>
 
