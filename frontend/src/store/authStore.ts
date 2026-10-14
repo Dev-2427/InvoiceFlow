@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput, ChangePasswordInput } from "../validation/authValidation"
-import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, getActiveSessionsApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, getActiveSessionsApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signoutSessionApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { Session, User } from "../types/auth.types"
 
@@ -39,7 +39,10 @@ interface IAuthStore {
 
     isGettingActiveSessions: boolean,
     getActiveSessions: () => Promise<ApiResponse<{ sessions: Session[] }>>,
-    activeSessions: Session[] | null
+    activeSessions: Session[] | null,
+    isSigningoutSession: boolean,
+    signingOutSessionId: string | null,
+    signoutSession: (sessionId: string) => Promise<ApiResponse<null>>
 }
 
 const authStore = create<IAuthStore>((set, get) => ({
@@ -55,6 +58,8 @@ const authStore = create<IAuthStore>((set, get) => ({
     isChangingPassword: false,
     isDeletingUserAccount: false,
     isGettingActiveSessions: false,
+    isSigningoutSession: false,
+    signingOutSessionId: null,
 
     user: null,
     activeSessions: null,
@@ -327,6 +332,48 @@ const authStore = create<IAuthStore>((set, get) => ({
             }
         } finally {
             set({ isGettingActiveSessions: false })
+        }
+    },
+
+    async signoutSession(sessionId) {
+        set({ isSigningoutSession: true, signingOutSessionId: sessionId })
+        try {
+
+            const activeSessions = get().activeSessions
+
+            if (!activeSessions) {
+                return {
+                    success: false,
+                    message: "No session found"
+                }
+            }
+
+            const res = await signoutSessionApi(sessionId)
+
+            if (res.data.success) {
+                const currentSession = activeSessions.find((session) => session.currentSession === true)
+
+                if (currentSession?.sessionId === sessionId) {
+                    set({ user: null, isAuthenticated: false, activeSessions: null })
+                } else {
+                    set((state) => {
+                        if (!state.activeSessions) return state
+                        return {
+                            activeSessions: state.activeSessions.filter((session) => session.sessionId !== sessionId)
+                        }
+                    })
+                }
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to signout session:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isSigningoutSession: false, signingOutSessionId: null })
         }
     },
 

@@ -8,6 +8,9 @@ export default function Devices() {
     const getActiveSessions = authStore((state) => state.getActiveSessions)
     const isGettingActiveSessions = authStore((state) => state.isGettingActiveSessions)
     const activeSessions = authStore((state) => state.activeSessions)
+    const isSigningoutSession = authStore((state) => state.isSigningoutSession)
+    const signoutSession = authStore((state) => state.signoutSession)
+    const signingOutSessionId = authStore((state) => state.signingOutSessionId)
 
     async function fetchActiveSessions() {
         const res = await getActiveSessions()
@@ -18,9 +21,20 @@ export default function Devices() {
         }
     }
 
+    async function handleSignoutSession(sessionId: string) {
+        const res = await signoutSession(sessionId)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+
+        toast.success(res.message)
+    }
+
     return (
         <div className="px-5 pb-5 max-w-2xl">
-            <div className="flex flex-col bg-card border-[1.5px] border-border rounded-[14px] px-5 py-3 space-y-4">
+            <div className="bg-card border-[1.5px] border-border rounded-[14px] px-5 py-3 space-y-4">
 
                 {/* header */}
                 <div>
@@ -29,13 +43,6 @@ export default function Devices() {
                 </div>
 
                 <hr className="border border-border/70" />
-
-                <button
-                    className="flex self-end items-center gap-1 px-3 py-1.5 rounded-lg text-[13px] border-[1.5px] font-semibold  border-overdue-border bg-overdue-bg text-overdue cursor-pointer"
-                    type="button"
-                >
-                    <TbPower size={15} /> Sign Out From All The Devices
-                </button>
 
                 {!activeSessions ?
                     <div className="flex flex-col justify-center items-center gap-3">
@@ -58,7 +65,17 @@ export default function Devices() {
                         </button>
                     </div>
                     :
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
+
+                        {/* signout from all the devices */}
+                        <button
+                            disabled={isSigningoutSession}
+                            className="flex self-end items-center gap-1 px-3 py-1.5 rounded-lg text-[13px] border-[1.5px] font-semibold border-overdue-border bg-overdue-bg text-overdue cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                            type="button"
+                        >
+                            <TbPower size={15} /> Sign Out From All The Devices
+                        </button>
+
                         {activeSessions.map((session) => {
                             const isCurrentSession = session.currentSession
                             return (
@@ -87,23 +104,26 @@ export default function Devices() {
 
                                     {/* sign out button */}
                                     <button
-                                        className="px-3 py-1 rounded-lg text-[13px] border-[1.5px] font-semibold shrink-0 min-w-20 border-overdue-border bg-overdue-bg text-overdue cursor-pointer"
+                                        onClick={() => handleSignoutSession(session.sessionId)}
+                                        disabled={isSigningoutSession}
+                                        className="px-3 py-1 rounded-lg text-[13px] border-[1.5px] font-semibold shrink-0 min-w-20 border-overdue-border bg-overdue-bg text-overdue cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                                         type="button"
                                     >
-                                        Sign Out
+                                        {signingOutSessionId === session.sessionId ? "Signing Out..." : "Sign Out"}
                                     </button>
 
                                 </div>
                             )
                         })}
 
+                        {/* session count and refresh button */}
                         <div className="flex justify-between items-center text-[13px] text-text-sm">
 
                             <span>{activeSessions.length} sessions</span>
 
                             <button
                                 onClick={fetchActiveSessions}
-                                disabled={isGettingActiveSessions}
+                                disabled={isGettingActiveSessions || isSigningoutSession}
                                 type="button"
                                 className="flex items-center gap-1 text-navy-700 text-[13px] font-bold cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                             >
