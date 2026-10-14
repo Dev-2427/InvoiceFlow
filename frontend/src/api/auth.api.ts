@@ -50,3 +50,7 @@ export function changePasswordApi(data: ChangePasswordInput) {
 export function deleteUserAccountApi() {
     return api.delete("/api/auth/account")
 }
+
+export function getActiveSessionsApi() {
+    return api.get("/api/auth/sessions")
+}

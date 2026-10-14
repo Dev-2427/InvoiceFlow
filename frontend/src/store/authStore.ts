@@ -1,8 +1,8 @@
 import { create } from "zustand"
 import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput, ChangePasswordInput } from "../validation/authValidation"
-import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, getActiveSessionsApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
-import type { User } from "../types/auth.types"
+import type { Session, User } from "../types/auth.types"
 
 interface IAuthStore {
     isSigningUp: boolean,
@@ -35,7 +35,11 @@ interface IAuthStore {
     changePassword: (data: ChangePasswordInput) => Promise<ApiResponse<null>>,
 
     isDeletingUserAccount: boolean,
-    deleteUserAccount: () => Promise<ApiResponse<null>>
+    deleteUserAccount: () => Promise<ApiResponse<null>>,
+
+    isGettingActiveSessions: boolean,
+    getActiveSessions: () => Promise<ApiResponse<{ sessions: Session[] }>>,
+    activeSessions: Session[] | null
 }
 
 const authStore = create<IAuthStore>((set, get) => ({
@@ -50,8 +54,10 @@ const authStore = create<IAuthStore>((set, get) => ({
     isCheckingAuth: true,
     isChangingPassword: false,
     isDeletingUserAccount: false,
+    isGettingActiveSessions: false,
 
     user: null,
+    activeSessions: null,
 
     changeUserAvatar(avatar) {
         set((state) => {
@@ -301,7 +307,28 @@ const authStore = create<IAuthStore>((set, get) => ({
         } finally {
             set({ isDeletingUserAccount: false })
         }
-    }
+    },
+
+    async getActiveSessions() {
+        set({ isGettingActiveSessions: true })
+        try {
+            const res = await getActiveSessionsApi()
+
+            if (res.data.success) {
+                set({ activeSessions: res.data.data.sessions })
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to fetch active sessions:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isGettingActiveSessions: false })
+        }
+    },
 
 }))
 

@@ -8,3 +8,14 @@ export interface User {
     authProviders: { credentials: boolean, google: boolean },
     currentOrganization: string | null
 }
+
+export interface Session {
+    sessionId: string,
+    createdAt: string,
+    currentSession: boolean,
+    deviceName: string,
+    browser: string,
+    os: string,
+    lastUsedAt: string,
+    ipAddress: string
+}

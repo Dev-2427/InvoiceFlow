@@ -6,10 +6,11 @@ import { useLocation } from "react-router-dom";
 import Password from "../../components/settings/Password";
 import organizationStore from "../../store/organizationStore";
 import Organization from "../../components/settings/organization/Organization";
+import Devices from "../../components/settings/Devices";
 
-type IScreen = "profile" | "password" | "organizations"
+type IScreen = "profile" | "password" | "organizations" | "devices"
 
-const screens: IScreen[] = ["profile", "password", "organizations"]
+const screens: IScreen[] = ["profile", "password", "organizations", "devices"]
 
 export default function Settings() {
 
@@ -68,10 +69,15 @@ export default function Settings() {
                     <Password />
 
                     :
-                    currentScreen === "organizations" &&
-                    <Organization
-                        organization={organization!}
-                    />
+                    currentScreen === "organizations" ?
+                        <Organization
+                            organization={organization!}
+                        />
+
+                        :
+
+                        currentScreen === "devices" &&
+                        <Devices />
             }
 
         </main>
