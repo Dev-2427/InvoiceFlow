@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, ResetPasswordInput, ChangePasswordInput } from "../validation/authValidation"
-import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, getActiveSessionsApi, googleAuthApi, resetPasswordApi, signinApi, signoutApi, signoutSessionApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
+import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, getActiveSessionsApi, googleAuthApi, resetPasswordApi, signinApi, signoutAllSessionsApi, signoutApi, signoutSessionApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { Session, User } from "../types/auth.types"
 
@@ -43,7 +43,8 @@ interface IAuthStore {
     isSigningoutSession: boolean,
     signingOutSessionId: string | null,
     signoutSession: (sessionId: string) => Promise<ApiResponse<null>>,
-    removeAllSessionState: () => void
+    removeAllSessionState: () => void,
+    signoutAllSessions: () => Promise<ApiResponse<null>>
 }
 
 const authStore = create<IAuthStore>((set, get) => ({
@@ -381,6 +382,27 @@ const authStore = create<IAuthStore>((set, get) => ({
     removeAllSessionState() {
         set({ activeSessions: null })
     },
+
+    async signoutAllSessions() {
+        set({ isSigningoutSession: true, signingOutSessionId: null })
+        try {
+            const res = await signoutAllSessionsApi()
+
+            if (res.data.success) {
+                get().forceLogout()
+            }
+
+            return res.data
+        } catch (error: any) {
+            console.error("Failed to signout all sessions:", error)
+            return {
+                success: false,
+                message: "Something went wrong. please try again."
+            }
+        } finally {
+            set({ isSigningoutSession: false })
+        }
+    }
 }))
 
 export default authStore

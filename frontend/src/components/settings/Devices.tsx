@@ -11,6 +11,7 @@ export default function Devices() {
     const isSigningoutSession = authStore((state) => state.isSigningoutSession)
     const signoutSession = authStore((state) => state.signoutSession)
     const signingOutSessionId = authStore((state) => state.signingOutSessionId)
+    const signoutAllSessions = authStore((state) => state.signoutAllSessions)
 
     async function fetchActiveSessions() {
         const res = await getActiveSessions()
@@ -23,6 +24,17 @@ export default function Devices() {
 
     async function handleSignoutSession(sessionId: string) {
         const res = await signoutSession(sessionId)
+
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+
+        toast.success(res.message)
+    }
+
+    async function handleSignoutAllSessions() {
+        const res = await signoutAllSessions()
 
         if (!res.success) {
             toast.error(res.message)
@@ -69,6 +81,7 @@ export default function Devices() {
 
                         {/* signout from all the devices */}
                         <button
+                            onClick={handleSignoutAllSessions}
                             disabled={isSigningoutSession}
                             className="flex self-end items-center gap-1 px-3 py-1.5 rounded-lg text-[13px] border-[1.5px] font-semibold border-overdue-border bg-overdue-bg text-overdue cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                             type="button"

@@ -58,3 +58,7 @@ export function getActiveSessionsApi() {
 export function signoutSessionApi(sessionId: string) {
     return api.delete(`/api/auth/signout-session/${sessionId}`)
 }
+
+export function signoutAllSessionsApi() {
+    return api.post("/api/auth/signout-all")
+}
