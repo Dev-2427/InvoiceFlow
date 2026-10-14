@@ -7,6 +7,7 @@ import Password from "../../components/settings/Password";
 import organizationStore from "../../store/organizationStore";
 import Organization from "../../components/settings/organization/Organization";
 import Devices from "../../components/settings/Devices";
+import authStore from "../../store/authStore";
 
 type IScreen = "profile" | "password" | "organizations" | "devices"
 
@@ -19,13 +20,23 @@ export default function Settings() {
     const [currentScreen, setCurrentScreen] = useState<IScreen>("profile")
 
     const user = useAuthUser()
+    const removeAllSessionState = authStore((state) => state.removeAllSessionState)
+
     const organization = organizationStore((state) => state.organization)
+    const removeAllOrganizations = organizationStore((state) => state.removeAllOrganizations)
 
     useEffect(() => {
         if (location.state?.changeScreen === "organizations") {
             setCurrentScreen("organizations")
         }
     }, [location.state])
+
+    useEffect(() => {
+        return () => {
+            removeAllOrganizations()
+            removeAllSessionState()
+        }
+    }, [])
 
     const showPasswordScreen = user.authProviders.credentials
 

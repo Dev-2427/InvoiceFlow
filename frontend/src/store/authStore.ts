@@ -42,7 +42,8 @@ interface IAuthStore {
     activeSessions: Session[] | null,
     isSigningoutSession: boolean,
     signingOutSessionId: string | null,
-    signoutSession: (sessionId: string) => Promise<ApiResponse<null>>
+    signoutSession: (sessionId: string) => Promise<ApiResponse<null>>,
+    removeAllSessionState: () => void
 }
 
 const authStore = create<IAuthStore>((set, get) => ({
@@ -377,6 +378,9 @@ const authStore = create<IAuthStore>((set, get) => ({
         }
     },
 
+    removeAllSessionState() {
+        set({ activeSessions: null })
+    },
 }))
 
 export default authStore

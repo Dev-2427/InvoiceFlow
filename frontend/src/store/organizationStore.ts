@@ -28,7 +28,8 @@ interface IOrganizationStore {
 
     removeOrganization: () => void,
     isDeletingOrganization: boolean,
-    deleteOrganization: (organizationId: string) => Promise<ApiResponse<{ organization: organizationData }>>
+    deleteOrganization: (organizationId: string) => Promise<ApiResponse<{ organization: organizationData }>>,
+    removeAllOrganizations: () => void
 }
 
 const organizationStore = create<IOrganizationStore>((set) => ({
@@ -231,6 +232,10 @@ const organizationStore = create<IOrganizationStore>((set) => ({
 
     removeOrganization() {
         set({ organization: null })
+    },
+
+    removeAllOrganizations() {
+        set({ allOrganizations: null })
     },
 
     async deleteOrganization(organizationId) {
