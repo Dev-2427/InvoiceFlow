@@ -4,6 +4,7 @@ import type { ApiResponse } from "../types/api.types";
 import { getReportsApi } from "../api/reports.api";
 import type { GetReportsData, GetReportsParams } from "../types/reports.types";
 import { getTimeZone } from "../utils/getTimeZone";
+import { failureResponse } from "../utils/failureResponse";
 
 interface IReportsStore {
     isGettingReports: boolean,
@@ -46,14 +47,11 @@ const reportsStore = create<IReportsStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch reports:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingReports: false })
         }
-    },
+    }
 }))
 
 export default reportsStore

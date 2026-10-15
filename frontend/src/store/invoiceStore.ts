@@ -3,6 +3,7 @@ import type { ApiResponse } from "../types/api.types";
 import { changeInvoiceStatusApi, changeLogoVisibilityApi, createInvoiceApi, deleteInvoicesApi, deleteInvoicesPermanentlyApi, getInvoiceOverviewApi, getInvoicesApi, getSoftDeletedInvoicesApi, restoreDeletedInvoicesApi, sendInvoiceEmailApi, updateInvoiceApi } from "../api/invoice.api";
 import type { ChangeInvoiceStatusInput, CreateInvoiceInput, UpdateInvoiceInput } from "../validation/invoice.validation";
 import type { GetInvoiceOverviewData, getInvoiceParams, GetInvoicesResponseData, getSoftDeletedInvoicesResponseData, IInvoiceSort, InvoiceFilterType } from "../types/invoice.types";
+import { failureResponse } from "../utils/failureResponse";
 
 interface IInvoiceStore {
     creatingInvoice: boolean,
@@ -184,10 +185,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to create invoice:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ creatingInvoice: false })
         }
@@ -225,10 +223,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to get Invoices:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingInvoices: false })
         }
@@ -249,10 +244,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to delete invoice:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -279,10 +271,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to get soft deleted invoices:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingSoftDeletedInvoices: false })
         }
@@ -304,10 +293,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to restore invoice:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isPerformingActionForDeletionPage: false })
         }
@@ -329,10 +315,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to delete permanently invoice:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isPerformingActionForDeletionPage: false })
         }
@@ -351,10 +334,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to get invoice overview data:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingInvoiceOverviewData: false })
         }
@@ -385,10 +365,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to delete overview invoice:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -435,10 +412,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to change invoice status:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isChangingInvoiceStatus: false })
         }
@@ -474,10 +448,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             }))
 
             console.error("Failed to change show logo status:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         }
     },
 
@@ -500,10 +471,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to update invoice:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isUpdatingInvoice: false })
         }
@@ -533,11 +501,7 @@ const invoiceStore = create<IInvoiceStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to send invoice email:", error)
-
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }

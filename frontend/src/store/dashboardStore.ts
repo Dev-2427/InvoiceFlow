@@ -3,6 +3,7 @@ import type { ApiResponse } from "../types/api.types";
 import { getDashboardDataApi, getRevenueAndReceiptsApi } from "../api/dashboard.api";
 import type { DashboardResponseData, RevenueAndReceiptsChartFilter, RevenueAndReceiptsData } from "../types/dashboard.type";
 import { getTimeZone } from "../utils/getTimeZone";
+import { failureResponse } from "../utils/failureResponse";
 
 interface IDashboardStore {
     recentInvoiceLimit: number,
@@ -49,10 +50,7 @@ const dashboardStore = create<IDashboardStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch dashboard data:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingDashboardData: false })
         }
@@ -88,10 +86,7 @@ const dashboardStore = create<IDashboardStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch revenue and receipts data:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingRevenueAndReceiptsData: false })
         }

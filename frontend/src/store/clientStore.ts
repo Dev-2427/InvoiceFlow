@@ -3,6 +3,7 @@ import type { IClientFilter, GetClientsResponseData, IClientSort, getClientsPara
 import type { ApiResponse } from "../types/api.types";
 import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientInvoicesApi, getClientOverviewApi, getClientsApi, getRevenueApi, searchClientApi, updateClientApi } from "../api/client.api";
 import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
+import { failureResponse } from "../utils/failureResponse";
 
 interface IClientStore {
     clientSort: IClientSort,
@@ -173,10 +174,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update client status:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+         return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -199,10 +197,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to delete clients:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+           return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -243,10 +238,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error) {
             console.error("Failed to fetch clients data:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+          return failureResponse()
         } finally {
             set({ isGettingClients: false })
         }
@@ -262,10 +254,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to create client:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+           return failureResponse()
         } finally {
             set({ isCreatingClient: false })
         }
@@ -284,10 +273,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to get client overview:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+          return failureResponse()
         } finally {
             set({ isGettingClientOverview: false })
         }
@@ -322,10 +308,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update client status:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+          return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -354,10 +337,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to delete the client:", error);
-            return {
-                success: false,
-                message: "Something went wrong, please try again"
-            }
+         return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -382,10 +362,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update client:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+           return failureResponse()
         } finally {
             set({ isUpdatingClient: false })
         }
@@ -422,10 +399,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to search client:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+          return failureResponse()
         } finally {
             set({ isSearchingClient: false })
         }
@@ -461,10 +435,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch revenue:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+           return failureResponse()
         } finally {
             set({ isGettingRevenue: false })
         }
@@ -497,14 +468,11 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch client invoices:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+           return failureResponse()
         } finally {
             set({ isGettingClientInvoices: false })
         }
-    },
+    }
 
 }))
 

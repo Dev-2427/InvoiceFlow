@@ -3,6 +3,7 @@ import type { ApiResponse } from "../types/api.types";
 import { removeAvatarApi, updateAvatarApi, updateProfileApi } from "../api/user.api";
 import authStore from "./authStore";
 import type { UpdateProfileSchemaInput } from "../validation/user.validation";
+import { failureResponse } from "../utils/failureResponse";
 
 interface IUserStore {
     isUpdatingAvatar: boolean,
@@ -36,10 +37,7 @@ const userStore = create<IUserStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("failed to update avatar:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isUpdatingAvatar: false })
         }
@@ -62,10 +60,7 @@ const userStore = create<IUserStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("failed to update profile:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isUpdatingProfile: false })
         }
@@ -83,15 +78,12 @@ const userStore = create<IUserStore>((set) => ({
 
             return res.data
         } catch (error: any) {
-            console.error("failed to update profile:", error)
-            return {
-                success: false,
-                message: "Something went wrong, please try again."
-            }
+            console.error("failed to remove avatar:", error)
+            return failureResponse()
         } finally {
             set({ isRemovingAvatar: false })
         }
-    },
+    }
 
 }))
 

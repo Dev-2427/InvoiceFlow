@@ -23,9 +23,9 @@ const uiStore = create<UIStore>((set) => ({
     },
 
     toggleSidebarCollapsed() {
-set((state) => ({
-    isSidebarCollapsed: !state.isSidebarCollapsed
-}))
+        set((state) => ({
+            isSidebarCollapsed: !state.isSidebarCollapsed
+        }))
     }
 }))
 

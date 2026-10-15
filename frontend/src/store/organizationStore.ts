@@ -3,6 +3,7 @@ import type { CreateOrganizationInput, OrganizationAddressInput, UpdateOrganizat
 import type { ApiResponse } from "../types/api.types";
 import type { getAllOrganizationsResponseData, organizationData } from "../types/organization.types";
 import { createOrganizationApi, deleteOrganizationApi, getAllOrganizationsApi, getOrganizationDataApi, removeOrganizationLogoApi, switchOrganizationApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
+import { failureResponse } from "../utils/failureResponse";
 
 interface IOrganizationStore {
     isCreatingOrganization: boolean,
@@ -57,11 +58,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to create organization:", error);
-
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isCreatingOrganization: false })
         }
@@ -80,10 +77,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch organization data:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingOrganizationData: false })
         }
@@ -114,10 +108,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update organization logo:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isUpdatingLogo: false })
         }
@@ -144,10 +135,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to remove organization logo:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isUpdatingLogo: false })
         }
@@ -173,10 +161,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update organization data:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             if (isAddressUpdate) {
                 set({ isUpdatingOrganizationAddress: false })
@@ -200,10 +185,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to get all organization:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingAllOrganizations: false })
         }
@@ -221,10 +203,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to switch organization:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ switchingOrganizationId: null })
         }
@@ -257,10 +236,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to delete organization:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isDeletingOrganization: false })
         }

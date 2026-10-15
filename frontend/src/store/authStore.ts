@@ -3,6 +3,7 @@ import type { SignupInput, VerifyCodeInput, SigninInput, ForgotPasswordInput, Re
 import { changePasswordApi, checkAuthApi, deleteUserAccountApi, forgotPasswordApi, getActiveSessionsApi, googleAuthApi, resetPasswordApi, signinApi, signoutAllSessionsApi, signoutApi, signoutSessionApi, signupApi, verifyCodeApi, verifyResetCodeApi } from "../api/auth.api"
 import type { ApiResponse } from "../types/api.types"
 import type { Session, User } from "../types/auth.types"
+import { failureResponse } from "../utils/failureResponse"
 
 interface IAuthStore {
     isSigningUp: boolean,
@@ -96,11 +97,7 @@ const authStore = create<IAuthStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Error signing up:", error)
-
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isSigningUp: false })
         }
@@ -119,11 +116,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Error verifying code:", error)
-
-            return {
-                success: false,
-                message: "Something went wrong. Please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isVerifyingCode: false })
         }
@@ -142,10 +135,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Error signing in:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isSigningIn: false })
         }
@@ -160,10 +150,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to send email:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isSendingMail: false })
         }
@@ -178,11 +165,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Error verifying reset code:", error)
-
-            return {
-                success: false,
-                message: "Something went wrong. Please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isVerifyingResetCode: false })
         }
@@ -197,11 +180,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to reset password:", error)
-
-            return {
-                success: false,
-                message: "Something went wrong. Please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isResettingPassword: false })
         }
@@ -218,10 +197,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error) {
             console.error("Google authentication failed:", error);
-            return {
-                success: false,
-                message: "Google authentication failed"
-            }
+            return failureResponse()
         }
     },
 
@@ -236,11 +212,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch user data:", error)
-
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isCheckingAuth: false })
         }
@@ -259,10 +231,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error) {
             console.error("Failed to sign out:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isSigningout: false })
         }
@@ -285,10 +254,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error) {
             console.error("Failed to change password:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isChangingPassword: false })
         }
@@ -307,10 +273,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to delete user account:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isDeletingUserAccount: false })
         }
@@ -328,10 +291,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch active sessions:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isGettingActiveSessions: false })
         }
@@ -370,10 +330,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to signout session:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isSigningoutSession: false, signingOutSessionId: null })
         }
@@ -395,10 +352,7 @@ const authStore = create<IAuthStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to signout all sessions:", error)
-            return {
-                success: false,
-                message: "Something went wrong. please try again."
-            }
+            return failureResponse()
         } finally {
             set({ isSigningoutSession: false })
         }
