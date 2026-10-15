@@ -245,6 +245,13 @@ const organizationStore = create<IOrganizationStore>((set) => ({
 
             if (res.data.success) {
                 set({ organization: res.data.data.organization })
+                set((state) => {
+                    if (!state.allOrganizations) return state
+
+                    return {
+                        allOrganizations: state.allOrganizations.filter((organization) => organization._id !== organizationId)
+                    }
+                })
             }
 
             return res.data
