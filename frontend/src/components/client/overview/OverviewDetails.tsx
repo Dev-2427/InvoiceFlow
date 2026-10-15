@@ -1,5 +1,4 @@
 import { TbChevronDown } from "react-icons/tb"
-import useClientOverviewData from "../../../hooks/useClientOverviewData"
 import clientStore from "../../../store/clientStore"
 import organizationStore from "../../../store/organizationStore"
 import formatLocalDate from "../../../utils/dateUtils"
@@ -13,7 +12,7 @@ import RevenueChartSkeleton from "../../loading/client/RevenueChartSkeleton"
 
 export default function OverviewDetails() {
 
-    const clientOverviewData = useClientOverviewData()
+    const clientOverviewData = clientStore((state) => state.clientOverviewData)
     const revenueChartFilter = clientStore((state) => state.revenueChartFilter)
     const setRevenueChartFilter = clientStore((state) => state.setRevenueChartFilter)
     const revenueData = clientStore((state) => state.revenueData)
@@ -21,7 +20,6 @@ export default function OverviewDetails() {
     const getClientInvoices = clientStore((state) => state.getClientInvoices)
     const isGettingClientInvoices = clientStore((state) => state.isGettingClientInvoices)
     const isGettingRevenue = clientStore((state) => state.isGettingRevenue)
-
 
     const organization = organizationStore((state) => state.organization)
 
@@ -43,6 +41,10 @@ export default function OverviewDetails() {
         })
 
     }, [])
+
+    if (!clientOverviewData) {
+        return null
+    }
 
     const totalRevenue = revenueData?.reduce((total, next) => {
         return total + next.revenue
