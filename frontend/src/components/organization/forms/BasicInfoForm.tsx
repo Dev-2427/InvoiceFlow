@@ -81,7 +81,7 @@ export default function BasicInfo() {
                         <button
                             type="button"
                             onClick={() => setIsDropdownOpen(prev => !prev)}
-                            className="flex items-center gap-2 min-w-15 border border-text-sm rounded-lg py-2.5 px-3 h-10 text-text-sm text-sm cursor-pointer"
+                            className="flex items-center gap-2 min-w-15 border-[1.5px] border-border rounded-lg py-2.5 px-3 h-10 text-text-sm text-sm cursor-pointer"
                         >
                             {phoneCode}
                             <HiChevronDown className={`${isDropdownOpen ? "rotate-180" : ""} text-xl transition-transform duration-200`} />
@@ -127,7 +127,7 @@ export default function BasicInfo() {
 
                         <input
                             {...register("phone")}
-                            className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
+                            className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] w-full text-sm transition-all duration-200'
                             placeholder="Phone"
                             type="tel" id="phone" />
                     </div>

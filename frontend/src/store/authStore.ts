@@ -45,7 +45,9 @@ interface IAuthStore {
     signingOutSessionId: string | null,
     signoutSession: (sessionId: string) => Promise<ApiResponse<null>>,
     removeAllSessionState: () => void,
-    signoutAllSessions: () => Promise<ApiResponse<null>>
+    signoutAllSessions: () => Promise<ApiResponse<null>>,
+
+    changeUserOrganization: (organization: string | null) => void
 }
 
 const authStore = create<IAuthStore>((set, get) => ({
@@ -73,6 +75,15 @@ const authStore = create<IAuthStore>((set, get) => ({
 
             return {
                 user: { ...state.user, avatar }
+            }
+        })
+    },
+
+    changeUserOrganization(organization) {
+        set((state) => {
+            if (!state.user) return state
+            return {
+                user: { ...state.user, currentOrganization: organization }
             }
         })
     },

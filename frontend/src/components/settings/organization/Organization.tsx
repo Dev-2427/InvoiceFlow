@@ -7,12 +7,15 @@ import BusinessAddress from "./components/BusinessAddress"
 import SwitchOrganization from "./components/SwitchOrganization"
 import { useNavigate } from "react-router-dom"
 import DeleteOrganization from "./components/DeleteOrganization"
+import authStore from "../../../store/authStore"
 
 interface OrganizationProp {
     organization: organizationData
 }
 
 export default function Organization({ organization }: OrganizationProp) {
+
+    const changeUserOrganization = authStore((state) => state.changeUserOrganization)
 
     const updateOrganizationLogo = organizationStore((state) => state.updateOrganizationLogo)
     const isUpdatingLogo = organizationStore((state) => state.isUpdatingLogo)
@@ -28,6 +31,7 @@ export default function Organization({ organization }: OrganizationProp) {
     const removeOrganization = organizationStore((state) => state.removeOrganization)
     const isDeletingOrganization = organizationStore((state) => state.isDeletingOrganization)
     const deleteOrganization = organizationStore((state) => state.deleteOrganization)
+    const setOrganization = organizationStore((state) => state.setOrganization)
 
     const navigate = useNavigate()
 
@@ -116,6 +120,10 @@ export default function Organization({ organization }: OrganizationProp) {
         }
 
         toast.success(res.message)
+
+        changeUserOrganization(res.data.organization._id ?? null)
+        setOrganization(res.data.organization)
+
         return true
     }
 

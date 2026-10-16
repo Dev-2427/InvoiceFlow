@@ -101,7 +101,7 @@ export default function AddressForm() {
                                 setIsDropdownOpen(prev => !prev)
                             }}
                             type="button"
-                            className="flex items-center justify-between gap-2 border-text-sm border rounded-lg py-2.5 px-3 text-text-sm w-full text-sm cursor-pointer">
+                            className="flex items-center justify-between gap-2 border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm w-full text-sm cursor-pointer">
                             <span className="truncate">
                                 {countryValue || "Select country"}
                             </span>

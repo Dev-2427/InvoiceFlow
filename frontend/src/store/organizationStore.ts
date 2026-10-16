@@ -4,6 +4,7 @@ import type { ApiResponse } from "../types/api.types";
 import type { getAllOrganizationsResponseData, organizationData } from "../types/organization.types";
 import { createOrganizationApi, deleteOrganizationApi, getAllOrganizationsApi, getOrganizationDataApi, removeOrganizationLogoApi, switchOrganizationApi, updateOrganizationDataApi, updateOrganizationLogoApi } from "../api/organization.api";
 import { failureResponse } from "../utils/failureResponse";
+import authStore from "./authStore";
 
 interface IOrganizationStore {
     isCreatingOrganization: boolean,
@@ -30,7 +31,9 @@ interface IOrganizationStore {
     removeOrganization: () => void,
     isDeletingOrganization: boolean,
     deleteOrganization: (organizationId: string) => Promise<ApiResponse<{ organization: organizationData }>>,
-    removeAllOrganizations: () => void
+    removeAllOrganizations: () => void,
+
+    setOrganization: (organization: organizationData) => void
 }
 
 const organizationStore = create<IOrganizationStore>((set) => ({
@@ -53,6 +56,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
 
             if (res.data.success) {
                 set({ organization: res.data.data.organizationData })
+                authStore.getState().changeUserOrganization(res.data.data.organizationData._id)
             }
 
             return res.data
@@ -180,7 +184,6 @@ const organizationStore = create<IOrganizationStore>((set) => ({
             if (res.data.success) {
                 set({ allOrganizations: res.data.data.organizations })
             }
-            console.log(res.data.data.organizations);
 
             return res.data
         } catch (error: any) {
@@ -198,6 +201,7 @@ const organizationStore = create<IOrganizationStore>((set) => ({
 
             if (res.data.success) {
                 set({ organization: res.data.data.organizationData, allOrganizations: null })
+                authStore.getState().changeUserOrganization(res.data.data.organizationData._id)
             }
 
             return res.data
@@ -217,13 +221,16 @@ const organizationStore = create<IOrganizationStore>((set) => ({
         set({ allOrganizations: null })
     },
 
+    setOrganization(organization) {
+        set({ organization: organization })
+    },
+
     async deleteOrganization(organizationId) {
         set({ isDeletingOrganization: true })
         try {
             const res = await deleteOrganizationApi(organizationId)
 
             if (res.data.success) {
-                set({ organization: res.data.data.organization })
                 set((state) => {
                     if (!state.allOrganizations) return state
 
