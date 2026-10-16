@@ -61,7 +61,7 @@ export default function DashboardHeader({ organizationName }: PageHeaderProps) {
 
             </div>
 
-            <span className="text-[14px] text-text-sm">{organizationName} — {getCurrentMonthAndYear(today)}
+            <span className="text-[14px] text-text-sm capitalize">{organizationName} — {getCurrentMonthAndYear(today)}
             </span>
         </div>
     )

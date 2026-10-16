@@ -49,7 +49,7 @@ export default function Dashboard() {
                         Show Error Code
                     </div>
                     :
-                    <div className="space-y-5 mb-4">
+                    <div className="min-w-0 space-y-5 mb-4">
                         <DashboardHeader
                             organizationName={organization?.organizationName!}
                         />
