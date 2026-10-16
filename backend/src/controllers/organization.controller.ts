@@ -57,7 +57,7 @@ async function createOrganization(req: Request, res: Response) {
         await session.commitTransaction()
 
         const organizationData = {
-            id: organization._id.toString(),
+            _id: organization._id.toString(),
             organizationName: organization.organizationName,
             logo: organization.logo.url,
             email: organization.email,
