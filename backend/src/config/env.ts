@@ -13,7 +13,7 @@ export const env = {
 
     EMAIL_USER: process.env.EMAIL_USER,
 
-    EMAIL_PASS: process.env.EMAIL_Pass,
+    EMAIL_PASS: process.env.EMAIL_PASS,
 
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
 
