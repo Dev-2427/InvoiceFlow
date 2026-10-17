@@ -92,6 +92,7 @@ export default function CreateOrganization() {
         if (!isValid) return
 
         setStep((step) => step + 1)
+        window.scroll(0, 0)
     }
 
     async function onSubmit(data: CreateOrganizationInput) {
