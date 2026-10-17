@@ -121,7 +121,7 @@ export default function Organization({ organization }: OrganizationProp) {
 
         toast.success(res.message)
 
-        changeUserOrganization(res.data.organization._id ?? null)
+        changeUserOrganization(res.data.organization?._id ?? null)
         setOrganization(res.data.organization)
 
         return true

@@ -30,10 +30,10 @@ interface IOrganizationStore {
 
     removeOrganization: () => void,
     isDeletingOrganization: boolean,
-    deleteOrganization: (organizationId: string) => Promise<ApiResponse<{ organization: organizationData }>>,
+    deleteOrganization: (organizationId: string) => Promise<ApiResponse<{ organization: organizationData | null }>>,
     removeAllOrganizations: () => void,
 
-    setOrganization: (organization: organizationData) => void
+    setOrganization: (organization: organizationData | null) => void
 }
 
 const organizationStore = create<IOrganizationStore>((set) => ({
