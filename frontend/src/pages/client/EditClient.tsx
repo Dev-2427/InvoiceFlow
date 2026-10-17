@@ -19,7 +19,6 @@ export default function EditClient() {
     const { id } = useParams()
 
     const getClientOverview = clientStore((state) => state.getClientOverview)
-    const clearClientOverviewData = clientStore((state) => state.clearClientOverviewData)
     const clientOverviewData = clientStore((state) => state.clientOverviewData)
     const updateClient = clientStore((state) => state.updateClient)
     const isUpdatingClient = clientStore((state) => state.isUpdatingClient)
@@ -64,10 +63,6 @@ export default function EditClient() {
         }
 
         fetchClientOverview()
-
-        return (() => {
-            clearClientOverviewData()
-        })
     }, [id])
 
     useEffect(() => {
