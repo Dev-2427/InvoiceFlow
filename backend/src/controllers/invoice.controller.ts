@@ -137,13 +137,16 @@ async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
 
     try {
 
+        const today = new Date().setHours(0, 0, 0, 0)
+        const due = new Date(dueDate).setHours(0, 0, 0, 0)
+
         let finalStatus: "draft" | "unpaid" | "paid" | "overdue";
 
         if (status === "draft") {
             finalStatus = "draft"
         } else if (payment.mode && payment.receivedDate && payment.amount !== null) {
             finalStatus = "paid"
-        } else if (dueDate < new Date()) {
+        } else if (due <= today) {
             finalStatus = "overdue"
         } else {
             finalStatus = "unpaid"
@@ -166,7 +169,11 @@ async function updateInvoice(req: Request<InvoiceParams>, res: Response) {
             payment.amount = totalAmount
         }
 
-        const client = await Client.findById(clientId).lean()
+        const client = await Client.findOne({
+            _id: clientId,
+            organization: organizationId
+        }
+        ).lean()
 
         if (!client) {
             return sendResponse(res, { status: 404, message: "Client not found" })
