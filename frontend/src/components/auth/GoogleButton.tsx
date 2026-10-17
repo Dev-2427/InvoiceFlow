@@ -14,7 +14,6 @@ export default function GoogleButton({ text }: { text: string }) {
         flow: "auth-code",
 
         onSuccess: async ({ code }) => {
-            console.log("code", code)
             const res = await googleAuth(code)
             if (res.success) {
                 toast.success(res.message)
