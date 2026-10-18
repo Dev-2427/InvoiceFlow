@@ -55,10 +55,10 @@ interface IClientStore {
     setRevenueChartFilter: (filter: RevenueCHartFilter) => void,
     revenueData: RevenueData[] | null,
     isGettingRevenue: boolean,
-    getRevenue: () => Promise<ApiResponse<{ revenueData: RevenueData[] }>>
+    getRevenue: (clientId: string) => Promise<ApiResponse<{ revenueData: RevenueData[] }>>
 
     isGettingClientInvoices: boolean,
-    getClientInvoices: (page: number) => Promise<ApiResponse<{ data: GetClientInvoicesData }>>
+    getClientInvoices: (clientId: string, page: number) => Promise<ApiResponse<{ data: GetClientInvoicesData }>>
     clientInvoices: GetClientInvoicesData | null,
     clientInvoicesLimit: number
 }
@@ -174,7 +174,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update client status:", error);
-         return failureResponse()
+            return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -197,7 +197,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to delete clients:", error);
-           return failureResponse()
+            return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -238,7 +238,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error) {
             console.error("Failed to fetch clients data:", error);
-          return failureResponse()
+            return failureResponse()
         } finally {
             set({ isGettingClients: false })
         }
@@ -254,7 +254,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to create client:", error);
-           return failureResponse()
+            return failureResponse()
         } finally {
             set({ isCreatingClient: false })
         }
@@ -273,7 +273,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to get client overview:", error);
-          return failureResponse()
+            return failureResponse()
         } finally {
             set({ isGettingClientOverview: false })
         }
@@ -308,7 +308,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update client status:", error);
-          return failureResponse()
+            return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -337,7 +337,7 @@ const clientStore = create<IClientStore>((set, get) => ({
 
         } catch (error: any) {
             console.error("Failed to delete the client:", error);
-         return failureResponse()
+            return failureResponse()
         } finally {
             set({ isPerformingAction: false })
         }
@@ -362,7 +362,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to update client:", error)
-           return failureResponse()
+            return failureResponse()
         } finally {
             set({ isUpdatingClient: false })
         }
@@ -399,7 +399,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to search client:", error)
-          return failureResponse()
+            return failureResponse()
         } finally {
             set({ isSearchingClient: false })
         }
@@ -413,19 +413,11 @@ const clientStore = create<IClientStore>((set, get) => ({
         })
     },
 
-    async getRevenue() {
+    async getRevenue(clientId) {
         set({ isGettingRevenue: true })
         try {
-            const clientId = get().clientOverviewData?._id
             const filter = get().revenueChartFilter.filter
 
-            if (!clientId) {
-                return {
-                    success: false,
-                    message: "No client found"
-                }
-
-            }
             const res = await getRevenueApi(clientId, filter)
 
             if (res.data.success) {
@@ -435,24 +427,16 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch revenue:", error)
-           return failureResponse()
+            return failureResponse()
         } finally {
             set({ isGettingRevenue: false })
         }
     },
 
-    async getClientInvoices(page) {
+    async getClientInvoices(clientId, page) {
         set({ isGettingClientInvoices: true })
         try {
             const limit = get().clientInvoicesLimit
-            const clientId = get().clientOverviewData?._id
-
-            if (!clientId) {
-                return {
-                    success: false,
-                    message: "No client found"
-                }
-            }
 
             const query = {
                 page,
@@ -468,7 +452,7 @@ const clientStore = create<IClientStore>((set, get) => ({
             return res.data
         } catch (error: any) {
             console.error("Failed to fetch client invoices:", error)
-           return failureResponse()
+            return failureResponse()
         } finally {
             set({ isGettingClientInvoices: false })
         }

@@ -48,7 +48,7 @@ export default function ClientDetails() {
         async function fetchRevenueData() {
             if (!clientOverviewData) return
 
-            const res = await getRevenue()
+            const res = await getRevenue(clientOverviewData._id)
 
             if (!res.success) {
                 toast.error(res.message)
@@ -64,7 +64,7 @@ export default function ClientDetails() {
         async function fetchClientInvoices() {
             if (!clientOverviewData) return
 
-            const res = await getClientInvoices(1)
+            const res = await getClientInvoices(clientOverviewData._id, 1)
 
             if (!res.success) {
                 toast.error(res.message)

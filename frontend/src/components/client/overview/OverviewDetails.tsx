@@ -225,7 +225,7 @@ export default function OverviewDetails() {
                             data={clientInvoices}
                             currencySymbol={organization?.currency.symbol ?? ""}
                             changePage={(newPage) => {
-                                getClientInvoices(newPage)
+                                getClientInvoices(clientOverviewData._id, newPage)
                             }}
                         />
                     }
