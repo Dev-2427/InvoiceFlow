@@ -119,34 +119,47 @@ export default function OverviewDetails() {
       }
 
 
-      {/* line items */}
-      <div>
-        <div className="flex justify-between items-center border-b-2 border-border text-[12px] text-text-sm font-bold pb-2">
 
-          <span className="flex-1">DESCRIPTION</span>
+      {/* Line items */}
+      <div className="w-full min-w-0">
+        {/* Header */}
+        <div className="flex items-center border-b-2 border-border pb-2 text-[10px] sm:text-[12px] text-text-sm font-bold">
+          <span className="flex-1 min-w-0">DESCRIPTION</span>
 
-          <div className="flex">
-            <span className="w-28 text-end">QTY</span>
-            <span className="w-28 text-end">RATE</span>
-            <span className="w-28 text-end">AMOUNT</span>
+          <div className="grid grid-cols-3 w-[58%] sm:w-auto sm:flex">
+            <span className="text-end sm:w-28">QTY</span>
+            <span className="text-end sm:w-28">RATE</span>
+            <span className="text-end sm:w-28">AMOUNT</span>
           </div>
         </div>
 
+        {/* Items */}
         {invoiceOverviewData.lineItems.map((item) => (
           <div
             key={item._id}
-            className="flex justify-between items-center border-b border-border text-[13px] font-semibold py-2.5">
-            <span className="flex-1 text-text">{item.description}</span>
+            className="flex items-center border-b border-border py-2.5 text-[12px] sm:text-[13px] font-semibold"
+          >
+            <span className="flex-1 min-w-0 pr-2 text-text wrap-break-word">
+              {item.description}
+            </span>
 
-            <div className="flex">
-              <span className="w-28 text-end text-text-sm">{item.quantity}</span>
-              <span className="w-28 text-end text-text-sm">{currencySymbol}{formatCurrency(item.rate)}</span>
-              <span className="w-28 text-end text-text">{currencySymbol}{formatCurrency(item.amount)}</span>
+            <div className="grid grid-cols-3 w-[58%] sm:w-auto sm:flex">
+              <span className="text-end text-text-sm sm:w-28">
+                {item.quantity}
+              </span>
+
+              <span className="text-end text-text-sm sm:w-28 break-all">
+                {currencySymbol}{formatCurrency(item.rate)}
+              </span>
+
+              <span className="text-end text-text sm:w-28 break-all">
+                {currencySymbol}{formatCurrency(item.amount)}
+              </span>
             </div>
           </div>
         ))}
-
       </div>
+
 
       {/* calculations */}
       <div className="self-end min-w-44">
