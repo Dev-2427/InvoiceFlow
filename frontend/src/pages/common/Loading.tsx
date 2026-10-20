@@ -1,5 +1,3 @@
-import { HiOutlineDocumentText } from "react-icons/hi2";
-
 export default function Loading() {
     return (
         <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy-900 px-6">
@@ -19,8 +17,11 @@ export default function Loading() {
                     <span className="absolute inset-0 scale-150 animate-ping rounded-full border border-gold/10 [animation-delay:400ms]" />
 
                     {/* Logo Box */}
-                    <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gold shadow-[0_0_35px_rgba(228,180,41,0.35)]">
-                        <HiOutlineDocumentText className="text-4xl text-gold-dark" />
+                    <div className="relative flex h-20 w-20 items-center justify-center ">
+                        <img src="/InvoiceFlow.png"
+                            alt="InvoiceFlow"
+                            className="w-full h-full object-contain"
+                        />
                     </div>
                 </div>
 

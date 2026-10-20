@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom"
-import { HiSquares2X2, HiOutlineDocumentText, HiUsers, HiChartBar, HiCog6Tooth, HiBuildingOffice2 } from "react-icons/hi2"
+import { HiSquares2X2, HiOutlineDocumentText, HiUsers, HiChartBar, HiCog6Tooth } from "react-icons/hi2"
 import { RiArrowDownSFill } from "react-icons/ri";
 import { TbLayoutSidebar, TbPlus } from "react-icons/tb";
 import { HiXMark } from "react-icons/hi2";
@@ -88,9 +88,10 @@ export default function AppLayout() {
                 <div className="flex justify-between items-center">
 
                     <div className={`flex items-center gap-3 ${isSidebarCollapsed && "lg:hidden"}`}>
-                        <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-gold">
-                            <HiBuildingOffice2 className="text-xl text-gold-dark" />
-                        </div>
+                        <img src="/InvoiceFlow.png"
+                            alt="InvoiceFlow"
+                            className="h-9 w-9 object-contain"
+                        />
 
                         <div>
                             <p className="text-card text-lg font-bold">InvoiceFlow</p>

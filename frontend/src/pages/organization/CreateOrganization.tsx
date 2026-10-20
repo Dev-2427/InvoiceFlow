@@ -1,4 +1,3 @@
-import { HiOutlineDocumentText, HiBuildingOffice2 } from "react-icons/hi2";
 import { BsCaretDownFill } from "react-icons/bs";
 import Steps from "../../components/organization/Steps";
 import BasicInfo from "../../components/organization/forms/BasicInfoForm";
@@ -120,9 +119,10 @@ export default function CreateOrganization() {
                 <div className="flex justify-between">
 
                     <div className="flex items-center gap-2">
-                        <div className='bg-gold w-8 h-8 rounded-lg flex justify-center items-center'>
-                            < HiOutlineDocumentText className='text-lg text-gold-dark' />
-                        </div>
+                        <img src="/InvoiceFlow.png"
+                            alt="InvoiceFlow"
+                            className="w-8 h-8 object-contain"
+                        />
                         <span className="font-bold text-card text-[18px]">InvoiceFlow</span>
                     </div>
 
@@ -154,9 +154,11 @@ export default function CreateOrganization() {
 
                 {/* header  */}
                 <div className="flex items-center gap-3 md:p-8 p-5">
-                    <div className='bg-gold md:w-10 md:h-10 w-8 h-8 rounded-lg flex justify-center items-center'>
-                        < HiBuildingOffice2 className='text-[20px] text-gold-dark' />
-                    </div>
+
+                    <img src="/InvoiceFlow.png"
+                        alt="InvoiceFlow"
+                        className="md:w-10 md:h-10 w-8 h-8 object-contain"
+                    />
 
                     <div className="flex flex-col">
                         <span className="text-card font-bold md:text-xl text-lg">Create Organisation</span>
