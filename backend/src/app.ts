@@ -16,9 +16,22 @@ import "./services/cron/invoiceOverdueStatus.js"
 import dashboardRouter from "./routes/dashboard.route.js"
 import reportsRouter from "./routes/reports.route.js"
 import userRouter from "./routes/user.route.js"
+import { apiRateLimiter } from "./middleware/rateLimit.js"
 
 const app = express()
 
+app.set("trust proxy", 1)
+
+app.use("/api", (req, _res, next) => {
+    console.log({
+        ip: req.ip,
+        ips: req.ips,
+        socketAddress: req.socket.remoteAddress,
+        forwardedFor: req.headers["x-forwarded-for"]
+    })
+
+    next()
+})
 app.use(helmet())
 app.use(morgan("common"))
 app.use(express.json())
@@ -36,6 +49,8 @@ app.get("/health", (_, res) => {
         .status(connected ? 200 : 500)
         .json({ success: connected, message: connected ? "Connected" : "Failed" })
 })
+
+app.use("/api", apiRateLimiter)
 
 app.use("/api/auth", authRouter)
 app.use("/api/organization", authCheck, organizationRouter)
