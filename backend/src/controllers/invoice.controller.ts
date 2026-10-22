@@ -8,6 +8,7 @@ import { getInvoicesSchema, getSoftDeletedInvoicesSchema, type ChangeInvoiceStat
 import sendEmail from "../services/email/sendEmail.js";
 import invoiceEmailTemplate from "../services/email/templates/invoiceEmailTemplate.js";
 import formatLocalDate from "../utils/formateLocalDate.js";
+import { env } from "../config/env.js";
 
 type InvoiceParams = {
     invoiceId: string
@@ -639,6 +640,14 @@ async function sendInvoiceEmail(req: Request<InvoiceParams>, res: Response) {
         if (!invoice.client.email) {
             return sendResponse(res, {
                 status: 404, message: "Client does not have an email address. Please update the client before sending the invoice."
+            })
+        }
+
+        // Render's free tier blocks outbound SMTP, so email delivery fails in production.
+        if (env.NODE_ENV === "production") {
+            return sendResponse(res, {
+                status: 503,
+                message: "Invoice email delivery is temporarily unavailable. Download the PDF and send it manually."
             })
         }
 

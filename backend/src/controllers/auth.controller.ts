@@ -28,6 +28,11 @@ async function signup(req: Request, res: Response) {
             return sendResponse(res, { status: 409, message: "Email is already registered" })
         }
 
+        // Render's free tier blocks outbound SMTP, so email delivery fails in production.
+        if (env.NODE_ENV === "production") {
+            return sendResponse(res, { status: 503, message: "Email sign-up is temporarily unavailable. Please continue with Google." })
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10)
         const newVerificationCode = Math.floor(100000 + Math.random() * 900000).toString()
         const verificationCodeExpiry = new Date(Date.now() + 10 * 60 * 1000)
