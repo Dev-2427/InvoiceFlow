@@ -16,6 +16,7 @@ import "./services/cron/invoiceOverdueStatus.js"
 import dashboardRouter from "./routes/dashboard.route.js"
 import reportsRouter from "./routes/reports.route.js"
 import userRouter from "./routes/user.route.js"
+import "./services/cron/deleteUnverifiedUser.js"
 
 const app = express()
 
