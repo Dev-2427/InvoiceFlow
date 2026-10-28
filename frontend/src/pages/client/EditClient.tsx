@@ -624,7 +624,7 @@ export default function EditClient() {
                                     <input
                                         {...register("shippingAddress.pincode")}
                                         spellCheck={false}
-                                        className='border-text-sm border rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
+                                        className='border-border border-[1.5px] rounded-lg py-2.5 px-3 text-text-sm outline-none focus:ring-[1.5px] placeholder:text-text-sm text-[13px] text-sm transition-all duration-200'
                                         placeholder={"Pincode"} id="pincodeForShip" />
 
                                     <p className="min-h-5 text-xs text-overdue">

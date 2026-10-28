@@ -45,8 +45,9 @@ export default function Dashboard() {
                 )
                 :
                 !dashboardData ?
-                    <div>
-                        Show Error Code
+                    <div role="alert" className="p-6 text-center text-text-sm">
+                        <p className="font-medium text-text">We couldn’t load your dashboard.</p>
+                        <p className="mt-1">Please refresh the page and try again.</p>
                     </div>
                     :
                     <div className="min-w-0 space-y-5 mb-4">
