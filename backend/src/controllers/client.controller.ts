@@ -6,6 +6,8 @@ import mongoose, { Types } from "mongoose";
 import { completeClientSchema, getclientInvoicesSchema, getClientsSchema, getRevenueSchema, searchClientSchema } from "../validations/client.validation.js";
 import Invoice from "../models/Invoice.js";
 import type { QueryFilter } from "mongoose"
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { addMonths, addYears, startOfMonth, startOfYear } from "date-fns";
 
 type clientParams = {
     clientId: string
@@ -478,23 +480,28 @@ async function getRevenue(req: Request<clientParams>, res: Response) {
     }
 
     try {
+        const { revenueFilter, timeZone } = passedQuery.data
+
         const now = new Date()
+
+        const localNow = toZonedTime(now, timeZone)
 
         let startDate: Date;
         let endDate: Date;
 
-        const { revenueFilter } = passedQuery.data
-
         if (revenueFilter === "current_year") {
-            startDate = new Date(now.getFullYear(), 0, 1)
-            endDate = new Date(now.getFullYear() + 1, 0, 1)
+            startDate = startOfYear(localNow)
+            endDate = addYears(startDate, 1)
         } else if (revenueFilter === "previous_year") {
-            startDate = new Date(now.getFullYear() - 1, 0, 1)
-            endDate = new Date(now.getFullYear(), 0, 1)
+            endDate = startOfYear(localNow)
+            startDate = addYears(endDate, -1)
         } else {
-            startDate = new Date(now.getFullYear(), now.getMonth() - 11, 1)
-            endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+            startDate = addMonths(startOfMonth(localNow), -11)
+            endDate = addMonths(startOfMonth(localNow), 1)
         }
+
+        const startDateUtc = fromZonedTime(startDate, timeZone)
+        const endDateUtc = fromZonedTime(endDate, timeZone)
 
         const revenueData = await Invoice.aggregate([
             {
@@ -504,16 +511,16 @@ async function getRevenue(req: Request<clientParams>, res: Response) {
                     status: { $ne: "draft" },
                     isDeleted: false,
                     issueDate: {
-                        $gte: startDate,
-                        $lt: endDate
+                        $gte: startDateUtc,
+                        $lt: endDateUtc
                     }
                 }
             },
             {
                 $group: {
                     _id: {
-                        year: { $year: "$issueDate" },
-                        month: { $month: "$issueDate" }
+                        year: { $year: { date: "$issueDate", timezone: timeZone } },
+                        month: { $month: { date: "$issueDate", timezone: timeZone } }
                     },
                     revenue: {
                         $sum: "$totalAmount"

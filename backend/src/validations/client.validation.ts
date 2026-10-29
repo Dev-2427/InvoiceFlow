@@ -92,7 +92,8 @@ export const searchClientSchema = z.object({
 })
 
 export const getRevenueSchema = z.object({
-    revenueFilter: z.enum(["current_year", "previous_year", "past_12_months"])
+    revenueFilter: z.enum(["current_year", "previous_year", "past_12_months"]),
+    timeZone: z.string()
 })
 
 export const getclientInvoicesSchema = z.object({
