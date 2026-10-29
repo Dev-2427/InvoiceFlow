@@ -47,7 +47,7 @@ export default function DashboardHeader({ organizationName }: PageHeaderProps) {
                     <button
                         type="button"
                         onClick={() => setShowCreateOptions(prev => !prev)}
-                        className="flex items-center gap-1 bg-gold text-gold-dark px-4 py-2 text-[14px] rounded-lg font-bold cursor-pointer hover:bg-gold/90"
+                        className="flex items-center gap-1 bg-gold text-gold-dark px-4 py-2 text-[14px] rounded-lg font-bold cursor-pointer hover:bg-gold/90 transition-colors duration-150"
                     >
                         <TbPlus />
                         <span>Create</span>

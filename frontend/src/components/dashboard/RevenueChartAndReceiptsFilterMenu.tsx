@@ -29,7 +29,7 @@ export default function RevenueChartAndReceiptsFilterMenu({ onClick, revenueAndR
                     key={option.filter}
                     onClick={() => onClick(option)}
                     type="button"
-                    className={`text-sm px-3 py-1.5  w-full cursor-pointer capitalize ${revenueAndReceiptsChartFilter.filter === option.filter ? "bg-navy-700 text-card" : "hover:bg-page bg-card text-text"}`}
+                    className={`text-sm px-3 py-1.5  w-full cursor-pointer capitalize transition-colors duration-150 ${revenueAndReceiptsChartFilter.filter === option.filter ? "bg-navy-700 text-card" : "hover:bg-page bg-card text-text"}`}
                 >
                     {option.label}
                 </button>

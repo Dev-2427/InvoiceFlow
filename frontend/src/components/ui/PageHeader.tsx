@@ -18,7 +18,7 @@ export default function PageHeader({ title, buttonText, icon: Icon, subtitle, on
         <button
           type="button"
           onClick={onClick}
-          className="flex items-center gap-1 bg-gold text-gold-dark px-4 py-2 text-[14px] rounded-lg font-bold cursor-pointer hover:bg-gold/90"
+          className="flex items-center gap-1 bg-gold text-gold-dark px-4 py-2 text-[14px] rounded-lg font-bold cursor-pointer hover:bg-gold/90 transition-colors duration-150"
         >
           <Icon />
           {buttonText}

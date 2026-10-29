@@ -71,7 +71,7 @@ export default function RecentInvoices({ recentInvoices }: RecentInvoicesProps) 
                                     <tr
                                         onClick={() => navigate(`/invoices/${invoice._id}`)}
                                         key={invoice._id}
-                                        className="bg-card border-b border-border last:border-b-0 text-sm cursor-pointer hover:bg-page" >
+                                        className="bg-card border-b border-border last:border-b-0 text-sm cursor-pointer hover:bg-page transition-colors duration-150" >
                                         <td className="px-5 py-3 text-navy-700 font-bold">{invoice.invoiceNumber} </td>
                                         <td className="px-5 py-3">
                                             <p className="text-text font-semibold text-sm wrap-break-word">{invoice.client.displayName}</p>

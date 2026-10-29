@@ -8,11 +8,11 @@ export default function CreateOptionsMenu() {
         <div className="absolute top-full right-0 mt-1 bg-card w-38 rounded-lg overflow-hidden shadow-xl border border-border">
             <button
                 onClick={() => navigate("/invoices/new")}
-                className="text-text text-sm font-semibold px-5 py-2 cursor-pointer w-full hover:bg-navy-50">New Invoice</button>
+                className="text-text text-sm font-semibold px-5 py-2 cursor-pointer w-full hover:bg-navy-50 transition-colors duration-150">New Invoice</button>
             <hr className="border opacity-35 border-border" />
             <button
                 onClick={() => navigate("/clients/new")}
-                className="text-text text-sm font-semibold px-5 py-2 cursor-pointer w-full hover:bg-navy-50">New Client</button>
+                className="text-text text-sm font-semibold px-5 py-2 cursor-pointer w-full hover:bg-navy-50 transition-colors duration-150">New Client</button>
         </div>
     )
 }

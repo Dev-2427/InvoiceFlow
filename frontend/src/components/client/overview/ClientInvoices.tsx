@@ -52,7 +52,7 @@ export default function ClientInvoices({ data, currencySymbol, changePage }: Cli
                     <tr
                       key={invoice._id}
                       onClick={() => navigate(`/invoices/${invoice._id}`)}
-                      className="bg-card border-b border-border last:border-b-0 text-sm cursor-pointer hover:bg-page" >
+                      className="bg-card border-b border-border last:border-b-0 text-sm cursor-pointer hover:bg-page transition-colors duration-150" >
                       <td className="px-5 py-3 font-bold text-navy-700"> {invoice.invoiceNumber} </td>
                       <td className="px-5 py-3 text-text-sm"> {formatLocalDate(invoice.issueDate)} </td>
                       <td className="px-5 py-3 font-semibold text-text"> {currencySymbol}{formatCurrency(invoice.totalAmount)} </td>
