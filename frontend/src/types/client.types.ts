@@ -86,12 +86,16 @@ export interface searchClients {
     city: string | null,
     receivable: number
 }
+export type RevenueFilterType = "current_year" | "previous_year" | "past_12_months"
 
-export type GetRevenueParams = "current_year" | "previous_year" | "past_12_months"
+export interface GetRevenueParams {
+    revenueFilter: RevenueFilterType
+    timeZone: string
+}
 
 export type RevenueCHartFilter = {
     label: "current year" | "previous year" | "past 12 months",
-    filter: GetRevenueParams
+    filter: RevenueFilterType
 }
 
 export interface RevenueData {

@@ -31,7 +31,7 @@ export function searchClientApi(search: string) {
 }
 
 export function getRevenueApi(clientId: string, query: GetRevenueParams) {
-    return api.get(`/api/client/revenue/${clientId}`, { params: { revenueFilter: query } })
+    return api.get(`/api/client/revenue/${clientId}`, { params: query })
 }
 
 export function getClientInvoicesApi(clientId: string, query: GetClientInvoicesParams) {

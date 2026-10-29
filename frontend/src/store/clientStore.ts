@@ -4,6 +4,7 @@ import type { ApiResponse } from "../types/api.types";
 import { changeClientStatusApi, createClientApi, deleteClientsApi, getClientInvoicesApi, getClientOverviewApi, getClientsApi, getRevenueApi, searchClientApi, updateClientApi } from "../api/client.api";
 import type { BaseClientInput, CreateClientInput } from "../validation/clientValidation";
 import { failureResponse } from "../utils/failureResponse";
+import { getTimeZone } from "../utils/getTimeZone";
 
 interface IClientStore {
     clientSort: IClientSort,
@@ -418,7 +419,12 @@ const clientStore = create<IClientStore>((set, get) => ({
         try {
             const filter = get().revenueChartFilter.filter
 
-            const res = await getRevenueApi(clientId, filter)
+            const query = {
+                revenueFilter: filter,
+                timeZone: getTimeZone()
+            }
+
+            const res = await getRevenueApi(clientId, query)
 
             if (res.data.success) {
                 set({ revenueData: res.data.data.revenueData })
