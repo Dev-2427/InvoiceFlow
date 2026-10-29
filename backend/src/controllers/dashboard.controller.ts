@@ -186,8 +186,8 @@ async function getDashboardData(req: Request, res: Response) {
                 {
                     $group: {
                         _id: {
-                            year: { $year: "$issueDate" },
-                            month: { $month: "$issueDate" }
+                            year: { $year: { date: "$issueDate", timezone: timeZone } },
+                            month: { $month: { date: "$issueDate", timezone: timeZone } }
                         },
                         revenue: {
                             $sum: "$totalAmount"
@@ -213,8 +213,8 @@ async function getDashboardData(req: Request, res: Response) {
                 {
                     $group: {
                         _id: {
-                            year: { $year: "$payment.receivedDate" },
-                            month: { $month: "$payment.receivedDate" }
+                            year: { $year: { date: "$payment.receivedDate", timezone: timeZone } },
+                            month: { $month: { date: "$payment.receivedDate", timezone: timeZone } }
                         },
                         receipts: {
                             $sum: "$payment.amount"
@@ -518,8 +518,8 @@ async function getRevenueAndReceiptsData(req: Request, res: Response) {
                 {
                     $group: {
                         _id: {
-                            year: { $year: "$issueDate" },
-                            month: { $month: "$issueDate" }
+                            year: { $year: { date: "$issueDate", timezone: timeZone } },
+                            month: { $month: { date: "$issueDate", timezone: timeZone } }
                         },
                         revenue: {
                             $sum: "$totalAmount"
@@ -541,8 +541,8 @@ async function getRevenueAndReceiptsData(req: Request, res: Response) {
                 {
                     $group: {
                         _id: {
-                            year: { $year: "$payment.receivedDate" },
-                            month: { $month: "$payment.receivedDate" }
+                            year: { $year: { date: "$payment.receivedDate", timezone: timeZone } },
+                            month: { $month: { date: "$payment.receivedDate", timezone: timeZone } }
                         },
                         receipts: {
                             $sum: "$payment.amount"
