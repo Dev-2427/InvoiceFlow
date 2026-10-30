@@ -101,9 +101,12 @@ export default function CreateInvoice() {
 
         return (() => {
             clearTimeout(searchTimeout)
-            clearSearchedAndSelectedClient()
         })
     }, [clientSearchString])
+
+    useEffect(() => {
+        return () => clearSearchedAndSelectedClient()
+    }, [clearSearchedAndSelectedClient])
 
     useEffect(() => {
         if (isPaid) {
