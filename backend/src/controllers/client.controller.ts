@@ -82,7 +82,7 @@ async function getClientDetails(req: Request<clientParams>, res: Response) {
             return sendResponse(res, { status: 404, message: "Client not found" })
         }
 
-        const reveivableData = await Invoice.aggregate([
+        const receivableData = await Invoice.aggregate([
             {
                 $match: {
                     organization: new mongoose.Types.ObjectId(organizationId),
@@ -101,7 +101,7 @@ async function getClientDetails(req: Request<clientParams>, res: Response) {
             }
         ])
 
-        const receivable = reveivableData[0]?.receivable ?? 0
+        const receivable = receivableData[0]?.receivable ?? 0
         const clientData = { ...client, receivable: receivable }
 
         return sendResponse(res, { status: 200, message: "Client details fetched successfully", data: { clientData: clientData } })
