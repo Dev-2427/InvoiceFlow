@@ -109,7 +109,7 @@ const clientStore = create<IClientStore>((set, get) => ({
     },
 
     clearSearchedAndSelectedClient() {
-        set({ searchedClients: null, selectedClient: null })
+        set({ searchedClients: null, selectedClient: null, clientSearchString: "" })
     },
 
     changeSelectedClientsIds(id) {
