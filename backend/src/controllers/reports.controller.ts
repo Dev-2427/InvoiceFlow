@@ -196,6 +196,10 @@ async function getReports(req: Request, res: Response) {
             invoicesCountsByStatus[item._id as InvoiceStatus] = item.count
         }
 
+        if (status === "all") {
+            invoicesCountsByStatus.unpaid += invoicesCountsByStatus.overdue
+        }
+
         const finalReportData = {
             invoices: report.invoices ?? [],
             totalInvoices: report.count[0]?.totalInvoices ?? 0,
